@@ -1,13 +1,6 @@
 package com.example.familiasquesuman.ui.screens.inicio
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,14 +26,16 @@ fun GridMenuPrincipal(
     onOpcionClick: (OpcionMenuPrincipal) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(2),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = modifier.height(220.dp)
-    ) {
-        items(opciones) { opcion ->
-            TarjetaMenuPrincipal(opcion = opcion, onClick = { onOpcionClick(opcion) })
+    require(opciones.size == 4) { "GridMenuPrincipal espera exactamente 4 opciones" }
+
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            TarjetaMenuPrincipal(opciones[0], Modifier.weight(1f)) { onOpcionClick(opciones[0]) }
+            TarjetaMenuPrincipal(opciones[1], Modifier.weight(1f)) { onOpcionClick(opciones[1]) }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            TarjetaMenuPrincipal(opciones[2], Modifier.weight(1f)) { onOpcionClick(opciones[2]) }
+            TarjetaMenuPrincipal(opciones[3], Modifier.weight(1f)) { onOpcionClick(opciones[3]) }
         }
     }
 }
@@ -48,23 +43,19 @@ fun GridMenuPrincipal(
 @Composable
 private fun TarjetaMenuPrincipal(
     opcion: OpcionMenuPrincipal,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Card(
         onClick = onClick,
         colors = CardDefaults.cardColors(
-            containerColor = if (opcion.destacada) {
-                MaterialTheme.colorScheme.secondary
-            } else {
-                MaterialTheme.colorScheme.surface
-            }
+            containerColor = if (opcion.destacada) MaterialTheme.colorScheme.secondary
+            else MaterialTheme.colorScheme.surface
         ),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        modifier = modifier
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
+        Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.Start) {
             Icon(imageVector = opcion.icono, contentDescription = null)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = opcion.titulo, style = MaterialTheme.typography.titleSmall)
