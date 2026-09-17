@@ -35,7 +35,8 @@ class MainActivity : ComponentActivity() {
             FamiliasQueSumanTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Iniciooo",
+                        name = "Iniciooo"
+
                         modifier = Modifier.padding(innerPadding)
                     )
 
