@@ -27,6 +27,7 @@ fun BarraNavegacionInferior(
     pantallaActual: PantallaPrincipal,
     onPantallaSeleccionada: (PantallaPrincipal) -> Unit
 ) {
+
     NavigationBar {
         NavigationBarItem(
             selected = pantallaActual == PantallaPrincipal.INICIO,
@@ -38,7 +39,7 @@ fun BarraNavegacionInferior(
             selected = pantallaActual == PantallaPrincipal.ACTIVIDADES,
             onClick = { onPantallaSeleccionada(PantallaPrincipal.ACTIVIDADES) },
             icon = { Icon(Icons.Default.Groups, contentDescription = null) },
-            label = { Text("Actividades") }
+            label = { Text("Actividad") }
         )
         NavigationBarItem(
             selected = pantallaActual == PantallaPrincipal.PROYECTOS,

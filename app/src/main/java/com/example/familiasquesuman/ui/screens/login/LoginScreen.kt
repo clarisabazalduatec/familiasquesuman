@@ -17,18 +17,31 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(
+    navController: NavHostController,
+    loginViewModel: LoginViewModel = viewModel()
+){
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var mostrarPassword by remember { mutableStateOf(false) }
     var recordarme by remember { mutableStateOf(false) }
 
+    val uiState by loginViewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState) {
+        if (uiState is LoginUiState.Exito) {
+            navController.navigate(Rutas.Inicio.ruta) {
+                popUpTo(Rutas.Login.ruta) { inclusive = true }
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -105,18 +118,25 @@ fun LoginScreen(navController: NavHostController) {
         }
 
         Spacer(modifier = Modifier.height(8.dp))
+        if (uiState is LoginUiState.Error) {
+            Text(
+                text = (uiState as LoginUiState.Error).mensaje,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
 
         Button(
-            onClick = {
-                // TODO: aquí conectamos con AuthRepository/ViewModel cuando armemos la capa de red
-                navController.navigate(Rutas.Inicio.ruta) {
-                    popUpTo(Rutas.Login.ruta) { inclusive = true }
-                }
-            },
+            onClick = { loginViewModel.iniciarSesion(email, password) },
+            enabled = uiState !is LoginUiState.Cargando,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Iniciar sesión")
+            if (uiState is LoginUiState.Cargando) {
+                CircularProgressIndicator(modifier = Modifier.size(20.dp), color = MaterialTheme.colorScheme.onSecondary)
+            } else {
+                Text("Iniciar sesión")
+            }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -165,6 +185,7 @@ fun LoginScreen(navController: NavHostController) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+
     }
 }
 

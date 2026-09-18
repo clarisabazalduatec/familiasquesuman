@@ -104,7 +104,7 @@ private fun EstadisticaImpacto(valor: String, etiqueta: String) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InicioScreen(navController: NavHostController = rememberNavController()) {
+fun InicioScreen(navController: NavHostController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     ModalNavigationDrawer(

@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.familiasquesuman.ui.navigation.NavGraphFamilias
 
 
 class MainActivity : ComponentActivity() {
@@ -33,30 +34,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FamiliasQueSumanTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Iniciooo",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-
-                }
+                NavGraphFamilias()
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-
-@Composable
-fun GreetingPreview() {
-    FamiliasQueSumanTheme {
-        Greeting("Android")
-    }
-}

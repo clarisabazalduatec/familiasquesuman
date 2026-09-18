@@ -13,4 +13,6 @@ fun PantallaProximamente(nombrePantalla: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(text = "$nombrePantalla — próximamente", style = MaterialTheme.typography.titleMedium)
     }
+
+
 }
