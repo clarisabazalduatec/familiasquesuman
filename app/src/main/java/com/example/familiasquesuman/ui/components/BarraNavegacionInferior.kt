@@ -1,6 +1,7 @@
 package com.example.familiasquesuman.ui.components
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
@@ -18,6 +19,7 @@ enum class PantallaPrincipal(val etiqueta: String) {
     PROYECTOS("Proyectos"),
     DONAR("Donar"),
     DIRECTORIO("Directorio"),
+    CHATBOT("Asistente")
 }
 
 @Composable
@@ -25,6 +27,7 @@ fun BarraNavegacionInferior(
     pantallaActual: PantallaPrincipal,
     onPantallaSeleccionada: (PantallaPrincipal) -> Unit
 ) {
+
     NavigationBar {
         NavigationBarItem(
             selected = pantallaActual == PantallaPrincipal.INICIO,
@@ -36,7 +39,7 @@ fun BarraNavegacionInferior(
             selected = pantallaActual == PantallaPrincipal.ACTIVIDADES,
             onClick = { onPantallaSeleccionada(PantallaPrincipal.ACTIVIDADES) },
             icon = { Icon(Icons.Default.Groups, contentDescription = null) },
-            label = { Text("Actividades") }
+            label = { Text("Actividad") }
         )
         NavigationBarItem(
             selected = pantallaActual == PantallaPrincipal.PROYECTOS,
@@ -55,6 +58,12 @@ fun BarraNavegacionInferior(
             onClick = { onPantallaSeleccionada(PantallaPrincipal.DIRECTORIO) },
             icon = { Icon(Icons.Default.Place, contentDescription = null) },
             label = { Text("Directorio") }
+        )
+        NavigationBarItem(
+            selected = pantallaActual == PantallaPrincipal.CHATBOT,
+            onClick = { onPantallaSeleccionada(PantallaPrincipal.CHATBOT) },
+            icon = { Icon(Icons.Default.ChatBubble, contentDescription = null) },
+            label = { Text("Chatbot") }
         )
     }
 }
