@@ -9,10 +9,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
+
 fun PantallaProximamente(nombrePantalla: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(text = "$nombrePantalla — próximamente", style = MaterialTheme.typography.titleMedium)
     }
-
-
 }

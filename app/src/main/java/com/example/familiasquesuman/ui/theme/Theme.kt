@@ -23,10 +23,16 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = Color.White,
     secondary = Ambar,
     onSecondary = Color.White,
+    tertiary = AzulMarinoOscuro,
     background = CremaFondo,
-    surface = Color.White,
+    onBackground = AzulMarino,
+    surface = Blanco,
     onSurface = AzulMarino,
+    surfaceVariant = GrisClaroFondo,
     onSurfaceVariant = GrisTexto,
+    outline = GrisBorde,
+    error = ColorError,
+    onError = Color.White,
 )
 
 @Composable
