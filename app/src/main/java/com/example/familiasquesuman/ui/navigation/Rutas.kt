@@ -7,5 +7,13 @@ sealed class Rutas(val ruta: String) {
     object Proyectos : Rutas("proyectos")
     object Directorio : Rutas("directorio")
     object Chatbot : Rutas("chatbot")
-    object  Login : Rutas("login")
+    object Login : Rutas("login")
+    object Comunidad : Rutas("comunidad")
+    object NuevaPublicacion : Rutas("nueva_publicacion")
+
+    object ResultadoPublicacion : Rutas("resultado_publicacion/{fueExitoso}") {
+        fun crearRuta(fueExitoso: Boolean) = "resultado_publicacion/$fueExitoso"
+
+
+    }
 }

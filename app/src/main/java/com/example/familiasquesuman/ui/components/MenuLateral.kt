@@ -6,12 +6,15 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun MenuLateral(
+    onInicioClick: () -> Unit,
     onIniciarSesionClick: () -> Unit,
-    onCrearCuentaClick: () -> Unit
+    onCrearCuentaClick: () -> Unit,
+    onComunidadClick: () -> Unit
 ) {
     ModalDrawerSheet {
         Text(
@@ -19,6 +22,12 @@ fun MenuLateral(
             modifier = androidx.compose.ui.Modifier.padding(16.dp)
         )
         HorizontalDivider()
+        NavigationDrawerItem(
+            label = { Text("Inicio") },
+            selected = false,
+            onClick = onInicioClick,
+            modifier = androidx.compose.ui.Modifier.padding(horizontal = 12.dp)
+        )
         NavigationDrawerItem(
             label = { Text("Iniciar sesión") },
             selected = false,
@@ -30,6 +39,12 @@ fun MenuLateral(
             selected = false,
             onClick = onCrearCuentaClick,
             modifier = androidx.compose.ui.Modifier.padding(horizontal = 12.dp)
+        )
+        NavigationDrawerItem(
+            label = { Text("Comunidad") },
+            selected = false,
+            onClick = onComunidadClick,
+            modifier = Modifier.padding(horizontal = 12.dp)
         )
     }
 }

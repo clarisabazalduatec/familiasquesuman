@@ -111,6 +111,10 @@ fun InicioScreen(navController: NavHostController) {
         drawerState = drawerState,
         drawerContent = {
             MenuLateral(
+                onInicioClick = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Inicio.ruta)
+                },
                 onIniciarSesionClick = {
                     scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Login.ruta)
@@ -118,6 +122,10 @@ fun InicioScreen(navController: NavHostController) {
                 onCrearCuentaClick = {
                     scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Login.ruta) // por ahora manda al mismo login, luego separamos registro
+                },
+                onComunidadClick = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Comunidad.ruta)
                 }
             )
         }
