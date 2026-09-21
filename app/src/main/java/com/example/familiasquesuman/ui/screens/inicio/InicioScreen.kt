@@ -111,6 +111,10 @@ fun InicioScreen(navController: NavHostController) {
         drawerState = drawerState,
         drawerContent = {
             MenuLateral(
+                onInicioClick = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Inicio.ruta)
+                },
                 onIniciarSesionClick = {
                     scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Login.ruta)

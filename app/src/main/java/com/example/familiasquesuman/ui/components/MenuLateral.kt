@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun MenuLateral(
+    onInicioClick: () -> Unit,
     onIniciarSesionClick: () -> Unit,
     onCrearCuentaClick: () -> Unit,
     onComunidadClick: () -> Unit
@@ -21,6 +22,12 @@ fun MenuLateral(
             modifier = androidx.compose.ui.Modifier.padding(16.dp)
         )
         HorizontalDivider()
+        NavigationDrawerItem(
+            label = { Text("Inicio") },
+            selected = false,
+            onClick = onInicioClick,
+            modifier = androidx.compose.ui.Modifier.padding(horizontal = 12.dp)
+        )
         NavigationDrawerItem(
             label = { Text("Iniciar sesión") },
             selected = false,
