@@ -2,6 +2,9 @@ package com.example.familiasquesuman.ui.screens.comunidad
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.Autorenew
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material3.*
@@ -24,7 +27,7 @@ fun ResultadoPublicacionScreen(navController: NavHostController, fueExitoso: Boo
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = if (fueExitoso) Icons.Default.CheckCircle else Icons.Default.ErrorOutline,
+            imageVector = if (fueExitoso) Icons.Default.AccessTime else Icons.Default.ErrorOutline,
             contentDescription = null,
             modifier = Modifier.size(72.dp),
             tint = if (fueExitoso) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
@@ -54,11 +57,18 @@ fun ResultadoPublicacionScreen(navController: NavHostController, fueExitoso: Boo
         Spacer(modifier = Modifier.height(24.dp))
 
         if (fueExitoso) {
-            Button(
-                onClick = { navController.navigate(Rutas.Comunidad.ruta) { popUpTo(Rutas.Comunidad.ruta) { inclusive = true } } },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Volver a Comunidad")
+            Button(onClick = { navController.popBackStack() }, modifier = Modifier.fillMaxWidth()) {
+                    Icon(
+                        imageVector = if (fueExitoso) Icons.Default.CalendarToday else Icons.Default.Autorenew,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = "Ver mis publicaciones")
+                    }
+
+            TextButton(onClick = { navController.navigate(Rutas.Comunidad.ruta) { popUpTo(Rutas.Comunidad.ruta) { inclusive = true } } }) {
+                Text("Volver a la Comunidad")
             }
         } else {
             Button(onClick = { navController.popBackStack() }, modifier = Modifier.fillMaxWidth()) {
