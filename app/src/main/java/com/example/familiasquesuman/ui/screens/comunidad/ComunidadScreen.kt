@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,8 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.domain.Publicacion
+import com.example.familiasquesuman.ui.components.MenuLateral
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
+import kotlinx.coroutines.launch
 
 private val publicacionesDeEjemplo = listOf(
     Publicacion(
@@ -49,17 +52,42 @@ fun ComunidadScreen(navController: NavHostController) {
         else publicacionesDeEjemplo
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Regresar")
-                    }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            MenuLateral(
+                onInicioClick = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Inicio.ruta)
                 },
-                title = { Text("Familias que Suman+") }
+                onIniciarSesionClick = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Login.ruta)
+                },
+                onCrearCuentaClick = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Login.ruta) // por ahora manda al mismo login, luego separamos registro
+                },
+                onComunidadClick = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Comunidad.ruta)
+                }
             )
-        },
+        }
+    ) {
+
+    Scaffold(
+        topBar = { TopAppBar(
+            navigationIcon = {
+                IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                    Icon(Icons.Default.Menu, contentDescription = "Menú")
+                }
+            },
+            title = { Text("Familias que Suman+") },
+            actions = { /* igual que antes */ }
+        )},
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate(Rutas.NuevaPublicacion.ruta) }) {
                 Icon(Icons.Default.Add, contentDescription = "Nueva publicación")
@@ -100,6 +128,7 @@ fun ComunidadScreen(navController: NavHostController) {
         }
     }
 }
+    }
 
 @Preview(showBackground = true)
 @Composable
