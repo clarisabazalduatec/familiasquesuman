@@ -1,0 +1,113 @@
+package com.example.familiasquesuman.ui.screens.chatbot
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.familiasquesuman.ui.components.BarraNavegacionInferior
+import com.example.familiasquesuman.ui.components.MenuLateral
+import com.example.familiasquesuman.ui.components.PantallaPrincipal
+import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
+import kotlinx.coroutines.launch
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChatbotScreen(navController: NavHostController) {
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+
+    // Estado temporal en memoria — se reemplaza por el ViewModel cuando conectemos el backend real
+    var mensajes by remember {
+        mutableStateOf(
+            listOf(
+                MensajeUi("¡Hola! Soy tu asistente. Estoy aquí para ayudarte a encontrar proyectos, organizar tu voluntariado o resolver dudas.", esDelUsuario = false)
+            )
+        )
+    }
+    var textoActual by remember { mutableStateOf("") }
+
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            MenuLateral(
+                onInicioClick = { scope.launch { drawerState.close() }; navController.navigate(Rutas.Inicio.ruta) },
+                onIniciarSesionClick = { scope.launch { drawerState.close() }; navController.navigate(Rutas.Login.ruta) },
+                onCrearCuentaClick = { scope.launch { drawerState.close() }; navController.navigate(Rutas.Login.ruta) },
+                onComunidadClick = { scope.launch { drawerState.close() }; navController.navigate(Rutas.Comunidad.ruta) }
+            )
+        }
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    navigationIcon = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(Icons.Default.Menu, contentDescription = "Menú")
+                        }
+                    },
+                    title = { Text("Asistente Comunitario") }
+                )
+            },
+            bottomBar = {
+                BarraNavegacionInferior(
+                    pantallaActual = PantallaPrincipal.CHATBOT,
+                    onPantallaSeleccionada = { pantalla ->
+                        val ruta = when (pantalla) {
+                            PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
+                            PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
+                            PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
+                            PantallaPrincipal.DONAR -> Rutas.Donar.ruta
+                            PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
+                            PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
+                        }
+                        navController.navigate(ruta) { launchSingleTop = true }
+                    }
+                )
+            }
+        ) { paddingInterno ->
+            Column(modifier = Modifier.padding(paddingInterno).fillMaxSize()) {
+
+                LazyColumn(
+                    reverseLayout = true,
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.weight(1f).fillMaxWidth()
+                ) {
+                    items(mensajes.reversed()) { mensaje ->
+                        BurbujaMensaje(mensaje = mensaje)
+                    }
+                }
+
+                HorizontalDivider()
+
+                BarraEscribirMensaje(
+                    texto = textoActual,
+                    onTextoChange = { textoActual = it },
+                    habilitado = true,
+                    onEnviarClick = {
+                        mensajes = mensajes + MensajeUi(textoActual, esDelUsuario = true)
+                        textoActual = ""
+                        // TODO: aquí llamamos al ChatViewModel real, ver la guía de conexión abajo
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ChatbotScreenPreview() {
+    FamiliasQueSumanTheme {
+        ChatbotScreen(navController = rememberNavController())
+    }
+}
