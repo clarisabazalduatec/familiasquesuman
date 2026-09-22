@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.ui.components.BarraNavegacionInferior
@@ -21,18 +22,15 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatbotScreen(navController: NavHostController) {
+fun ChatbotScreen(
+    navController: NavHostController,
+    chatViewModel: ChatViewModel = viewModel()
+) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    // Estado temporal en memoria — se reemplaza por el ViewModel cuando conectemos el backend real
-    var mensajes by remember {
-        mutableStateOf(
-            listOf(
-                MensajeUi("¡Hola! Soy tu asistente. Estoy aquí para ayudarte a encontrar proyectos, organizar tu voluntariado o resolver dudas.", esDelUsuario = false)
-            )
-        )
-    }
+    val mensajes by chatViewModel.mensajes.collectAsState()
+    val estaEnviando by chatViewModel.estaEnviando.collectAsState()
     var textoActual by remember { mutableStateOf("") }
 
     ModalNavigationDrawer(
@@ -83,7 +81,7 @@ fun ChatbotScreen(navController: NavHostController) {
                     modifier = Modifier.weight(1f).fillMaxWidth()
                 ) {
                     items(mensajes.reversed()) { mensaje ->
-                        BurbujaMensaje(mensaje = mensaje)
+                        BurbujaMensaje(mensaje = mensaje) // ahora recibe MensajeChat en vez de MensajeUi
                     }
                 }
 
@@ -92,11 +90,10 @@ fun ChatbotScreen(navController: NavHostController) {
                 BarraEscribirMensaje(
                     texto = textoActual,
                     onTextoChange = { textoActual = it },
-                    habilitado = true,
+                    habilitado = !estaEnviando,
                     onEnviarClick = {
-                        mensajes = mensajes + MensajeUi(textoActual, esDelUsuario = true)
+                        chatViewModel.enviarMensaje(textoActual)
                         textoActual = ""
-                        // TODO: aquí llamamos al ChatViewModel real, ver la guía de conexión abajo
                     }
                 )
             }
