@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.familiasquesuman.ui.screens.chatbot.ChatbotScreen
 import com.example.familiasquesuman.ui.screens.comun.PantallaProximamente
 import com.example.familiasquesuman.ui.screens.comunidad.ComunidadScreen
 import com.example.familiasquesuman.ui.screens.comunidad.NuevaPublicacionScreen
@@ -33,7 +34,7 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController())
             PantallaProximamente("Directorio")
         }
         composable(Rutas.Chatbot.ruta) {
-            PantallaProximamente("Chatbot")
+            ChatbotScreen(navController)
         }
         composable (Rutas.Login.ruta){
             LoginScreen(navController = navController)

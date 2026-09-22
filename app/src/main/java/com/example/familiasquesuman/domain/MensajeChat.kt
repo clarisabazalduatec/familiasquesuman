@@ -1,4 +1,6 @@
 package com.example.familiasquesuman.domain
 
-class MensajeChat {
-}
+data class MensajeChat (
+    val contenido: String,
+    val esDelUsuario: Boolean
+)
