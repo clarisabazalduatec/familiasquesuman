@@ -14,6 +14,7 @@ import com.example.familiasquesuman.ui.screens.comunidad.NuevaPublicacionScreen
 import com.example.familiasquesuman.ui.screens.comunidad.ResultadoPublicacionScreen
 import com.example.familiasquesuman.ui.screens.inicio.InicioScreen
 import com.example.familiasquesuman.ui.screens.login.LoginScreen
+import com.example.familiasquesuman.ui.screens.actividad.ActividadScreen
 
 @Composable
 fun NavGraphFamilias(navController: NavHostController = rememberNavController()) {
@@ -22,16 +23,16 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController())
             InicioScreen(navController = navController)
         }
         composable(Rutas.Actividades.ruta) {
-            PantallaProximamente("Actividades")
+            ActividadScreen(navController = navController)
         }
         composable(Rutas.Donar.ruta) {
-            PantallaProximamente("Donar")
+            PantallaProximamente(navController = navController)
         }
         composable(Rutas.Proyectos.ruta) {
-            PantallaProximamente("Proyectos")
+            PantallaProximamente(navController = navController)
         }
         composable(Rutas.Directorio.ruta) {
-            PantallaProximamente("Directorio")
+            PantallaProximamente(navController = navController)
         }
         composable(Rutas.Chatbot.ruta) {
             ChatbotScreen(navController)

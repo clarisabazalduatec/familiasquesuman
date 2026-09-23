@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,6 +18,7 @@ import com.example.familiasquesuman.ui.components.BarraNavegacionInferior
 import com.example.familiasquesuman.ui.components.MenuLateral
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.theme.AzulMarinoOscuro
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 import kotlinx.coroutines.launch
 
@@ -48,27 +50,11 @@ fun ChatbotScreen(
             topBar = {
                 TopAppBar(
                     navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menú")
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar", tint = AzulMarinoOscuro)
                         }
                     },
                     title = { Text("Asistente Comunitario") }
-                )
-            },
-            bottomBar = {
-                BarraNavegacionInferior(
-                    pantallaActual = PantallaPrincipal.CHATBOT,
-                    onPantallaSeleccionada = { pantalla ->
-                        val ruta = when (pantalla) {
-                            PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
-                            PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
-                            PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
-                            PantallaPrincipal.DONAR -> Rutas.Donar.ruta
-                            PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
-                            PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
-                        }
-                        navController.navigate(ruta) { launchSingleTop = true }
-                    }
                 )
             }
         ) { paddingInterno ->

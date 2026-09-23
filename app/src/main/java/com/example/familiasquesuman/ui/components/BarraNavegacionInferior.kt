@@ -18,8 +18,7 @@ enum class PantallaPrincipal(val etiqueta: String) {
     ACTIVIDADES("Actividades"),
     PROYECTOS("Proyectos"),
     DONAR("Donar"),
-    DIRECTORIO("Directorio"),
-    CHATBOT("Asistente")
+    DIRECTORIO("Directorio")
 }
 
 @Composable
@@ -29,12 +28,6 @@ fun BarraNavegacionInferior(
 ) {
 
     NavigationBar {
-        NavigationBarItem(
-            selected = pantallaActual == PantallaPrincipal.INICIO,
-            onClick = { onPantallaSeleccionada(PantallaPrincipal.INICIO) },
-            icon = { Icon(Icons.Default.Home, contentDescription = null) },
-            label = { Text("Inicio") }
-        )
         NavigationBarItem(
             selected = pantallaActual == PantallaPrincipal.ACTIVIDADES,
             onClick = { onPantallaSeleccionada(PantallaPrincipal.ACTIVIDADES) },
@@ -48,6 +41,12 @@ fun BarraNavegacionInferior(
             label = { Text("Proyectos") }
         )
         NavigationBarItem(
+            selected = pantallaActual == PantallaPrincipal.INICIO,
+            onClick = { onPantallaSeleccionada(PantallaPrincipal.INICIO) },
+            icon = { Icon(Icons.Default.Home, contentDescription = null) },
+            label = { Text("Inicio") }
+        )
+        NavigationBarItem(
             selected = pantallaActual == PantallaPrincipal.DONAR,
             onClick = { onPantallaSeleccionada(PantallaPrincipal.DONAR) },
             icon = { Icon(Icons.Default.Favorite, contentDescription = null) },
@@ -58,12 +57,6 @@ fun BarraNavegacionInferior(
             onClick = { onPantallaSeleccionada(PantallaPrincipal.DIRECTORIO) },
             icon = { Icon(Icons.Default.Place, contentDescription = null) },
             label = { Text("Directorio") }
-        )
-        NavigationBarItem(
-            selected = pantallaActual == PantallaPrincipal.CHATBOT,
-            onClick = { onPantallaSeleccionada(PantallaPrincipal.CHATBOT) },
-            icon = { Icon(Icons.Default.ChatBubble, contentDescription = null) },
-            label = { Text("Chatbot") }
         )
     }
 }
