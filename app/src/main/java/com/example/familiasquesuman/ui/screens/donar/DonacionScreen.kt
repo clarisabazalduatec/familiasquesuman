@@ -152,7 +152,7 @@ fun DonacionScreen(
                                     onClick = { viewModel.seleccionarCategoria(filtro) },
                                     label = { Text(filtro) },
                                     colors = FilterChipDefaults.filterChipColors(
-                                        selectedContainerColor = MaterialTheme.colorScheme.primary, // Azul marino si está seleccionado
+                                        selectedContainerColor = MaterialTheme.colorScheme.primary, // Azul marino sí está seleccionado
                                         selectedLabelColor = Color.White
                                     )
                                 )
@@ -162,7 +162,12 @@ fun DonacionScreen(
                 }
 
                 items(donacionesAMostrar) { donacion ->
-                    TarjetaDonacion(donacion = donacion)
+                    TarjetaDonacion(
+                        donacion = donacion,
+                        onDonarClick = {
+                            navController.navigate("detalle_donacion/${donacion.id}")
+                        }
+                    )
                 }
             }
         }
@@ -208,7 +213,7 @@ fun SelectorDeTabs(tabSeleccionada: Int, onTabSelected: (Int) -> Unit) {
 }
 
 @Composable
-fun TarjetaDonacion(donacion: Donacion) {
+fun TarjetaDonacion(donacion: Donacion, onDonarClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -290,7 +295,7 @@ fun TarjetaDonacion(donacion: Donacion) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { /* TODO: Pantalla de detalles */ },
+                onClick = onDonarClick,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,

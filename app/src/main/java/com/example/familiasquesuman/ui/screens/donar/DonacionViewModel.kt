@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.familiasquesuman.data.repository.DonacionRepository
 import com.example.familiasquesuman.data.repository.DonacionRepositoryFake
 import com.example.familiasquesuman.domain.Donacion
-import com.example.familiasquesuman.domain.TipoDonacion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,10 +37,9 @@ class DonacionViewModel(
         _tabSeleccionada.value = index
     }
 
-    // Manda a la pantalla solo lo que corresponde a la pestaña actual
-    fun obtenerDonacionesFiltradas(): List<Donacion> {
-        val tipoActual = if (_tabSeleccionada.value == 0) TipoDonacion.CAMPANA else TipoDonacion.ARTICULO
-        return _donaciones.value.filter { it.tipo == tipoActual }
+    // Busca una donación específica por su ID
+    fun obtenerDonacionPorId(id: String): Donacion? {
+        return _donaciones.value.find { it.id == id }
     }
 
     private val _categoriaSeleccionada = MutableStateFlow<String?>("Todos")
