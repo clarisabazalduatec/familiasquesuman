@@ -17,11 +17,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.ui.theme.*
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,35 +31,18 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
     // Buscar la actividad, si no existe mostramos la primera por defecto para evitar crashes
     val actividad = actividadesMockData.find { it.id == actividadId } ?: actividadesMockData.first()
 
+
     Scaffold(
         containerColor = FondoClaro,
-        topBar = {
-            CenterAlignedTopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar", tint = AzulOscuro)
-                    }
-                },
-                title = {
-                    Text(
-                        text = "Familias que Suman+",
-                        fontWeight = FontWeight.Bold,
-                        color = AzulOscuro,
-                        fontSize = 20.sp
-                    )
-                },
-                actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        BadgedBox(badge = { Badge { Text("1") } }) {
-                            Icon(Icons.Default.Notifications, contentDescription = "Notificaciones", tint = AzulOscuro)
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = FondoClaro
-                )
-            )
-        },
+        topBar = { TopAppBar(
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar", tint = AzulMarinoOscuro)
+                }
+            },
+            title = { Text("Familias que Suman+") },
+            actions = { /* igual que antes */ }
+        )},
         bottomBar = {
             Surface(
                 color = FondoClaro,

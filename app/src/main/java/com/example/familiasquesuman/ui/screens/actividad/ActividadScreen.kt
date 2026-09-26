@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +31,7 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AzulMarinoOscuro
+import com.example.familiasquesuman.ui.theme.AzulOscuro
 import com.example.familiasquesuman.ui.theme.GrisClaroFondo
 import com.example.familiasquesuman.ui.theme.GrisTexto
 import kotlinx.coroutines.launch
