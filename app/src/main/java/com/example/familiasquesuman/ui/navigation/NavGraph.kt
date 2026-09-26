@@ -47,6 +47,16 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController())
             NuevaPublicacionScreen(navController = navController)
         }
         composable(
+            route = Rutas.ActividadDetalle.ruta,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 1
+            com.example.familiasquesuman.ui.screens.actividad.ActividadDetalleScreen(
+                navController = navController, 
+                actividadId = id
+            )
+        }
+        composable(
             route = Rutas.ResultadoPublicacion.ruta,
             arguments = listOf(navArgument("fueExitoso") { type = NavType.BoolType })
         ) { backStackEntry ->

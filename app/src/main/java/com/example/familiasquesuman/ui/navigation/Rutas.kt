@@ -10,6 +10,10 @@ sealed class Rutas(val ruta: String) {
     object Login : Rutas("login")
     object Comunidad : Rutas("comunidad")
     object NuevaPublicacion : Rutas("nueva_publicacion")
+    
+    object ActividadDetalle : Rutas("actividad_detalle/{id}") {
+        fun crearRuta(id: Int) = "actividad_detalle/$id"
+    }
 
     object ResultadoPublicacion : Rutas("resultado_publicacion/{fueExitoso}") {
         fun crearRuta(fueExitoso: Boolean) = "resultado_publicacion/$fueExitoso"

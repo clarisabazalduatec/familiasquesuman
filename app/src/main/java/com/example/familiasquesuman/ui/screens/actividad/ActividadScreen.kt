@@ -112,7 +112,12 @@ fun ActividadScreen(navController: NavHostController) {
                 item { Separador() }
                 item { HeaderDiaActividades() }
                 items(actividadesMockData) { actividad ->
-                    TarjetaActividadDia(actividad)
+                    TarjetaActividadDia(
+                        actividad = actividad,
+                        onActividadClick = { id ->
+                            navController.navigate(Rutas.ActividadDetalle.crearRuta(id))
+                        }
+                    )
                 }
                 item { BannerSincronizarCalendario() }
             }
@@ -182,11 +187,12 @@ fun HeaderDiaActividades() {
 }
 
 @Composable
-fun TarjetaActividadDia(actividad: ActividadMock) {
+fun TarjetaActividadDia(actividad: ActividadMock, onActividadClick: (Int) -> Unit) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        onClick = { onActividadClick(actividad.id) },
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)

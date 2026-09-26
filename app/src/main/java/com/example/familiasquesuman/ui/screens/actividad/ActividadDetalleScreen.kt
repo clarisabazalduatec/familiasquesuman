@@ -1,8 +1,6 @@
 package com.example.familiasquesuman.ui.screens.actividad
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -18,14 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.familiasquesuman.data.ActividadMock
 import com.example.familiasquesuman.data.actividadesMockData
+import com.example.familiasquesuman.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,52 +30,52 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
     val actividad = actividadesMockData.find { it.id == actividadId } ?: actividadesMockData.first()
 
     Scaffold(
-        containerColor = LightBackground,
+        containerColor = FondoClaro,
         topBar = {
             CenterAlignedTopAppBar(
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar", tint = DarkBlue)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar", tint = AzulOscuro)
                     }
                 },
                 title = {
                     Text(
                         text = "Familias que Suman+",
                         fontWeight = FontWeight.Bold,
-                        color = DarkBlue,
+                        color = AzulOscuro,
                         fontSize = 20.sp
                     )
                 },
                 actions = {
                     IconButton(onClick = { /*TODO*/ }) {
                         BadgedBox(badge = { Badge { Text("1") } }) {
-                            Icon(Icons.Default.Notifications, contentDescription = "Notificaciones", tint = DarkBlue)
+                            Icon(Icons.Default.Notifications, contentDescription = "Notificaciones", tint = AzulOscuro)
                         }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = LightBackground
+                    containerColor = FondoClaro
                 )
             )
         },
         bottomBar = {
             Surface(
-                color = LightBackground,
+                color = FondoClaro,
                 modifier = Modifier.fillMaxWidth(),
                 shadowElevation = 16.dp
             ) {
                 Button(
                     onClick = { /*TODO*/ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF9A825)), // Amarillo oscuro
+                    colors = ButtonDefaults.buttonColors(containerColor = Ambar), // Amarillo oscuro
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
                         .height(56.dp)
                 ) {
-                    Icon(Icons.Default.VolunteerActivism, contentDescription = null, tint = DarkBlue)
+                    Icon(Icons.Default.VolunteerActivism, contentDescription = null, tint = AzulOscuro)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Quiero participar", color = DarkBlue, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text("Quiero participar", color = AzulOscuro, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -139,7 +135,7 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                             .background(Color.White, CircleShape)
                             .size(40.dp)
                     ) {
-                        Icon(Icons.Default.Share, contentDescription = "Compartir", tint = DarkBlue, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.Share, contentDescription = "Compartir", tint = AzulOscuro, modifier = Modifier.size(20.dp))
                     }
                     IconButton(
                         onClick = { /*TODO*/ },
@@ -147,7 +143,7 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                             .background(Color.White, CircleShape)
                             .size(40.dp)
                     ) {
-                        Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorito", tint = DarkBlue, modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.FavoriteBorder, contentDescription = "Favorito", tint = AzulOscuro, modifier = Modifier.size(20.dp))
                     }
                 }
 
@@ -187,7 +183,7 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                 
                 // Efecto de esquinas redondeadas en la parte inferior para conectar con el contenido
                 Surface(
-                    color = LightBackground,
+                    color = FondoClaro,
                     shape = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -200,7 +196,7 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(LightBackground)
+                    .background(FondoClaro)
                     .padding(horizontal = 16.dp)
             ) {
                 // Tarjetas de Ubicación y Fecha
@@ -211,38 +207,38 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                     // Tarjeta de Ubicación
                     Surface(
                         shape = RoundedCornerShape(16.dp),
-                        color = Color(0xFFF6F4ED), // Beige muy claro
+                        color = BeigeClaro,
                         modifier = Modifier.weight(1f)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Place, contentDescription = null, tint = DarkBlue, modifier = Modifier.size(16.dp))
+                                Icon(Icons.Default.Place, contentDescription = null, tint = AzulOscuro, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Ubicación", fontWeight = FontWeight.Bold, color = DarkBlue, fontSize = 12.sp)
+                                Text("Ubicación", fontWeight = FontWeight.Bold, color = AzulOscuro, fontSize = 12.sp)
                             }
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(actividad.ubicacion, fontSize = 12.sp, color = TextGray)
+                            Text(actividad.ubicacion, fontSize = 12.sp, color = TextoGrisActividad)
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(actividad.distancia, fontSize = 10.sp, color = Color(0xFF1976D2), fontWeight = FontWeight.Medium) // Azul
+                            Text(actividad.distancia, fontSize = 10.sp, color = AzulEnlace, fontWeight = FontWeight.Medium)
                         }
                     }
                     
                     // Tarjeta de Fecha y Hora
                     Surface(
                         shape = RoundedCornerShape(16.dp),
-                        color = Color(0xFFF6F4ED), // Beige muy claro
+                        color = BeigeClaro,
                         modifier = Modifier.weight(1f)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.DateRange, contentDescription = null, tint = DarkBlue, modifier = Modifier.size(16.dp))
+                                Icon(Icons.Default.DateRange, contentDescription = null, tint = AzulOscuro, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Fecha y Hora", fontWeight = FontWeight.Bold, color = DarkBlue, fontSize = 12.sp)
+                                Text("Fecha y Hora", fontWeight = FontWeight.Bold, color = AzulOscuro, fontSize = 12.sp)
                             }
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(actividad.fecha, fontSize = 12.sp, color = TextGray)
+                            Text(actividad.fecha, fontSize = 12.sp, color = TextoGrisActividad)
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(actividad.horario, fontSize = 10.sp, color = Color(0xFF1976D2), fontWeight = FontWeight.Medium) // Azul
+                            Text(actividad.horario, fontSize = 10.sp, color = AzulEnlace, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
@@ -264,26 +260,26 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                         Box(
                             modifier = Modifier
                                 .size(48.dp)
-                                .background(Color(0xFFE5F0E6), CircleShape),
+                                .background(FondoVerde, CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Default.Eco, contentDescription = null, tint = Color(0xFF2E7D32))
+                            Icon(Icons.Default.Eco, contentDescription = null, tint = TextoVerde)
                         }
                         
                         Spacer(modifier = Modifier.width(12.dp))
                         
                         Column(modifier = Modifier.weight(1f)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(actividad.organizador, fontWeight = FontWeight.Bold, color = DarkBlue, fontSize = 14.sp)
+                                Text(actividad.organizador, fontWeight = FontWeight.Bold, color = AzulOscuro, fontSize = 14.sp)
                                 if (actividad.organizadorVerificado) {
                                     Spacer(modifier = Modifier.width(4.dp))
-                                    Icon(Icons.Default.Verified, contentDescription = "Verificado", tint = Color(0xFF1976D2), modifier = Modifier.size(14.dp))
+                                    Icon(Icons.Default.Verified, contentDescription = "Verificado", tint = AzulEnlace, modifier = Modifier.size(14.dp))
                                 }
                             }
-                            Text("Organizador verificado", color = TextGray, fontSize = 12.sp)
+                            Text("Organizador verificado", color = TextoGrisActividad, fontSize = 12.sp)
                         }
                         
-                        Icon(Icons.Default.Info, contentDescription = "Info organizador", tint = DarkBlue)
+                        Icon(Icons.Default.Info, contentDescription = "Info organizador", tint = AzulOscuro)
                     }
                 }
                 
@@ -293,13 +289,13 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(actividad.iconoCategoria, contentDescription = null, tint = actividad.textColorCategoria, modifier = Modifier.size(20.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Acerca del proyecto", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = DarkBlue)
+                    Text("Acerca del proyecto", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = AzulOscuro)
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = actividad.acercaDe,
                     fontSize = 14.sp,
-                    color = TextGray,
+                    color = TextoGrisActividad,
                     lineHeight = 22.sp
                 )
                 
@@ -318,8 +314,8 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Plazas disponibles", fontWeight = FontWeight.Bold, color = DarkBlue, fontSize = 14.sp)
-                            Text("${actividad.lugaresDisponibles} / ${actividad.lugaresTotales}", fontWeight = FontWeight.Bold, color = DarkBlue, fontSize = 14.sp)
+                            Text("Plazas disponibles", fontWeight = FontWeight.Bold, color = AzulOscuro, fontSize = 14.sp)
+                            Text("${actividad.lugaresDisponibles} / ${actividad.lugaresTotales}", fontWeight = FontWeight.Bold, color = AzulOscuro, fontSize = 14.sp)
                         }
                         
                         Spacer(modifier = Modifier.height(12.dp))
@@ -332,16 +328,16 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                                 .fillMaxWidth()
                                 .height(8.dp)
                                 .clip(RoundedCornerShape(4.dp)),
-                            color = Color(0xFFF9A825), // Amarillo oscuro
-                            trackColor = Color(0xFFE8E8E8)
+                            color = AmarilloOscuro, // Usando color recién definido
+                            trackColor = GrisBordeClaro // Usando color recién definido
                         )
                         
                         Spacer(modifier = Modifier.height(12.dp))
                         
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.GroupAdd, contentDescription = null, tint = DarkBlue, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.GroupAdd, contentDescription = null, tint = AzulOscuro, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("¡Súmate, quedan pocas plazas!", color = TextGray, fontSize = 12.sp)
+                            Text("¡Súmate, quedan pocas plazas!", color = TextoGrisActividad, fontSize = 12.sp)
                         }
                     }
                 }
