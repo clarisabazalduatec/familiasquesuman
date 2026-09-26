@@ -12,6 +12,7 @@ import com.example.familiasquesuman.ui.screens.comun.PantallaProximamente
 import com.example.familiasquesuman.ui.screens.comunidad.ComunidadScreen
 import com.example.familiasquesuman.ui.screens.comunidad.NuevaPublicacionScreen
 import com.example.familiasquesuman.ui.screens.comunidad.ResultadoPublicacionScreen
+import com.example.familiasquesuman.ui.screens.donar.DonacionDetalleScreen
 import com.example.familiasquesuman.ui.screens.donar.DonacionScreen
 import com.example.familiasquesuman.ui.screens.inicio.InicioScreen
 import com.example.familiasquesuman.ui.screens.login.LoginScreen
@@ -28,6 +29,14 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController())
         composable(Rutas.Donar.ruta) {
             DonacionScreen(navController = navController)
         }
+        composable(
+            route = "detalle_donacion/{donacionId}",
+            arguments = listOf(navArgument("donacionId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("donacionId") ?: ""
+            DonacionDetalleScreen(navController = navController, donacionId = id)
+        }
+
         composable(Rutas.Proyectos.ruta) {
             PantallaProximamente("Proyectos")
         }
