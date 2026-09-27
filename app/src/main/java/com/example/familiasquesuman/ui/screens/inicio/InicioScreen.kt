@@ -131,15 +131,22 @@ fun InicioScreen(navController: NavHostController) {
         }
     ) {
         Scaffold(
-            topBar = { TopAppBar(
+            topBar = {
+                TopAppBar(
                 navigationIcon = {
                     IconButton(onClick = { scope.launch { drawerState.open() } }) {
                         Icon(Icons.Default.Menu, contentDescription = "Menú")
                     }
                 },
                 title = { Text("Familias que Suman+") },
-                actions = { /* igual que antes */ }
-            )},
+                    actions = {
+
+                        IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
+                            Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
+                        }
+                    }
+            )
+                     },
             bottomBar = {
                 BarraNavegacionInferior(
                     pantallaActual = PantallaPrincipal.INICIO,

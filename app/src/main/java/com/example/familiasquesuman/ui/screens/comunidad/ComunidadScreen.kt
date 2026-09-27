@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -86,7 +87,12 @@ fun ComunidadScreen(navController: NavHostController) {
                 }
             },
             title = { Text("Familias que Suman+") },
-            actions = { /* igual que antes */ }
+            actions = {
+
+                IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
+                    Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
+                }
+            }
         )},
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate(Rutas.NuevaPublicacion.ruta) }) {
