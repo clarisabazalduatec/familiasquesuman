@@ -95,7 +95,7 @@ fun DonacionScreen(
                     },
                     title = { Text("Familias que Suman+") },
                     actions = {
-                        IconButton(onClick = { /* TODO: Notificaciones */ }) {
+                        IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
                             Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
                         }
                     }

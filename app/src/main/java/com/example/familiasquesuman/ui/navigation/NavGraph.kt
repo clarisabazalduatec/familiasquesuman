@@ -16,6 +16,7 @@ import com.example.familiasquesuman.ui.screens.donar.DonacionDetalleScreen
 import com.example.familiasquesuman.ui.screens.donar.DonacionScreen
 import com.example.familiasquesuman.ui.screens.inicio.InicioScreen
 import com.example.familiasquesuman.ui.screens.login.LoginScreen
+import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScreen
 
 @Composable
 fun NavGraphFamilias(navController: NavHostController = rememberNavController()) {
@@ -61,6 +62,9 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController())
         ) { backStackEntry ->
             val fueExitoso = backStackEntry.arguments?.getBoolean("fueExitoso") ?: false
             ResultadoPublicacionScreen(navController = navController, fueExitoso = fueExitoso)
+        }
+        composable(Rutas.Notificaciones.ruta) {
+            NotificacionesScreen(navController = navController)
         }
     }
 }
