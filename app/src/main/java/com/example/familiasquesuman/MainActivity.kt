@@ -25,16 +25,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.familiasquesuman.data.local.OnboardingPreferences
 import com.example.familiasquesuman.ui.navigation.NavGraphFamilias
-
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val preferencias = OnboardingPreferences(this)
+        val onboardingCompletado =
+            preferencias.yaCompletoOnboarding()
+
         setContent {
             FamiliasQueSumanTheme {
-                NavGraphFamilias()
+                NavGraphFamilias(
+                    mostrarOnboarding =  !onboardingCompletado,
+                    marcarOnboardingVisto = {
+                        preferencias.marcarComoCompletado()
+                    }
+                )
             }
         }
     }

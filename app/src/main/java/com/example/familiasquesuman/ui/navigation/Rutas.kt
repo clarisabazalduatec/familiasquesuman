@@ -1,6 +1,7 @@
 package com.example.familiasquesuman.ui.navigation
 
 sealed class Rutas(val ruta: String) {
+    object Onboarding : Rutas ("onborading")
     object Inicio : Rutas("inicio")
     object Actividades : Rutas("actividades")
     object Donar : Rutas("donar_screen")

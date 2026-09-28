@@ -1,3 +1,4 @@
+
 package com.example.familiasquesuman.ui.navigation
 
 import androidx.compose.runtime.Composable
@@ -7,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+
 import com.example.familiasquesuman.ui.screens.chatbot.ChatbotScreen
 import com.example.familiasquesuman.ui.screens.comun.PantallaProximamente
 import com.example.familiasquesuman.ui.screens.comunidad.ComunidadScreen
@@ -19,13 +21,30 @@ import com.example.familiasquesuman.ui.screens.inicio.InicioScreen
 import com.example.familiasquesuman.ui.screens.login.LoginScreen
 import com.example.familiasquesuman.ui.screens.actividad.ActividadScreen
 import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScreen
+import com.example.familiasquesuman.ui.screens.onboarding.OnboardingScreen
 
 @Composable
-fun NavGraphFamilias(navController: NavHostController = rememberNavController()) {
-    NavHost(navController = navController, startDestination = Rutas.Inicio.ruta) {
-        composable(Rutas.Inicio.ruta) {
-            InicioScreen(navController = navController)
+fun NavGraphFamilias(navController: NavHostController = rememberNavController(), mostrarOnboarding: Boolean, marcarOnboardingVisto: () -> Unit
+) {
+    NavHost(navController = navController, startDestination = if (mostrarOnboarding) { Rutas.Onboarding.ruta
+        } else {
+            Rutas.Inicio.ruta
         }
+    ) {
+        composable(Rutas.Onboarding.ruta) {
+            OnboardingScreen(
+                onComenzar = {
+                    marcarOnboardingVisto()
+                    navController.navigate(Rutas.Inicio.ruta) {
+                        popUpTo(Rutas.Onboarding.ruta) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+        composable(Rutas.Inicio.ruta) { InicioScreen(navController = navController) }
         composable(Rutas.Actividades.ruta) {
             ActividadScreen(navController = navController)
         }
@@ -100,10 +119,19 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController())
         }
         composable(
             route = Rutas.ResultadoPublicacion.ruta,
-            arguments = listOf(navArgument("fueExitoso") { type = NavType.BoolType })
+            arguments = listOf(
+                navArgument("fueExitoso") {
+                    type = NavType.BoolType
+                }
+            )
         ) { backStackEntry ->
-            val fueExitoso = backStackEntry.arguments?.getBoolean("fueExitoso") ?: false
-            ResultadoPublicacionScreen(navController = navController, fueExitoso = fueExitoso)
+            val fueExitoso = backStackEntry.arguments
+                ?.getBoolean("fueExitoso") ?: false
+
+            ResultadoPublicacionScreen(
+                navController = navController,
+                fueExitoso = fueExitoso
+            )
         }
         composable(Rutas.Notificaciones.ruta) {
             NotificacionesScreen(navController = navController)
