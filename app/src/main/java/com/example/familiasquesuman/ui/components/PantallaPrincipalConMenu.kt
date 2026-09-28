@@ -56,7 +56,6 @@ fun PantallaPrincipalConMenu(
                             PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
                             PantallaPrincipal.DONAR -> Rutas.Donar.ruta
                             PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
-                            PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
                         }
                         navController.navigate(ruta) { launchSingleTop = true }
                     }

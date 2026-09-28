@@ -69,6 +69,36 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController())
             )
         }
         composable(
+            route = Rutas.ActividadParticipar.ruta,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 1
+            com.example.familiasquesuman.ui.screens.actividad.ActividadParticiparScreen(
+                navController = navController, 
+                actividadId = id
+            )
+        }
+        composable(
+            route = Rutas.ActividadSeleccionParticipantes.ruta,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 1
+            com.example.familiasquesuman.ui.screens.actividad.ActividadSeleccionParticipantesScreen(
+                navController = navController, 
+                actividadId = id
+            )
+        }
+        composable(
+            route = Rutas.ActividadConfirmacion.ruta,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 1
+            com.example.familiasquesuman.ui.screens.actividad.ActividadConfirmacionScreen(
+                navController = navController, 
+                actividadId = id
+            )
+        }
+        composable(
             route = Rutas.ResultadoPublicacion.ruta,
             arguments = listOf(navArgument("fueExitoso") { type = NavType.BoolType })
         ) { backStackEntry ->

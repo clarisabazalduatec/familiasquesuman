@@ -164,16 +164,6 @@ fun InicioScreen(navController: NavHostController) {
                         navController.navigate(ruta)
                     }
                 )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navController.navigate(Rutas.Chatbot.ruta) },
-                    containerColor = AzulMarinoOscuro,
-                    contentColor = Color.White,
-                    shape = CircleShape
-                ) {
-                    Icon(Icons.Default.ChatBubble, contentDescription = "Asistente Virtual")
-                }
             }
             item {
                 TarjetaActividadDestacada(
