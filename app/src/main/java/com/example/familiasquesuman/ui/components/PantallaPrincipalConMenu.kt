@@ -165,18 +165,12 @@ fun PantallaPrincipalConMenu(
                         { pantalla ->
                             val ruta =
                                 when (pantalla) {
-                                    PantallaPrincipal.INICIO ->
-                                        Rutas.Inicio.ruta
-                                    PantallaPrincipal.ACTIVIDADES ->
-                                        Rutas.Actividades.ruta
-                                    PantallaPrincipal.PROYECTOS ->
-                                        Rutas.Proyectos.ruta
-                                    PantallaPrincipal.DONAR ->
-                                        Rutas.Donar.ruta
-                                    PantallaPrincipal.DIRECTORIO ->
-                                        Rutas.Directorio.ruta
-                                    PantallaPrincipal.CHATBOT ->
-                                        Rutas.Chatbot.ruta
+                                    PantallaPrincipal.INICIO ->Rutas.Inicio.ruta
+                                    PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
+                                    PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
+                                    PantallaPrincipal.DONAR ->Rutas.Donar.ruta
+                                    PantallaPrincipal.DIRECTORIO ->Rutas.Directorio.ruta
+                                    PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
                                 }
                             navController.navigate(ruta ) { launchSingleTop =true}
                         }

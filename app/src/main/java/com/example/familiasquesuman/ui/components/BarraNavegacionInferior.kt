@@ -33,11 +33,9 @@ enum class PantallaPrincipal(
     PROYECTOS("Proyectos"),
     DONAR("Donar"),
     DIRECTORIO("Directorio"),
-
-    // Se conserva porque el flujo del chatbot ya existe.
     CHATBOT("Asistente")
-}
 
+}
 
 @Composable
 fun BarraNavegacionInferior(
@@ -226,7 +224,6 @@ fun BarraNavegacionInferior(
                         }
                 )
             },
-
             colors = colores
         )
 
