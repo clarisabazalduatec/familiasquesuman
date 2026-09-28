@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.ui.components.BarraNavegacionInferior
 import com.example.familiasquesuman.ui.components.MenuLateral
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
+import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.AzulMarinoOscuro
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
@@ -35,29 +37,15 @@ fun ChatbotScreen(
     val estaEnviando by chatViewModel.estaEnviando.collectAsState()
     var textoActual by remember { mutableStateOf("") }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MenuLateral(
-                onInicioClick = { scope.launch { drawerState.close() }; navController.navigate(Rutas.Inicio.ruta) },
-                onIniciarSesionClick = { scope.launch { drawerState.close() }; navController.navigate(Rutas.Login.ruta) },
-                onCrearCuentaClick = { scope.launch { drawerState.close() }; navController.navigate(Rutas.Login.ruta) },
-                onComunidadClick = { scope.launch { drawerState.close() }; navController.navigate(Rutas.Comunidad.ruta) }
-            )
-        }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar", tint = AzulMarinoOscuro)
-                        }
-                    },
-                    title = { Text("Asistente Comunitario") }
-                )
+    PantallaPrincipalConMenu(
+        navController = navController,
+        pantallaActual = PantallaPrincipal.INICIO,
+        acciones = {
+            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
+                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
             }
-        ) { paddingInterno ->
+        }
+    )  { paddingInterno ->
             Column(modifier = Modifier.padding(paddingInterno).fillMaxSize()) {
 
                 LazyColumn(
@@ -85,7 +73,7 @@ fun ChatbotScreen(
             }
         }
     }
-}
+
 
 @Preview(showBackground = true)
 @Composable
