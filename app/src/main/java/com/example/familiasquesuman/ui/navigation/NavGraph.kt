@@ -12,8 +12,13 @@ import com.example.familiasquesuman.ui.screens.comun.PantallaProximamente
 import com.example.familiasquesuman.ui.screens.comunidad.ComunidadScreen
 import com.example.familiasquesuman.ui.screens.comunidad.NuevaPublicacionScreen
 import com.example.familiasquesuman.ui.screens.comunidad.ResultadoPublicacionScreen
+import com.example.familiasquesuman.ui.screens.directorio.DirectorioScreen
+import com.example.familiasquesuman.ui.screens.donar.DonacionDetalleScreen
+import com.example.familiasquesuman.ui.screens.donar.DonacionScreen
 import com.example.familiasquesuman.ui.screens.inicio.InicioScreen
 import com.example.familiasquesuman.ui.screens.login.LoginScreen
+import com.example.familiasquesuman.ui.screens.actividad.ActividadScreen
+import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScreen
 
 @Composable
 fun NavGraphFamilias(navController: NavHostController = rememberNavController()) {
@@ -22,16 +27,24 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController())
             InicioScreen(navController = navController)
         }
         composable(Rutas.Actividades.ruta) {
-            PantallaProximamente("Actividades")
+            ActividadScreen(navController = navController)
         }
         composable(Rutas.Donar.ruta) {
-            PantallaProximamente("Donar")
+            DonacionScreen(navController = navController)
         }
+        composable(
+            route = "detalle_donacion/{donacionId}",
+            arguments = listOf(navArgument("donacionId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getString("donacionId") ?: ""
+            DonacionDetalleScreen(navController = navController, donacionId = id)
+        }
+
         composable(Rutas.Proyectos.ruta) {
-            PantallaProximamente("Proyectos")
+            PantallaProximamente(navController = navController)
         }
         composable(Rutas.Directorio.ruta) {
-            PantallaProximamente("Directorio")
+            DirectorioScreen(navController = navController)
         }
         composable(Rutas.Chatbot.ruta) {
             ChatbotScreen(navController)
@@ -46,11 +59,24 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController())
             NuevaPublicacionScreen(navController = navController)
         }
         composable(
+            route = Rutas.ActividadDetalle.ruta,
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: 1
+            com.example.familiasquesuman.ui.screens.actividad.ActividadDetalleScreen(
+                navController = navController, 
+                actividadId = id
+            )
+        }
+        composable(
             route = Rutas.ResultadoPublicacion.ruta,
             arguments = listOf(navArgument("fueExitoso") { type = NavType.BoolType })
         ) { backStackEntry ->
             val fueExitoso = backStackEntry.arguments?.getBoolean("fueExitoso") ?: false
             ResultadoPublicacionScreen(navController = navController, fueExitoso = fueExitoso)
+        }
+        composable(Rutas.Notificaciones.ruta) {
+            NotificacionesScreen(navController = navController)
         }
     }
 }
