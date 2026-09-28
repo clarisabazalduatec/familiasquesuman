@@ -35,6 +35,7 @@ import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 import com.example.familiasquesuman.ui.components.BarraNavegacionInferior
 import com.example.familiasquesuman.ui.components.MenuLateral
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
+import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,66 +63,15 @@ fun DonacionScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MenuLateral(
-                onInicioClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Inicio.ruta)
-                },
-                onIniciarSesionClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta)
-                },
-                onCrearCuentaClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta)
-                },
-                onComunidadClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Comunidad.ruta)
-                }
-            )
+    PantallaPrincipalConMenu(
+        navController = navController,
+        pantallaActual = PantallaPrincipal.INICIO,
+        acciones = {
+            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
+                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
+            }
         }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menú")
-                        }
-                    },
-                    title = { Text("Familias que Suman+") },
-                    actions = {
-                        IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                            Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-                        }
-                    }
-                )
-            },
-            bottomBar = {
-                BarraNavegacionInferior(
-                    // Le decimos a la barra que estamos en la sección DONAR para que la pinte
-                    pantallaActual = PantallaPrincipal.DONAR,
-                    onPantallaSeleccionada = { pantalla ->
-                        val ruta = when (pantalla) {
-                            PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
-                            PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
-                            PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
-                            PantallaPrincipal.DONAR -> Rutas.Donar.ruta
-                            PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
-                            PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
-                        }
-                        navController.navigate(ruta) {
-                            launchSingleTop = true
-                        }
-                    }
-                )
-            },
-            containerColor = MaterialTheme.colorScheme.background
-        ) { paddingValues ->
+    )  { paddingValues ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -172,7 +122,7 @@ fun DonacionScreen(
             }
         }
     }
-}
+
 
 @Composable
 fun EncabezadoDonacion() {
