@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
@@ -19,6 +20,7 @@ import com.example.familiasquesuman.ui.components.MenuLateral
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.theme.AzulMarinoOscuro
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 import kotlinx.coroutines.launch
 
