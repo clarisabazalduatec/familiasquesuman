@@ -39,15 +39,21 @@ fun ChatbotScreen(
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.INICIO,
+        pantallaActual = PantallaPrincipal.CHATBOT,
         acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
+            IconButton(
+                onClick = {
+                    navController.navigate(Rutas.Notificaciones.ruta)
+                }
+            ) {
                 Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
             }
         }
-    )  { paddingInterno ->
-            Column(modifier = Modifier.padding(paddingInterno).fillMaxSize()) {
-
+    ) { paddingInterno -> Column(
+            modifier = Modifier
+                .padding(paddingInterno)
+                .fillMaxSize()
+        ){
                 LazyColumn(
                     reverseLayout = true,
                     contentPadding = PaddingValues(16.dp),
@@ -55,12 +61,11 @@ fun ChatbotScreen(
                     modifier = Modifier.weight(1f).fillMaxWidth()
                 ) {
                     items(mensajes.reversed()) { mensaje ->
-                        BurbujaMensaje(mensaje = mensaje) // ahora recibe MensajeChat en vez de MensajeUi
+                        BurbujaMensaje(mensaje = mensaje)
                     }
                 }
 
                 HorizontalDivider()
-
                 BarraEscribirMensaje(
                     texto = textoActual,
                     onTextoChange = { textoActual = it },
