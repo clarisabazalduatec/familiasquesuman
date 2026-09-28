@@ -12,6 +12,7 @@ import com.example.familiasquesuman.ui.screens.comun.PantallaProximamente
 import com.example.familiasquesuman.ui.screens.comunidad.ComunidadScreen
 import com.example.familiasquesuman.ui.screens.comunidad.NuevaPublicacionScreen
 import com.example.familiasquesuman.ui.screens.comunidad.ResultadoPublicacionScreen
+import com.example.familiasquesuman.ui.screens.directorio.DirectorioScreen
 import com.example.familiasquesuman.ui.screens.donar.DonacionDetalleScreen
 import com.example.familiasquesuman.ui.screens.donar.DonacionScreen
 import com.example.familiasquesuman.ui.screens.inicio.InicioScreen
@@ -42,7 +43,7 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController())
             PantallaProximamente("Proyectos")
         }
         composable(Rutas.Directorio.ruta) {
-            PantallaProximamente("Directorio")
+            DirectorioScreen(navController = navController)
         }
         composable(Rutas.Chatbot.ruta) {
             ChatbotScreen(navController)

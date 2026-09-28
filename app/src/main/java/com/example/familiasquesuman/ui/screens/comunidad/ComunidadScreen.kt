@@ -17,6 +17,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.domain.Publicacion
 import com.example.familiasquesuman.ui.components.MenuLateral
+import com.example.familiasquesuman.ui.components.PantallaPrincipal
+import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 import kotlinx.coroutines.launch
@@ -55,48 +57,12 @@ fun ComunidadScreen(navController: NavHostController) {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MenuLateral(
-                onInicioClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Inicio.ruta)
-                },
-                onIniciarSesionClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta)
-                },
-                onCrearCuentaClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta) // por ahora manda al mismo login, luego separamos registro
-                },
-                onComunidadClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Comunidad.ruta)
-                }
-            )
-        }
-    ) {
-
-    Scaffold(
-        topBar = { TopAppBar(
-            navigationIcon = {
-                IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                    Icon(Icons.Default.Menu, contentDescription = "Menú")
-                }
-            },
-            title = { Text("Familias que Suman+") },
-            actions = {
-
-                IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                    Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-                }
-            }
-        )},
-        floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(Rutas.NuevaPublicacion.ruta) }) {
-                Icon(Icons.Default.Add, contentDescription = "Nueva publicación")
+    PantallaPrincipalConMenu(
+        navController = navController,
+        pantallaActual = PantallaPrincipal.INICIO,
+        acciones = {
+            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
+                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
             }
         }
     ) { paddingInterno ->
@@ -134,7 +100,7 @@ fun ComunidadScreen(navController: NavHostController) {
         }
     }
 }
-    }
+
 
 @Preview(showBackground = true)
 @Composable

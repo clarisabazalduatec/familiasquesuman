@@ -13,7 +13,5 @@ sealed class Rutas(val ruta: String) {
     object Notificaciones : Rutas("notificaciones")
     object ResultadoPublicacion : Rutas("resultado_publicacion/{fueExitoso}") {
         fun crearRuta(fueExitoso: Boolean) = "resultado_publicacion/$fueExitoso"
-
-
     }
 }
