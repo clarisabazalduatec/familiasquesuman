@@ -69,6 +69,7 @@ fun MenuLateral(
     onContactoClick: () -> Unit = {},
     onAdminClick: () -> Unit = {},
     onChatbotClick: () -> Unit,
+    onBackClick: () -> Unit,
     onPerfilClick: () -> Unit = {}
 ) {
 

@@ -7,12 +7,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalNavigationDrawer
@@ -34,7 +34,6 @@ import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.CremaFondo
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaPrincipalConMenu(
@@ -43,15 +42,16 @@ fun PantallaPrincipalConMenu(
     titulo: String = "Familias que Suman+",
     navbar: Boolean = true,
     chatbot: Boolean = false,
+    backButton: Boolean = false,
+    onBackClick: (() -> Unit)? = null,
     acciones: @Composable RowScope.() -> Unit = {},
-    contenido: @Composable (
-        paddingInterno: PaddingValues
-    ) -> Unit,
+    contenido: @Composable (paddingInterno: PaddingValues) -> Unit,
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
+        gesturesEnabled = !backButton,
         drawerState = drawerState,
         drawerContent = {
             MenuLateral(
@@ -75,87 +75,88 @@ fun PantallaPrincipalConMenu(
                     scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Comunidad.ruta)
                 },
-
                 onActividadesClick = {
                     scope.launch {
                         drawerState.close()
                     }
                     navController.navigate(Rutas.Actividades.ruta)
                 },
-
                 onProyectosClick = {
-                    scope.launch {
-                        drawerState.close()
-                    }
+                    scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Proyectos.ruta)
                 },
-
                 onDonarClick = {
-                    scope.launch {
-                        drawerState.close()
-                    }
+                    scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Donar.ruta)
                 },
-
                 onDirectorioClick = {
-                    scope.launch {
-                        drawerState.close()
-                    }
+                    scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Directorio.ruta)
                 },
                 onAdminClick = {
-                    scope.launch {
-                        drawerState.close()
-                    }
+                    scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Admin.ruta)
                 },
                 onPerfilClick = {
-                    scope.launch {
-                        drawerState.close()
-                    }
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Perfil.ruta)
+                },
+                onBackClick = {
+                    scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Perfil.ruta)
                 }
             )
         }
-
     ) {
-
-        Scaffold(containerColor = CremaFondo,
-            topBar = { TopAppBar(
-                    colors =
-                        TopAppBarDefaults.topAppBarColors(
-                            containerColor = CremaFondo,
-                            navigationIconContentColor =AzulMarino,
-                            actionIconContentColor =AzulMarino
-                        ),
-
+        Scaffold(
+            containerColor = CremaFondo,
+            topBar = {
+                TopAppBar(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = CremaFondo,
+                        navigationIconContentColor = AzulMarino,
+                        actionIconContentColor = AzulMarino
+                    ),
                     navigationIcon = {
-                        IconButton(
-                            onClick = { scope.launch {drawerState.open()
+                        if (!backButton) {
+                            IconButton(
+                                onClick = {
+                                    scope.launch { drawerState.open() }
                                 }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = "Menú"
+                                )
                             }
-                        ) {
-                            Icon( imageVector = Icons.Default.Menu, contentDescription ="Menú")
+                        } else {
+                            IconButton(
+                                onClick = {
+                                    onBackClick?.invoke() ?: navController.popBackStack()
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Regresar"
+                                )
+                            }
                         }
                     },
                     title = {
                         Image(
-                            painter =painterResource(id = R.drawable.logo2_onb),
-                            contentDescription =titulo,
+                            painter = painterResource(id = R.drawable.logo2_onb),
+                            contentDescription = titulo,
                             modifier = Modifier
                                 .width(300.dp)
                                 .height(62.dp),
-                            contentScale =ContentScale.Fit
+                            contentScale = ContentScale.Fit
                         )
                     },
                     actions = acciones
                 )
             },
-
-//chatbot
             floatingActionButton = {
                 if (chatbot) {
-
                     FloatingActionButton(
                         onClick = {
                             navController.navigate(Rutas.Chatbot.ruta) {
@@ -176,27 +177,25 @@ fun PantallaPrincipalConMenu(
                 }
             },
             bottomBar = {
-                if(navbar) {
+                if (navbar) {
                     BarraNavegacionInferior(
-                        pantallaActual =
-                            pantallaActual,
-                        onPantallaSeleccionada =
-                            { pantalla ->
-                                val ruta =
-                                    when (pantalla) {
-                                        PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
-                                        PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
-                                        PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
-                                        PantallaPrincipal.DONAR -> Rutas.Donar.ruta
-                                        PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
-                                        PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
-                                    }
-                                navController.navigate(ruta) { launchSingleTop = true }
+                        pantallaActual = pantallaActual,
+                        onPantallaSeleccionada = { pantalla ->
+                            val ruta = when (pantalla) {
+                                PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
+                                PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
+                                PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
+                                PantallaPrincipal.DONAR -> Rutas.Donar.ruta
+                                PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
+                                PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
                             }
+                            navController.navigate(ruta) { launchSingleTop = true }
+                        }
                     )
                 }
             }
-        ) { paddingInterno ->contenido( paddingInterno )
+        ) { paddingInterno ->
+            contenido(paddingInterno)
         }
     }
 }
