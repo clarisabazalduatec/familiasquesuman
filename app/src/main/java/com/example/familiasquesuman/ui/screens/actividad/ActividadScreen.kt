@@ -1,5 +1,6 @@
 package com.example.familiasquesuman.ui.screens.actividad
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -37,35 +38,13 @@ import com.example.familiasquesuman.ui.theme.GrisClaroFondo
 import com.example.familiasquesuman.ui.theme.GrisTexto
 import kotlinx.coroutines.launch
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActividadScreen(navController: NavHostController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MenuLateral(
-                onInicioClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Inicio.ruta)
-                },
-                onIniciarSesionClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta)
-                },
-                onCrearCuentaClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta)
-                },
-                onComunidadClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Comunidad.ruta)
-                }
-            )
-        }
-    ) {
+
         PantallaPrincipalConMenu(
             navController = navController,
             pantallaActual = PantallaPrincipal.ACTIVIDADES,
@@ -96,7 +75,7 @@ fun ActividadScreen(navController: NavHostController) {
             }
         }
     }
-}
+
 
 @Composable
 fun LeyendaFiltros() {

@@ -39,7 +39,10 @@ import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.GrisBorde
 import androidx.core.net.toUri
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.familiasquesuman.ui.components.PantallaPrincipal
+import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 
 fun abrirEnlace(context: Context, url: String) {
@@ -50,7 +53,7 @@ fun abrirEnlace(context: Context, url: String) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DonacionDetalleScreen(
-    navController: NavController,
+    navController: NavHostController,
     donacionId: String,
     viewModel: DonacionViewModel = viewModel()
 ) {
@@ -67,53 +70,15 @@ fun DonacionDetalleScreen(
         return
     }
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MenuLateral(
-                onInicioClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Inicio.ruta)
-                },
-                onIniciarSesionClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta)
-                },
-                onCrearCuentaClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta)
-                },
-                onComunidadClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Comunidad.ruta)
-                }
-            )
+    PantallaPrincipalConMenu(
+        navController = navController,
+        pantallaActual = PantallaPrincipal.ACTIVIDADES,
+        acciones = {
+            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
+                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
+            }
         }
-    ) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    navigationIcon = {
-                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "Menú")
-                        }
-                    },
-                    title = { Text("Familias que Suman+") },
-                    actions = {
-                        IconButton(onClick = { /* TODO: Notificaciones */ }) {
-                            Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = Color.White,
-                        titleContentColor = MaterialTheme.colorScheme.primary,
-                        actionIconContentColor = MaterialTheme.colorScheme.primary,
-                        navigationIconContentColor = MaterialTheme.colorScheme.primary
-                    )
-                )
-            },
-            containerColor = MaterialTheme.colorScheme.background
-        ) { paddingValues ->
+    ) { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -297,7 +262,6 @@ fun DonacionDetalleScreen(
                 }
             }
         }
-    }
 }
 
 @Preview(showBackground = true)
