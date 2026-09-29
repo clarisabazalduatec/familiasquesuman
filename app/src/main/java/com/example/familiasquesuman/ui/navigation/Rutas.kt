@@ -34,4 +34,7 @@ sealed class Rutas(val ruta: String) {
     object ResultadoPublicacion : Rutas("resultado_publicacion/{fueExitoso}") {
         fun crearRuta(fueExitoso: Boolean) = "resultado_publicacion/$fueExitoso"
     }
+    object ProyectoDetalle : Rutas("proyecto_detalle/{proyectoId}") {
+        fun crearRuta(proyectoId: String) = "proyecto_detalle/$proyectoId"
+    }
 }
