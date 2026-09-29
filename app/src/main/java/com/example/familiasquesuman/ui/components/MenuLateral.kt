@@ -26,6 +26,7 @@ import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Login
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.HorizontalDivider
@@ -65,7 +66,8 @@ fun MenuLateral(
     onDonarClick: () -> Unit = {},
     onDirectorioClick: () -> Unit = {},
     onContactoClick: () -> Unit = {},
-    onAdminClick: () -> Unit = {}
+    onAdminClick: () -> Unit = {},
+    onPerfilClick: () -> Unit = {}
 ) {
 
     ModalDrawerSheet(
@@ -165,6 +167,11 @@ fun MenuLateral(
                 texto = "Contacto y ayuda",
                 icono = Icons.Outlined.HelpOutline,
                 onClick = onContactoClick
+            )
+            ItemMenuLateral(
+                texto = "Perfil",
+                icono = Icons.Outlined.Person,
+                onClick = onPerfilClick
             )
             ItemMenuLateral(
                 texto = "Admin",
