@@ -65,7 +65,7 @@ fun DonacionScreen(
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.INICIO,
+        pantallaActual = PantallaPrincipal.DONAR,
         acciones = {
             IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
                 Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
