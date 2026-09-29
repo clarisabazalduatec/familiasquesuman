@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +38,7 @@ import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.ui.components.BarraNavegacionInferior
 import com.example.familiasquesuman.ui.components.MenuLateral
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
+import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.actividad.BannerSincronizarCalendario
 import com.example.familiasquesuman.ui.screens.actividad.HeaderDiaActividades
@@ -53,69 +55,15 @@ fun PantallaProximamente(navController: NavHostController) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            MenuLateral(
-                onInicioClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Inicio.ruta)
-                },
-                onIniciarSesionClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta)
-                },
-                onCrearCuentaClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta)
-                },
-                onComunidadClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Comunidad.ruta)
-                }
-            )
-        }
-    ) {
-        Scaffold(
-            containerColor = GrisClaroFondo,
-            topBar = { TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menú")
-                    }
-                },
-                title = { Text("Familias que Suman+") },
-                actions = { /* igual que antes */ }
-            )},
-            bottomBar = {
-                BarraNavegacionInferior(
-                    pantallaActual = PantallaPrincipal.INICIO,
-                    onPantallaSeleccionada = { pantalla ->
-                        val ruta = when (pantalla) {
-                            PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
-                            PantallaPrincipal.CHATBOT -> Rutas.Actividades.ruta
-                            PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
-                            PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
-                            PantallaPrincipal.DONAR -> Rutas.Donar.ruta
-                            PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
-                        }
-                        navController.navigate(ruta) {
-                            launchSingleTop = true
-                        }
-                    }
-                )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navController.navigate(Rutas.Chatbot.ruta) },
-                    containerColor = AzulMarinoOscuro,
-                    contentColor = Color.White,
-                    shape = CircleShape
-                ) {
-                    Icon(Icons.Default.ChatBubble, contentDescription = "Asistente Virtual")
-                }
+    PantallaPrincipalConMenu(
+        navController = navController,
+        pantallaActual = PantallaPrincipal.ACTIVIDADES,
+        acciones = {
+            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
+                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
             }
-        ) { paddingValues ->
+        }
+    ) { paddingValues ->
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -126,4 +74,3 @@ fun PantallaProximamente(navController: NavHostController) {
             }
         }
     }
-}

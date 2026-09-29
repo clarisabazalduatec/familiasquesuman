@@ -143,25 +143,25 @@ fun PantallaPrincipalConMenu(
 
 //chatbot
             floatingActionButton = {
-                FloatingActionButton(
-                    onClick = {navController.navigate(
-                            Rutas.Chatbot.ruta
-                        ) { launchSingleTop = true}
-                    },
-                    containerColor = AzulMarino,
-                    contentColor = Color.White,
-                    elevation = FloatingActionButtonDefaults.elevation(
-                            defaultElevation = 6.dp,
-                            pressedElevation = 9.dp
-                        ),
-                    modifier =Modifier.size(68.dp) ) {
-                    Icon(
-                        imageVector =
-                            Icons.Outlined.SmartToy,
-                        contentDescription = "Abrir chatbot",
-                        modifier =Modifier.size(34.dp),
-                        tint = Color.White
-                    )
+                if (pantallaActual != PantallaPrincipal.CHATBOT) {
+
+                    FloatingActionButton(
+                        onClick = {
+                            navController.navigate(Rutas.Chatbot.ruta) {
+                                launchSingleTop = true
+                            }
+                        },
+                        containerColor = AzulMarino,
+                        contentColor = Color.White,
+                        modifier = Modifier.size(68.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.SmartToy,
+                            contentDescription = "Abrir chatbot",
+                            modifier = Modifier.size(34.dp),
+                            tint = Color.White
+                        )
+                    }
                 }
             },
             bottomBar = {
