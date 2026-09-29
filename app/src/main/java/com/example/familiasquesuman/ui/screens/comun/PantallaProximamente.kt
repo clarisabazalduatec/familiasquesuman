@@ -93,6 +93,7 @@ fun PantallaProximamente(navController: NavHostController) {
                     onPantallaSeleccionada = { pantalla ->
                         val ruta = when (pantalla) {
                             PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
+                            PantallaPrincipal.CHATBOT -> Rutas.Actividades.ruta
                             PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
                             PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
                             PantallaPrincipal.DONAR -> Rutas.Donar.ruta

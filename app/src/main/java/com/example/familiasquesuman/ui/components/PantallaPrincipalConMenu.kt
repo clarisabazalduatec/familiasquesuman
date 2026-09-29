@@ -41,10 +41,11 @@ fun PantallaPrincipalConMenu(
     navController: NavHostController,
     pantallaActual: PantallaPrincipal,
     titulo: String = "Familias que Suman+",
+    navbar: Boolean = true,
     acciones: @Composable RowScope.() -> Unit = {},
     contenido: @Composable (
         paddingInterno: PaddingValues
-    ) -> Unit
+    ) -> Unit,
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -96,6 +97,12 @@ fun PantallaPrincipalConMenu(
                         drawerState.close()
                     }
                     navController.navigate(Rutas.Directorio.ruta)
+                },
+                onAdminClick = {
+                    scope.launch {
+                        drawerState.close()
+                    }
+                    navController.navigate(Rutas.Admin.ruta)
                 }
             )
         }
@@ -158,23 +165,25 @@ fun PantallaPrincipalConMenu(
                 }
             },
             bottomBar = {
-                BarraNavegacionInferior(
-                    pantallaActual =
-                        pantallaActual,
-                    onPantallaSeleccionada =
-                        { pantalla ->
-                            val ruta =
-                                when (pantalla) {
-                                    PantallaPrincipal.INICIO ->Rutas.Inicio.ruta
-                                    PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
-                                    PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
-                                    PantallaPrincipal.DONAR ->Rutas.Donar.ruta
-                                    PantallaPrincipal.DIRECTORIO ->Rutas.Directorio.ruta
-                                    PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
-                                }
-                            navController.navigate(ruta ) { launchSingleTop =true}
-                        }
-                )
+                if(navbar) {
+                    BarraNavegacionInferior(
+                        pantallaActual =
+                            pantallaActual,
+                        onPantallaSeleccionada =
+                            { pantalla ->
+                                val ruta =
+                                    when (pantalla) {
+                                        PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
+                                        PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
+                                        PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
+                                        PantallaPrincipal.DONAR -> Rutas.Donar.ruta
+                                        PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
+                                        PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
+                                    }
+                                navController.navigate(ruta) { launchSingleTop = true }
+                            }
+                    )
+                }
             }
         ) { paddingInterno ->contenido( paddingInterno )
         }

@@ -13,9 +13,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AddModerator
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Groups
@@ -61,7 +64,8 @@ fun MenuLateral(
     onProyectosClick: () -> Unit = {},
     onDonarClick: () -> Unit = {},
     onDirectorioClick: () -> Unit = {},
-    onContactoClick: () -> Unit = {}
+    onContactoClick: () -> Unit = {},
+    onAdminClick: () -> Unit = {}
 ) {
 
     ModalDrawerSheet(
@@ -82,6 +86,7 @@ fun MenuLateral(
                     horizontal = 18.dp,
                     vertical = 22.dp
                 )
+                .verticalScroll(rememberScrollState())
         ) {
 
             //logo
@@ -160,6 +165,11 @@ fun MenuLateral(
                 texto = "Contacto y ayuda",
                 icono = Icons.Outlined.HelpOutline,
                 onClick = onContactoClick
+            )
+            ItemMenuLateral(
+                texto = "Admin",
+                icono = Icons.Outlined.AddModerator,
+                onClick = onAdminClick
             )
             Spacer(modifier = Modifier.weight(1f))
 
