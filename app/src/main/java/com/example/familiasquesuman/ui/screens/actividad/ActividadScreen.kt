@@ -11,8 +11,10 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.ui.components.FiltrosChips
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
@@ -21,6 +23,7 @@ import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.actividad.components.BannerSincronizarCalendario
 import com.example.familiasquesuman.ui.screens.actividad.components.HeaderDiaActividades
 import com.example.familiasquesuman.ui.screens.actividad.components.TarjetaActividadDia
+import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 import com.example.familiasquesuman.ui.theme.FondoClaro
 import com.example.familiasquesuman.ui.theme.GrisBordeClaro
 
@@ -84,5 +87,13 @@ fun ActividadScreen(navController: NavHostController) {
             }
             item { BannerSincronizarCalendario() }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ActividadScreenPreview() {
+    FamiliasQueSumanTheme {
+        ActividadScreen(navController = rememberNavController())
     }
 }
