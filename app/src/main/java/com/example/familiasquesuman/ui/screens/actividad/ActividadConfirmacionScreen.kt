@@ -1,5 +1,7 @@
 package com.example.familiasquesuman.ui.screens.actividad
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,7 +9,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Event
@@ -23,10 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.compose.foundation.BorderStroke
+import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
@@ -38,6 +40,21 @@ import com.example.familiasquesuman.ui.theme.*
 fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: Int) {
     val actividad = actividadesMockData.find { it.id == actividadId } ?: actividadesMockData.first()
 
+    val regresarAlDetalle = {
+        val rutaDetalle = Rutas.ActividadDetalle.crearRuta(actividadId)
+        val popped = navController.popBackStack(route = rutaDetalle, inclusive = false)
+        if (!popped) {
+            navController.navigate(rutaDetalle) {
+                popUpTo(Rutas.Actividades.ruta)
+            }
+        }
+    }
+
+    // Intercepta el botón/gesto físico "Atrás" del sistema
+    BackHandler {
+        regresarAlDetalle()
+    }
+
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
@@ -46,9 +63,9 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                 Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
             }
         }
-    ) {  paddingValues ->
+    ) { paddingValues ->
         val scrollState = rememberScrollState()
-        
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -57,7 +74,7 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             // Placeholder para la ilustración de confirmación
             Box(
                 modifier = Modifier
@@ -65,12 +82,12 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = Icons.Default.Groups, 
-                    contentDescription = null, 
-                    tint = AzulOscuro.copy(alpha = 0.5f), 
+                    imageVector = Icons.Default.Groups,
+                    contentDescription = null,
+                    tint = AzulOscuro.copy(alpha = 0.5f),
                     modifier = Modifier.size(100.dp)
                 )
-                
+
                 // Círculo de check encima
                 Box(
                     modifier = Modifier
@@ -83,9 +100,9 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                     Icon(Icons.Default.Check, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Text(
                 text = "¡Participación confirmada!",
                 fontSize = 26.sp,
@@ -93,9 +110,9 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                 color = AzulOscuro,
                 textAlign = TextAlign.Center
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             Text(
                 text = "Tu registro quedó listo. Aquí tienes un resumen de la actividad y de las personas que asistirán.",
                 fontSize = 14.sp,
@@ -103,9 +120,9 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp)
             )
-            
+
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             // Tarjeta de Resumen
             Surface(
                 shape = RoundedCornerShape(16.dp),
@@ -126,7 +143,7 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                         }
                     }
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = GrisBordeClaro)
-                    
+
                     // Fecha
                     Row {
                         Icon(Icons.Default.DateRange, contentDescription = null, tint = AzulOscuro)
@@ -137,7 +154,7 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                         }
                     }
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = GrisBordeClaro)
-                    
+
                     // Hora
                     Row {
                         Icon(Icons.Default.Schedule, contentDescription = null, tint = AzulOscuro)
@@ -148,7 +165,7 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                         }
                     }
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = GrisBordeClaro)
-                    
+
                     // Lugar
                     Row {
                         Icon(Icons.Default.Place, contentDescription = null, tint = AzulOscuro)
@@ -159,7 +176,7 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                         }
                     }
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = GrisBordeClaro)
-                    
+
                     // Participantes
                     Row {
                         Icon(Icons.Default.Groups, contentDescription = null, tint = AzulOscuro)
@@ -179,9 +196,9 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             // Resumen de asistentes
             Surface(
                 shape = RoundedCornerShape(12.dp),
@@ -200,9 +217,9 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                     Text("1 asistente confirmado", color = AzulOscuro, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             // Botones Finales
             Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                 Button(
@@ -217,16 +234,11 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Agregar al calendario", color = AzulOscuro, fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 OutlinedButton(
-                    onClick = { 
-                        navController.navigate(Rutas.ActividadDetalle.crearRuta(actividadId)) {
-                            // Limpia la pila para que al darle "atrás" en el detalle, vayas al inicio de las actividades
-                            popUpTo(Rutas.Actividades.ruta)
-                        }
-                    },
+                    onClick = { regresarAlDetalle() },
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = AzulOscuro),
                     border = BorderStroke(1.dp, AmarilloOscuro),
                     shape = RoundedCornerShape(12.dp),
@@ -237,8 +249,19 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
                     Text("Ver detalles de la actividad", fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ActividadConfirmacionScreenPreview() {
+    FamiliasQueSumanTheme {
+        ActividadConfirmacionScreen(
+            navController = rememberNavController(),
+            actividadId = 1
+        )
     }
 }
