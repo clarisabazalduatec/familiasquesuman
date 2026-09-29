@@ -10,6 +10,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Chat
+import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -29,9 +32,10 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.familiasquesuman.domain.OpcionApoyo
 import com.example.familiasquesuman.domain.TipoApoyo
-
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 
@@ -40,7 +44,7 @@ private fun abrirEnlace(context: Context, url: String) {
 }
 
 private fun iconoPara(tipo: TipoApoyo): ImageVector = when (tipo) {
-    TipoApoyo.TIEMPO_TALENTO -> Icons.Default.MenuBook
+    TipoApoyo.TIEMPO_TALENTO -> Icons.AutoMirrored.Filled.MenuBook
     TipoApoyo.APORTACION_ECONOMICA -> Icons.Default.AttachMoney
     TipoApoyo.MATERIAL -> Icons.Default.Inventory2
 }
@@ -64,7 +68,12 @@ fun ProyectoDetalleScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.PROYECTOS,
-        chatbot = true
+        chatbot = true,
+        acciones = {
+            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
+                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
+            }
+        }
     ) { paddingInterno ->
         Column(
             modifier = Modifier
@@ -73,38 +82,109 @@ fun ProyectoDetalleScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
+            // Botón Volver
+            TextButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.padding(bottom = 8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Volver",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Volver",
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Tarjeta encabezado
-            Card(shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
-                Row(modifier = Modifier.padding(16.dp)) {
-                    if (proyecto.logoUrl != null) {
-                        AsyncImage(
-                            model = proyecto.logoUrl,
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(64.dp).clip(CircleShape)
-                        )
-                    } else {
-                        Box(modifier = Modifier.size(64.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant))
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        AssistChip(onClick = {}, enabled = false, label = { Text("Activo") })
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(proyecto.nombre, style = MaterialTheme.typography.titleLarge)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text(proyecto.ubicacion, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            // Tarjeta Encabezado
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (proyecto.logoUrl != null) {
+                            AsyncImage(
+                                model = proyecto.logoUrl,
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .clip(CircleShape)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Lightbulb,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
                         }
-                        Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            ChipEstadoActivo()
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = proyecto.nombre,
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Groups, contentDescription = null, modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Spacer(modifier = Modifier.width(2.dp))
-                            Text(proyecto.participantes, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = proyecto.ubicacion,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Groups,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = proyecto.participantes,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     }
                 }
@@ -113,12 +193,19 @@ fun ProyectoDetalleScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             SeccionTexto(titulo = "Acerca del proyecto", texto = proyecto.acercaDe)
+
             Spacer(modifier = Modifier.height(16.dp))
+
             SeccionTexto(titulo = "Descripción", texto = proyecto.descripcionLarga)
 
             if (proyecto.opcionesApoyo.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(24.dp))
-                Text("Elige tu forma de apoyar y que más se adapte a ti.", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = "Elige tu forma de apoyar y que más se adapte a ti",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 Spacer(modifier = Modifier.height(12.dp))
                 proyecto.opcionesApoyo.forEach { opcion ->
                     TarjetaOpcionApoyo(opcion)
@@ -126,17 +213,21 @@ fun ProyectoDetalleScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
             if (proyecto.telefonoWhatsapp != null) {
-                Button(
+                BotonPrimario(
                     onClick = {
                         val mensaje = "Hola, me interesa ayudar en el proyecto: ${proyecto.nombre}"
                         abrirEnlace(context, "https://wa.me/${proyecto.telefonoWhatsapp}?text=${Uri.encode(mensaje)}")
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = androidx.compose.ui.graphics.Color(0xFF25D366)),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth().height(56.dp)
+                    containerColor = AzulMarino,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 ) {
-                    Icon(Icons.Default.Chat, contentDescription = null)
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Chat,
+                        contentDescription = null
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Escribir por WhatsApp", fontWeight = FontWeight.Bold)
                 }
@@ -144,13 +235,15 @@ fun ProyectoDetalleScreen(
             }
 
             if (proyecto.telefonoLlamada != null) {
-                Button(
+                BotonPrimario(
                     onClick = { abrirEnlace(context, "tel:${proyecto.telefonoLlamada}") },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth().height(56.dp)
+                    containerColor = Ambar,
+                    contentColor = AzulMarino
                 ) {
-                    Icon(Icons.Default.Phone, contentDescription = null)
+                    Icon(
+                        imageVector = Icons.Default.Phone,
+                        contentDescription = null
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Llamar: ${proyecto.telefonoLlamada}", fontWeight = FontWeight.Bold)
                 }
@@ -161,31 +254,78 @@ fun ProyectoDetalleScreen(
 
 @Composable
 private fun SeccionTexto(titulo: String, texto: String) {
-    Card(shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(titulo, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Text(
+                text = titulo,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(texto, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = texto,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
 
 @Composable
 private fun TarjetaOpcionApoyo(opcion: OpcionApoyo) {
-    Card(shape = RoundedCornerShape(12.dp), modifier = Modifier.fillMaxWidth()) {
-        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Box(
-                modifier = Modifier.size(48.dp).clip(CircleShape).background(MaterialTheme.colorScheme.surfaceVariant),
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(iconoPara(opcion.tipo), contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    imageVector = iconoPara(opcion.tipo),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(opcion.titulo, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-                Text(opcion.descripcion, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(
+                    text = opcion.titulo,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = opcion.descripcion,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
-            Icon(Icons.Default.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
