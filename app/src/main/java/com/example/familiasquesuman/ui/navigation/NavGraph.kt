@@ -23,6 +23,7 @@ import com.example.familiasquesuman.ui.screens.actividad.ActividadScreen
 import com.example.familiasquesuman.ui.screens.admin.AdminScreen
 import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScreen
 import com.example.familiasquesuman.ui.screens.onboarding.OnboardingScreen
+import com.example.familiasquesuman.ui.screens.perfil.PerfilScreen
 
 @Composable
 fun NavGraphFamilias(navController: NavHostController = rememberNavController(), mostrarOnboarding: Boolean, marcarOnboardingVisto: () -> Unit
@@ -80,6 +81,9 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         }
         composable(Rutas.NuevaPublicacion.ruta) {
             NuevaPublicacionScreen(navController = navController)
+        }
+        composable(Rutas.Perfil.ruta) {
+            PerfilScreen(navController = navController)
         }
         composable(
             route = Rutas.ActividadDetalle.ruta,

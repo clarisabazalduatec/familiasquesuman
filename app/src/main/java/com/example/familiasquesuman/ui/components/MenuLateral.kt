@@ -20,13 +20,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddModerator
 import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.ChatBubble
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Login
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.material3.HorizontalDivider
@@ -66,8 +66,8 @@ fun MenuLateral(
     onDonarClick: () -> Unit = {},
     onDirectorioClick: () -> Unit = {},
     onContactoClick: () -> Unit = {},
-    onChatbotClick: () -> Unit = {},
-    onAdminClick: () -> Unit = {}
+    onAdminClick: () -> Unit = {},
+    onPerfilClick: () -> Unit = {}
 ) {
 
     ModalDrawerSheet(
@@ -102,21 +102,6 @@ fun MenuLateral(
                     .height(70.dp),
                 contentScale = ContentScale.Fit
             )
-
-            HorizontalDivider(
-                color = GrisBorde,
-                modifier = Modifier.padding(
-                    horizontal = 10.dp,
-                    vertical = 8.dp
-                )
-            )
-
-            ItemMenuLateral(
-                texto = "Chatbot",
-                icono = Icons.Outlined.ChatBubble,
-                onClick = onChatbotClick
-            )
-
             HorizontalDivider(
                 color = GrisBorde,
                 modifier = Modifier.padding(
@@ -182,6 +167,11 @@ fun MenuLateral(
                 texto = "Contacto y ayuda",
                 icono = Icons.Outlined.HelpOutline,
                 onClick = onContactoClick
+            )
+            ItemMenuLateral(
+                texto = "Perfil",
+                icono = Icons.Outlined.Person,
+                onClick = onPerfilClick
             )
             ItemMenuLateral(
                 texto = "Admin",
