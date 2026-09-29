@@ -13,5 +13,6 @@ data class CentroVisiteo(
     val descripcionCorta: String,
     val informacionGeneral: String,
     val necesidades: List<String>,
-    val direccion: String
+    val direccion: String,
+    val logoUrl: String? = null
 )
