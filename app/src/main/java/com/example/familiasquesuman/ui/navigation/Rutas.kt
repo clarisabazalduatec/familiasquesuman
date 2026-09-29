@@ -13,6 +13,7 @@ sealed class Rutas(val ruta: String) {
     object NuevaPublicacion : Rutas("nueva_publicacion")
     object Admin : Rutas("admin")
     object Notificaciones : Rutas("notificaciones")
+    object Perfil : Rutas("perfil")
     
     object ActividadDetalle : Rutas("actividad_detalle/{id}") {
         fun crearRuta(id: Int) = "actividad_detalle/$id"

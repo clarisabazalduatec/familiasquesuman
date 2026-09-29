@@ -103,6 +103,12 @@ fun PantallaPrincipalConMenu(
                         drawerState.close()
                     }
                     navController.navigate(Rutas.Admin.ruta)
+                },
+                onPerfilClick = {
+                    scope.launch {
+                        drawerState.close()
+                    }
+                    navController.navigate(Rutas.Perfil.ruta)
                 }
             )
         }
