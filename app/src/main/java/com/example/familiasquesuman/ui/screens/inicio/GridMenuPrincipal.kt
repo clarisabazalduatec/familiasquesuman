@@ -100,7 +100,7 @@ fun GridMenuPrincipal(
 
 
 @Composable
-private fun TarjetaMenuPrincipal(
+public fun TarjetaMenuPrincipal(
     opcion: OpcionMenuPrincipal,
     modifier: Modifier = Modifier,
     onClick: () -> Unit

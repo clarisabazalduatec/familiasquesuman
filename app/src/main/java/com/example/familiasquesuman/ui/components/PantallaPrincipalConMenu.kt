@@ -42,6 +42,7 @@ fun PantallaPrincipalConMenu(
     pantallaActual: PantallaPrincipal,
     titulo: String = "Familias que Suman+",
     navbar: Boolean = true,
+    chatbot: Boolean = false,
     acciones: @Composable RowScope.() -> Unit = {},
     contenido: @Composable (
         paddingInterno: PaddingValues
@@ -54,6 +55,10 @@ fun PantallaPrincipalConMenu(
         drawerState = drawerState,
         drawerContent = {
             MenuLateral(
+                onChatbotClick = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Chatbot.ruta)
+                },
                 onInicioClick = {
                     scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Inicio.ruta)
@@ -143,7 +148,7 @@ fun PantallaPrincipalConMenu(
 
 //chatbot
             floatingActionButton = {
-                if (pantallaActual != PantallaPrincipal.CHATBOT) {
+                if (chatbot) {
 
                     FloatingActionButton(
                         onClick = {

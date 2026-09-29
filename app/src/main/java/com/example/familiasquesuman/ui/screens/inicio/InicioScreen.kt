@@ -281,24 +281,6 @@ fun InicioScreen(
                     }
                 )
             }
-
-            item {
-                TarjetaActividadDestacada(
-                    categoria = "Educación",
-                    titulo = "Lectura para Niños",
-                    descripcion =
-                        "Apoya como voluntario en el círculo de lectura comunitaria.",
-                    fecha = "Sábado, 10:00 AM",
-                    onClick = {}
-                )
-            }
-
-            item {
-                SeccionTuImpacto(
-                    numeroActividades = 12,
-                    horasDonadas = 500
-                )
-            }
         }
     }
 }

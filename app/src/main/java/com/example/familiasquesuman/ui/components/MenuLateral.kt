@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddModerator
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.ChatBubble
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.HelpOutline
@@ -65,6 +66,7 @@ fun MenuLateral(
     onDonarClick: () -> Unit = {},
     onDirectorioClick: () -> Unit = {},
     onContactoClick: () -> Unit = {},
+    onChatbotClick: () -> Unit = {},
     onAdminClick: () -> Unit = {}
 ) {
 
@@ -100,6 +102,21 @@ fun MenuLateral(
                     .height(70.dp),
                 contentScale = ContentScale.Fit
             )
+
+            HorizontalDivider(
+                color = GrisBorde,
+                modifier = Modifier.padding(
+                    horizontal = 10.dp,
+                    vertical = 8.dp
+                )
+            )
+
+            ItemMenuLateral(
+                texto = "Chatbot",
+                icono = Icons.Outlined.ChatBubble,
+                onClick = onChatbotClick
+            )
+
             HorizontalDivider(
                 color = GrisBorde,
                 modifier = Modifier.padding(
