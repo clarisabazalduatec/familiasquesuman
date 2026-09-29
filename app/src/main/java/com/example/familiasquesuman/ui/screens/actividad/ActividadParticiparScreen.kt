@@ -34,6 +34,8 @@ fun ActividadParticiparScreen(navController: NavHostController, actividadId: Int
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
+        navbar = false,
+        chatbot = false,
         acciones = {
             IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
                 Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
