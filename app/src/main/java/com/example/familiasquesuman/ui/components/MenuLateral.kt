@@ -311,16 +311,6 @@ fun MenuLateral(
                 }
 
 
-                // =================================================
-                // CONFIGURACIÓN
-                // =================================================
-
-                ItemMenuLateral(
-                    texto = "Configuración",
-                    icono = Icons.Outlined.Settings,
-                    onClick = onConfiguracionClick
-                )
-
 
                 // =================================================
                 // PERFIL
