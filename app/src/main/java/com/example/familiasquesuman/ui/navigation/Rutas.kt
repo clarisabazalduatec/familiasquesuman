@@ -18,8 +18,14 @@ sealed class Rutas(val ruta: String) {
     object Admin : Rutas("admin")
     object AdminModeracionComunidad : Rutas("admin_moderacion_comunidad")
     object AdminModeracionActividades : Rutas("admin_moderacion_actividades")
+    object AdminModeracionProyectos : Rutas("admin_moderacion_proyectos")
     object AdminActualizacionDonaciones : Rutas("admin_actualizacion_donaciones")
     object AdminCrearContenido : Rutas("admin_crear_contenido")
+    
+    object AdminEditarContenido : Rutas("admin_editar_contenido/{tipo}/{id}") {
+        fun crearRuta(tipo: String, id: String) = "admin_editar_contenido/$tipo/$id"
+    }
+
     object Notificaciones : Rutas("notificaciones")
     object Perfil : Rutas("perfil")
     

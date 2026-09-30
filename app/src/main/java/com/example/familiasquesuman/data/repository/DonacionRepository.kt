@@ -43,6 +43,23 @@ fun agregarDonacionMock(donacion: Donacion) {
     donacionesMockData.add(0, donacion)
 }
 
+fun registrarAporteDonacion(id: String, cantidad: Float) {
+    val index = donacionesMockData.indexOfFirst { it.id == id }
+    if (index != -1) {
+        val vieja = donacionesMockData[index]
+        val nuevoRecaudado = vieja.recaudado + cantidad
+        val nuevoTextoProgreso = if (vieja.tipo == TipoDonacion.CAMPANA) {
+            "$${nuevoRecaudado.toInt()} recaudados"
+        } else {
+            "${nuevoRecaudado.toInt()} entregadas"
+        }
+        donacionesMockData[index] = vieja.copy(
+            recaudado = nuevoRecaudado,
+            textoProgreso = nuevoTextoProgreso
+        )
+    }
+}
+
 class DonacionRepositoryFake : DonacionRepository {
     override suspend fun obtenerDonaciones(): List<Donacion> {
         return donacionesMockData

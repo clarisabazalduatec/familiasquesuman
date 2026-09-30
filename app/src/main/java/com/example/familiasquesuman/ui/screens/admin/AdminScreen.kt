@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -79,19 +80,19 @@ fun AdminScreen(navController: NavHostController) {
 
             item {
                 AdminCardOption(
-                    titulo = "Moderación de comunidad",
-                    descripcion = "Revisa y aprueba publicaciones de la comunidad.",
-                    icono = Icons.Default.Groups,
-                    fondoIcono = FondoAzulClaro,
-                    colorIcono = TextoAzul,
-                    onClick = { navController.navigate(Rutas.AdminModeracionComunidad.ruta) }
+                    titulo = "Gestión de proyectos",
+                    descripcion = "Revisa y edita los proyectos sociales de la plataforma.",
+                    icono = Icons.Default.Lightbulb,
+                    fondoIcono = FondoNaranja,
+                    colorIcono = TextoNaranja,
+                    onClick = { navController.navigate(Rutas.AdminModeracionProyectos.ruta) }
                 )
             }
 
             item {
                 AdminCardOption(
-                    titulo = "Moderación de actividades",
-                    descripcion = "Gestiona las actividades activas y su contenido.",
+                    titulo = "Gestión de actividades",
+                    descripcion = "Revisa y edita las actividades activas de la comunidad.",
                     icono = Icons.Default.DateRange,
                     fondoIcono = FondoVerde,
                     colorIcono = TextoVerde,
@@ -101,12 +102,23 @@ fun AdminScreen(navController: NavHostController) {
 
             item {
                 AdminCardOption(
-                    titulo = "Actualización de donaciones",
-                    descripcion = "Revisa el progreso de las campañas de donación.",
+                    titulo = "Gestión de donaciones",
+                    descripcion = "Revisa y edita las campañas y donaciones en especie.",
                     icono = Icons.Default.Favorite,
-                    fondoIcono = FondoNaranja,
-                    colorIcono = TextoNaranja,
+                    fondoIcono = FondoAzulClaro,
+                    colorIcono = TextoAzul,
                     onClick = { navController.navigate(Rutas.AdminActualizacionDonaciones.ruta) }
+                )
+            }
+
+            item {
+                AdminCardOption(
+                    titulo = "Gestión de comunidad",
+                    descripcion = "Revisa y modera las publicaciones de la comunidad.",
+                    icono = Icons.Default.Groups,
+                    fondoIcono = AmbarClaro,
+                    colorIcono = Ambar,
+                    onClick = { navController.navigate(Rutas.AdminModeracionComunidad.ruta) }
                 )
             }
         }

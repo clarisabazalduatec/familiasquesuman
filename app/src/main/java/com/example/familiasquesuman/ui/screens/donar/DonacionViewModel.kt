@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.familiasquesuman.data.repository.DonacionRepository
 import com.example.familiasquesuman.data.repository.DonacionRepositoryFake
+import com.example.familiasquesuman.data.repository.donacionesMockData
+import com.example.familiasquesuman.data.repository.registrarAporteDonacion
 import com.example.familiasquesuman.domain.Donacion
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,8 +16,7 @@ class DonacionViewModel(
     private val repository: DonacionRepository = DonacionRepositoryFake()
 ) : ViewModel() {
 
-    // Se guarda toda la lista de donaciones
-    private val _donaciones = MutableStateFlow<List<Donacion>>(emptyList())
+    private val _donaciones = MutableStateFlow<List<Donacion>>(donacionesMockData)
     val donaciones: StateFlow<List<Donacion>> = _donaciones.asStateFlow()
 
     // 0 = Campañas Urgentes, 1 = Tengo algo para donar
@@ -28,7 +29,6 @@ class DonacionViewModel(
 
     private fun cargarDonaciones() {
         viewModelScope.launch {
-            // Pide los datos sin importarle de dónde vienen
             _donaciones.value = repository.obtenerDonaciones()
         }
     }
@@ -37,9 +37,12 @@ class DonacionViewModel(
         _tabSeleccionada.value = index
     }
 
-    // Busca una donación específica por su ID
     fun obtenerDonacionPorId(id: String): Donacion? {
-        return _donaciones.value.find { it.id == id }
+        return donacionesMockData.find { it.id == id }
+    }
+
+    fun registrarAporte(id: String, cantidad: Float) {
+        registrarAporteDonacion(id, cantidad)
     }
 
     private val _categoriaSeleccionada = MutableStateFlow<String?>("Todos")
