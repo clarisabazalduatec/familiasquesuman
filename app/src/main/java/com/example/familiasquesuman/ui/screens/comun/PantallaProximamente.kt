@@ -52,12 +52,7 @@ fun PantallaProximamente(navController: NavHostController) {
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.ACTIVIDADES,
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-            }
-        }
+        pantallaActual = PantallaPrincipal.ACTIVIDADES
     ) { paddingValues ->
             LazyColumn(
                 modifier = Modifier

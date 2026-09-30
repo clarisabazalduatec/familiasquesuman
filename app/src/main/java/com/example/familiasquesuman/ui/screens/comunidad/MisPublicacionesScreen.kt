@@ -66,27 +66,7 @@ fun MisPublicacionesScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.INICIO,
-        chatbot = false,
-
-        acciones = {
-
-            IconButton(
-                onClick = {
-                    navController.navigate(
-                        Rutas.Notificaciones.ruta
-                    )
-                }
-            ) {
-
-                Icon(
-                    imageVector =
-                        Icons.Default.Notifications,
-                    contentDescription =
-                        "Notificaciones",
-                    tint = AzulMarino
-                )
-            }
-        }
+        chatbot = false
     ) { paddingInterno ->
 
         LazyColumn(

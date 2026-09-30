@@ -42,12 +42,7 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
-        backButton = true,
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-            }
-        }
+        backButton = true
     ) { paddingValues ->
         val scrollState = rememberScrollState()
 

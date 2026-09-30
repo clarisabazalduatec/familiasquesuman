@@ -42,12 +42,7 @@ fun ActividadSeleccionParticipantesScreen(navController: NavHostController, acti
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
         navbar = false,
-        backButton = true,
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-            }
-        }
+        backButton = true
     ) { paddingValues ->
         Box(
             modifier = Modifier

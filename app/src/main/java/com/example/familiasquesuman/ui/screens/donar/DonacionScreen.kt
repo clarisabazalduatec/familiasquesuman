@@ -65,12 +65,7 @@ fun DonacionScreen(
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.DONAR,
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-            }
-        }
+        pantallaActual = PantallaPrincipal.DONAR
     )  { paddingValues ->
             LazyColumn(
                 modifier = Modifier

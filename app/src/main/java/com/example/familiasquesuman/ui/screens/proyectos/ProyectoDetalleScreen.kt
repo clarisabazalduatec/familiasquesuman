@@ -68,12 +68,7 @@ fun ProyectoDetalleScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.PROYECTOS,
-        chatbot = true,
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-            }
-        }
+        chatbot = true
     ) { paddingInterno ->
         Column(
             modifier = Modifier

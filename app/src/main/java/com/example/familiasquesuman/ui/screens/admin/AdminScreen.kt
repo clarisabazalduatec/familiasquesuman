@@ -35,12 +35,7 @@ fun AdminScreen(navController: NavHostController) {
         navbar = false,
         chatbot = false,
         backButton = false,
-        onBackClick = { navController.navigate(Rutas.Inicio.ruta) },
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones", tint = AzulMarino)
-            }
-        }
+        onBackClick = { navController.navigate(Rutas.Inicio.ruta) }
     ) { paddingInterno ->
         LazyColumn(
             modifier = Modifier

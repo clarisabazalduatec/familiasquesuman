@@ -44,12 +44,7 @@ fun ProyectosScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.PROYECTOS,
-        chatbot = false,
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-            }
-        },
+        chatbot = false
     ) { paddingInterno ->
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
