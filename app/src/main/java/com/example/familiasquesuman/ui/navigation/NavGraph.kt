@@ -90,6 +90,27 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         composable(Rutas.AdminActualizacionDonaciones.ruta) {
             com.example.familiasquesuman.ui.screens.admin.AdminActualizacionDonacionesScreen(navController = navController)
         }
+        composable(Rutas.AdminCrearContenido.ruta) {
+            com.example.familiasquesuman.ui.screens.admin.AdminCrearContenidoScreen(navController = navController)
+        }
+        composable(Rutas.AdminModeracionProyectos.ruta) {
+            com.example.familiasquesuman.ui.screens.admin.AdminModeracionProyectosScreen(navController = navController)
+        }
+        composable(
+            route = Rutas.AdminEditarContenido.ruta,
+            arguments = listOf(
+                navArgument("tipo") { type = NavType.StringType },
+                navArgument("id") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val tipo = backStackEntry.arguments?.getString("tipo") ?: "actividad"
+            val id = backStackEntry.arguments?.getString("id") ?: ""
+            com.example.familiasquesuman.ui.screens.admin.AdminEditarContenidoScreen(
+                navController = navController,
+                tipo = tipo,
+                id = id
+            )
+        }
         composable(Rutas.Comunidad.ruta) {
             ComunidadScreen(navController = navController)
         }

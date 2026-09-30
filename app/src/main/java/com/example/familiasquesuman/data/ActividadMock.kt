@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.example.familiasquesuman.ui.theme.FondoAzulClaro
@@ -34,7 +35,7 @@ data class ActividadMock(
     val participantesAdicionales: Int
 )
 
-val actividadesMockData = listOf(
+val actividadesMockData = mutableStateListOf(
     ActividadMock(
         id = 1,
         titulo = "Reforestación Parque Central",
@@ -93,3 +94,7 @@ val actividadesMockData = listOf(
         participantesAdicionales = 0
     )
 )
+
+fun agregarActividadMock(actividad: ActividadMock) {
+    actividadesMockData.add(0, actividad)
+}
