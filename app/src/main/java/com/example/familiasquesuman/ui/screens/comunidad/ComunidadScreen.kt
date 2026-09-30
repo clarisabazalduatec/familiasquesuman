@@ -60,6 +60,7 @@ fun ComunidadScreen(navController: NavHostController) {
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.INICIO,
+        chatbot = false,
         acciones = {
             IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
                 Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")

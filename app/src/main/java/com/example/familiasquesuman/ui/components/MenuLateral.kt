@@ -20,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddModerator
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.ChatBubble
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.HelpOutline
@@ -67,6 +68,8 @@ fun MenuLateral(
     onDirectorioClick: () -> Unit = {},
     onContactoClick: () -> Unit = {},
     onAdminClick: () -> Unit = {},
+    onChatbotClick: () -> Unit,
+    onBackClick: () -> Unit,
     onPerfilClick: () -> Unit = {}
 ) {
 
@@ -110,12 +113,23 @@ fun MenuLateral(
                 )
             )
 
+            ItemMenuLateral(
+                texto = "Chatbot",
+                icono = Icons.Outlined.ChatBubble,
+                onClick = onChatbotClick
+            )
+            HorizontalDivider(
+                color = GrisBorde,
+                modifier = Modifier.padding(
+                    horizontal = 10.dp,
+                    vertical = 8.dp
+                )
+            )
 
             //nav principal
             ItemMenuLateral(
                 texto = "Inicio",
                 icono = Icons.Outlined.Home,
-                selected = true,
                 onClick = onInicioClick
             )
             ItemMenuLateral(

@@ -1,5 +1,8 @@
 package com.example.familiasquesuman.ui.screens.actividad
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -7,26 +10,28 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.screens.actividad.components.CategoriaChip
+import com.example.familiasquesuman.ui.screens.actividad.components.TarjetaInfoActividad
+import com.example.familiasquesuman.ui.screens.actividad.components.TarjetaOrganizador
+import com.example.familiasquesuman.ui.screens.actividad.components.TarjetaPlazasDisponibles
 import com.example.familiasquesuman.ui.theme.*
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,6 +42,7 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
+        backButton = true,
         acciones = {
             IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
                 Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
@@ -44,10 +50,11 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
         }
     ) { paddingValues ->
         val scrollState = rememberScrollState()
-        
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(FondoClaro)
                 .padding(paddingValues)
         ) {
             Column(
@@ -65,7 +72,7 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.LightGray)
+                            .background(GrisClaroFondo)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Image,
@@ -100,26 +107,26 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         IconButton(
-                            onClick = { /*TODO*/ },
+                            onClick = { /* Compartir */ },
                             modifier = Modifier
                                 .background(Color.White, CircleShape)
                                 .size(40.dp)
                         ) {
                             Icon(
-                                Icons.Default.Share,
+                                imageVector = Icons.Default.Share,
                                 contentDescription = "Compartir",
                                 tint = AzulOscuro,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
                         IconButton(
-                            onClick = { /*TODO*/ },
+                            onClick = { /* Favorito */ },
                             modifier = Modifier
                                 .background(Color.White, CircleShape)
                                 .size(40.dp)
                         ) {
                             Icon(
-                                Icons.Default.FavoriteBorder,
+                                imageVector = Icons.Default.FavoriteBorder,
                                 contentDescription = "Favorito",
                                 tint = AzulOscuro,
                                 modifier = Modifier.size(20.dp)
@@ -134,31 +141,15 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                             .padding(
                                 horizontal = 16.dp,
                                 vertical = 32.dp
-                            ) // padding para evitar chocar con la superficie blanca
+                            )
                     ) {
-                        Surface(
-                            shape = RoundedCornerShape(12.dp),
-                            color = actividad.colorCategoria
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            ) {
-                                Icon(
-                                    actividad.iconoCategoria,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(14.dp),
-                                    tint = actividad.textColorCategoria
-                                )
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Text(
-                                    text = actividad.categoria,
-                                    fontSize = 12.sp,
-                                    color = actividad.textColorCategoria,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                        }
+                        CategoriaChip(
+                            categoria = actividad.categoria,
+                            icono = actividad.iconoCategoria,
+                            backgroundColor = actividad.colorCategoria,
+                            textColor = actividad.textColorCategoria,
+                            mostrarIcono = true
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = actividad.titulo,
@@ -192,154 +183,43 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        // Tarjeta de Ubicación
-                        Surface(
-                            shape = RoundedCornerShape(16.dp),
-                            color = BeigeClaro,
+                        TarjetaInfoActividad(
+                            titulo = "Ubicación",
+                            lineaPrincipal = actividad.ubicacion,
+                            lineaSecundaria = actividad.distancia,
+                            icono = Icons.Default.Place,
                             modifier = Modifier.weight(1f)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Default.Place,
-                                        contentDescription = null,
-                                        tint = AzulOscuro,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        "Ubicación",
-                                        fontWeight = FontWeight.Bold,
-                                        color = AzulOscuro,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    actividad.ubicacion,
-                                    fontSize = 12.sp,
-                                    color = TextoGrisActividad
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    actividad.distancia,
-                                    fontSize = 10.sp,
-                                    color = AzulEnlace,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
-
-                        // Tarjeta de Fecha y Hora
-                        Surface(
-                            shape = RoundedCornerShape(16.dp),
-                            color = BeigeClaro,
+                        )
+                        TarjetaInfoActividad(
+                            titulo = "Fecha y Hora",
+                            lineaPrincipal = actividad.fecha,
+                            lineaSecundaria = actividad.horario,
+                            icono = Icons.Default.DateRange,
                             modifier = Modifier.weight(1f)
-                        ) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        Icons.Default.DateRange,
-                                        contentDescription = null,
-                                        tint = AzulOscuro,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text(
-                                        "Fecha y Hora",
-                                        fontWeight = FontWeight.Bold,
-                                        color = AzulOscuro,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(actividad.fecha, fontSize = 12.sp, color = TextoGrisActividad)
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    actividad.horario,
-                                    fontSize = 10.sp,
-                                    color = AzulEnlace,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-                        }
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Organizador
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        color = Color.White,
-                        shadowElevation = 1.dp,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // Logo organizador
-                            Box(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .background(FondoVerde, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    Icons.Default.Eco,
-                                    contentDescription = null,
-                                    tint = TextoVerde
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            Column(modifier = Modifier.weight(1f)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Text(
-                                        actividad.organizador,
-                                        fontWeight = FontWeight.Bold,
-                                        color = AzulOscuro,
-                                        fontSize = 14.sp
-                                    )
-                                    if (actividad.organizadorVerificado) {
-                                        Spacer(modifier = Modifier.width(4.dp))
-                                        Icon(
-                                            Icons.Default.Verified,
-                                            contentDescription = "Verificado",
-                                            tint = AzulEnlace,
-                                            modifier = Modifier.size(14.dp)
-                                        )
-                                    }
-                                }
-                                Text(
-                                    "Organizador verificado",
-                                    color = TextoGrisActividad,
-                                    fontSize = 12.sp
-                                )
-                            }
-
-                            Icon(
-                                Icons.Default.Info,
-                                contentDescription = "Info organizador",
-                                tint = AzulOscuro
-                            )
-                        }
-                    }
+                    TarjetaOrganizador(
+                        nombreOrganizador = actividad.organizador,
+                        esVerificado = actividad.organizadorVerificado
+                    )
 
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // Acerca del proyecto
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
-                            actividad.iconoCategoria,
+                            imageVector = actividad.iconoCategoria,
                             contentDescription = null,
                             tint = actividad.textColorCategoria,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Acerca del proyecto",
+                            text = "Acerca del proyecto",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = AzulOscuro
@@ -356,122 +236,76 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // Plazas disponibles
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        color = Color.White,
-                        shadowElevation = 1.dp,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(modifier = Modifier.padding(16.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    "Plazas disponibles",
-                                    fontWeight = FontWeight.Bold,
-                                    color = AzulOscuro,
-                                    fontSize = 14.sp
-                                )
-                                Text(
-                                    "${actividad.lugaresDisponibles} / ${actividad.lugaresTotales}",
-                                    fontWeight = FontWeight.Bold,
-                                    color = AzulOscuro,
-                                    fontSize = 14.sp
-                                )
-                            }
+                    TarjetaPlazasDisponibles(
+                        disponibles = actividad.lugaresDisponibles,
+                        totales = actividad.lugaresTotales
+                    )
 
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            // Barra de progreso
-                            val progreso =
-                                actividad.lugaresDisponibles.toFloat() / actividad.lugaresTotales.toFloat()
-                            LinearProgressIndicator(
-                                progress = { progreso },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(8.dp)
-                                    .clip(RoundedCornerShape(4.dp)),
-                                color = AmarilloOscuro, // Usando color recién definido
-                                trackColor = GrisBordeClaro // Usando color recién definido
-                            )
-
-                            Spacer(modifier = Modifier.height(12.dp))
-
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    Icons.Default.GroupAdd,
-                                    contentDescription = null,
-                                    tint = AzulOscuro,
-                                    modifier = Modifier.size(16.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    "¡Súmate, quedan pocas plazas!",
-                                    color = TextoGrisActividad,
-                                    fontSize = 12.sp
-                                )
-                            }
-                        }
-                    }
-
-                    // Espacio extra al final para que el botón no tape contenido
                     Spacer(modifier = Modifier.height(100.dp))
                 }
             }
 
-        // Derivar si el usuario está scrolleando para ocultar el botón
-        val isScrolling by remember {
-            derivedStateOf { scrollState.isScrollInProgress }
-        }
+            val isScrolling by remember {
+                derivedStateOf { scrollState.isScrollInProgress }
+            }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.BottomCenter)
-        ) {
-            androidx.compose.animation.AnimatedVisibility(
-                visible = !isScrolling,
-                enter = androidx.compose.animation.slideInVertically(initialOffsetY = { it }),
-                exit = androidx.compose.animation.slideOutVertically(targetOffsetY = { it })
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
             ) {
-                Surface(
-                    color = FondoClaro,
-                    modifier = Modifier.fillMaxWidth(),
-                    shadowElevation = 16.dp
+                AnimatedVisibility(
+                    visible = !isScrolling,
+                    enter = slideInVertically(initialOffsetY = { it }),
+                    exit = slideOutVertically(targetOffsetY = { it })
                 ) {
-                    Button(
-                        onClick = {
-                            navController.navigate(
-                                Rutas.ActividadParticipar.crearRuta(
-                                    actividadId
-                                )
-                            )
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Ambar), // Amarillo oscuro
-                        shape = RoundedCornerShape(24.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .height(56.dp)
+                    Surface(
+                        color = FondoClaro,
+                        modifier = Modifier.fillMaxWidth(),
+                        shadowElevation = 16.dp
                     ) {
-                        Icon(
-                            Icons.Default.VolunteerActivism,
-                            contentDescription = null,
-                            tint = AzulOscuro
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            "Quiero participar",
-                            color = AzulOscuro,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                        Button(
+                            onClick = {
+                                navController.navigate(
+                                    Rutas.ActividadParticipar.crearRuta(
+                                        actividadId
+                                    )
+                                )
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Ambar),
+                            shape = RoundedCornerShape(24.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .height(56.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.VolunteerActivism,
+                                contentDescription = null,
+                                tint = AzulOscuro
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Quiero participar",
+                                color = AzulOscuro,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ActividadDetalleScreenPreview() {
+    FamiliasQueSumanTheme {
+        ActividadDetalleScreen(
+            navController = rememberNavController(),
+            actividadId = 1
+        )
     }
 }

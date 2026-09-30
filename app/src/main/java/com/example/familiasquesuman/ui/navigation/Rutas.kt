@@ -12,6 +12,9 @@ sealed class Rutas(val ruta: String) {
     object Comunidad : Rutas("comunidad")
     object NuevaPublicacion : Rutas("nueva_publicacion")
     object Admin : Rutas("admin")
+    object AdminModeracionComunidad : Rutas("admin_moderacion_comunidad")
+    object AdminModeracionActividades : Rutas("admin_moderacion_actividades")
+    object AdminActualizacionDonaciones : Rutas("admin_actualizacion_donaciones")
     object Notificaciones : Rutas("notificaciones")
     object Perfil : Rutas("perfil")
     
@@ -33,5 +36,8 @@ sealed class Rutas(val ruta: String) {
 
     object ResultadoPublicacion : Rutas("resultado_publicacion/{fueExitoso}") {
         fun crearRuta(fueExitoso: Boolean) = "resultado_publicacion/$fueExitoso"
+    }
+    object ProyectoDetalle : Rutas("proyecto_detalle/{proyectoId}") {
+        fun crearRuta(proyectoId: String) = "proyecto_detalle/$proyectoId"
     }
 }

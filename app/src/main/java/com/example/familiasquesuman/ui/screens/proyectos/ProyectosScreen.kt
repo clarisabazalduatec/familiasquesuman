@@ -1,4 +1,4 @@
-package com.example.familiasquesuman.ui.screens.directorio
+package com.example.familiasquesuman.ui.screens.proyectos
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,51 +14,37 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.familiasquesuman.domain.CentroVisiteo
-import com.example.familiasquesuman.domain.TipoCentro
+import com.example.familiasquesuman.domain.EstadoProyecto
 import com.example.familiasquesuman.ui.components.BarraBusqueda
-import com.example.familiasquesuman.ui.components.FiltrosChips
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 
-private val centrosDeEjemplo = listOf(
-    CentroVisiteo(
-        id = "1",
-        tipo = TipoCentro.ASILO,
-        nombre = "Morada del Anciano Desvalido Cadereyta",
-        descripcionCorta = "Asilo de ancianos donde se atienden 24 horas a 46 adultos mayores.",
-        informacionGeneral = "Atención a adultos mayores en abandono, soledad y falta de apoyo familiar. Se les proporciona una vida digna. Se les ofrece refugio, alimentación, atención integral y compañía.",
-        necesidades = listOf(
-            "Alimentos como: azúcar, leche, aceite, té, gelatina, mole en lata, saladitas, servilletas, ensure, jugos y frutas",
-            "Limpieza: trapeadores, cubetas, botes de basura, guantes, cloro, fabuloso, pino, jabón líquido, shampoo, desengrasantes, bolsas de basura",
-        ),
-        direccion = "Blvd Jose Maria Gonzalez #1000, Cadereyta",
-    ),
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DirectorioScreen(navController: NavHostController) {
+fun ProyectosScreen(
+    navController: NavHostController,
+    viewModel: ProyectoViewModel = viewModel(),
+) {
+    var pestanaActiva by remember { mutableStateOf(EstadoProyecto.ACTIVO) }
     var textoBusqueda by remember { mutableStateOf("") }
-    var tipoSeleccionado by remember { mutableStateOf<TipoCentro?>(null) }
 
-    val centrosFiltrados = remember(textoBusqueda, tipoSeleccionado) {
-        centrosDeEjemplo.filter { centro ->
-            val coincideTipo = (tipoSeleccionado == null) || (centro.tipo == tipoSeleccionado)
-            val coincideBusqueda = textoBusqueda.isBlank() ||
-                    centro.nombre.contains(textoBusqueda, ignoreCase = true) ||
-                    centro.descripcionCorta.contains(textoBusqueda, ignoreCase = true)
-            coincideTipo && coincideBusqueda
+    val proyectosFiltrados = remember(pestanaActiva, textoBusqueda) {
+        viewModel.obtenerProyectosPorEstado(pestanaActiva).filter {
+            textoBusqueda.isBlank() ||
+                    it.nombre.contains(textoBusqueda, ignoreCase = true) ||
+                    it.descripcionCorta.contains(textoBusqueda, ignoreCase = true)
         }
     }
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.DIRECTORIO,
+        pantallaActual = PantallaPrincipal.PROYECTOS,
+        chatbot = false,
         acciones = {
             IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
                 Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
@@ -75,45 +61,72 @@ fun DirectorioScreen(navController: NavHostController) {
             item {
                 Column(modifier = Modifier.padding(bottom = 4.dp)) {
                     Text(
-                        text = "Directorio de Visiteo",
+                        text = "Proyectos",
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Centros y espacios verificados para visitar y ayudar en familia.",
+                        text = "Proyectos con causas y objetivos específicos.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
+
+            item {
+                PrimaryTabRow(
+                    selectedTabIndex = if (pestanaActiva == EstadoProyecto.ACTIVO) 0 else 1,
+                    containerColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                ) {
+                    Tab(
+                        selected = pestanaActiva == EstadoProyecto.ACTIVO,
+                        onClick = { pestanaActiva = EstadoProyecto.ACTIVO },
+                        text = {
+                            Text(
+                                text = "Proyectos activos",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = if (pestanaActiva == EstadoProyecto.ACTIVO) FontWeight.Bold else FontWeight.Normal,
+                            )
+                        },
+                    )
+                    Tab(
+                        selected = pestanaActiva == EstadoProyecto.ANTERIOR,
+                        onClick = { pestanaActiva = EstadoProyecto.ANTERIOR },
+                        text = {
+                            Text(
+                                text = "Proyectos anteriores",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = if (pestanaActiva == EstadoProyecto.ANTERIOR) FontWeight.Bold else FontWeight.Normal,
+                            )
+                        },
+                    )
+                }
+            }
+
             item {
                 BarraBusqueda(
                     texto = textoBusqueda,
                     onTextoChange = { textoBusqueda = it },
-                    placeholder = "Buscar centro...",
+                    placeholder = "Buscar proyectos...",
                 )
             }
-            item {
-                FiltrosChips(
-                    opciones = TipoCentro.entries,
-                    seleccionado = tipoSeleccionado,
-                    etiquetaPara = { it.etiqueta },
-                    onSeleccionado = { tipoSeleccionado = it },
-                )
-            }
-            if (centrosFiltrados.isEmpty()) {
-                item { EstadoVacioDirectorio() }
+
+            if (proyectosFiltrados.isEmpty()) {
+                item { EstadoVacioProyectos() }
             } else {
-                items(centrosFiltrados) { centro ->
-                    TarjetaCentro(
-                        centro = centro,
-                        onComoAyudarClick = { },
-                        onVerDetallesClick = { },
+                items(proyectosFiltrados) { proyecto ->
+                    TarjetaProyecto(
+                        proyecto = proyecto,
+                        onVerDetallesClick = {
+                            navController.navigate(Rutas.ProyectoDetalle.crearRuta(proyecto.id))
+                        },
                     )
                 }
             }
+
             item {
                 Row(
                     modifier = Modifier
@@ -130,7 +143,7 @@ fun DirectorioScreen(navController: NavHostController) {
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Centros verificados por Familias que Suman",
+                        text = "Proyectos curados por Familias que Suman",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -143,8 +156,8 @@ fun DirectorioScreen(navController: NavHostController) {
 
 @Preview(showBackground = true)
 @Composable
-private fun DirectorioScreenPreview() {
+private fun ProyectosScreenPreview() {
     FamiliasQueSumanTheme {
-        DirectorioScreen(navController = rememberNavController())
+        ProyectosScreen(navController = rememberNavController())
     }
 }

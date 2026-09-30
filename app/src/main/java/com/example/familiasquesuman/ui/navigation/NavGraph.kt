@@ -24,6 +24,8 @@ import com.example.familiasquesuman.ui.screens.admin.AdminScreen
 import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScreen
 import com.example.familiasquesuman.ui.screens.onboarding.OnboardingScreen
 import com.example.familiasquesuman.ui.screens.perfil.PerfilScreen
+import com.example.familiasquesuman.ui.screens.proyectos.ProyectoDetalleScreen
+import com.example.familiasquesuman.ui.screens.proyectos.ProyectosScreen
 
 @Composable
 fun NavGraphFamilias(navController: NavHostController = rememberNavController(), mostrarOnboarding: Boolean, marcarOnboardingVisto: () -> Unit
@@ -75,6 +77,15 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         }
         composable(Rutas.Admin.ruta) {
             AdminScreen(navController = navController)
+        }
+        composable(Rutas.AdminModeracionComunidad.ruta) {
+            com.example.familiasquesuman.ui.screens.admin.AdminModeracionComunidadScreen(navController = navController)
+        }
+        composable(Rutas.AdminModeracionActividades.ruta) {
+            com.example.familiasquesuman.ui.screens.admin.AdminModeracionActividadesScreen(navController = navController)
+        }
+        composable(Rutas.AdminActualizacionDonaciones.ruta) {
+            com.example.familiasquesuman.ui.screens.admin.AdminActualizacionDonacionesScreen(navController = navController)
         }
         composable(Rutas.Comunidad.ruta) {
             ComunidadScreen(navController = navController)
@@ -143,6 +154,16 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         }
         composable(Rutas.Notificaciones.ruta) {
             NotificacionesScreen(navController = navController)
+        }
+        composable(Rutas.Proyectos.ruta) {
+            ProyectosScreen(navController = navController)
+        }
+        composable(
+            route = Rutas.ProyectoDetalle.ruta,
+            arguments = listOf(navArgument("proyectoId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val proyectoId = backStackEntry.arguments?.getString("proyectoId") ?: return@composable
+            ProyectoDetalleScreen(navController = navController, proyectoId = proyectoId)
         }
     }
 }

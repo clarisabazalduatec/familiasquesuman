@@ -5,15 +5,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.domain.Notificacion
 import com.example.familiasquesuman.domain.TipoNotificacion
+import com.example.familiasquesuman.ui.components.EstadoVacio
+import com.example.familiasquesuman.ui.theme.AzulMarino
+import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 
 private val notificacionesHoy = listOf(
@@ -33,33 +38,74 @@ private val notificacionesEstaSemana = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificacionesScreen(navController: NavHostController) {
+    val hayNotificaciones = notificacionesHoy.isNotEmpty() || notificacionesAyer.isNotEmpty() || notificacionesEstaSemana.isNotEmpty()
+
     Scaffold(
+        containerColor = CremaFondo,
         topBar = {
             TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = CremaFondo,
+                    navigationIconContentColor = AzulMarino,
+                    titleContentColor = AzulMarino,
+                ),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Regresar")
                     }
                 },
-                title = { Text("Notificaciones") }
+                title = {
+                    Text(
+                        text = "Notificaciones",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = AzulMarino,
+                    )
+                },
             )
-        }
+        },
     ) { paddingInterno ->
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .padding(paddingInterno)
-                .fillMaxSize()
-        ) {
-            item { EncabezadoSeccion("HOY") }
-            items(notificacionesHoy) { NotificacionItem(it) }
+        if (!hayNotificaciones) {
+            Box(
+                modifier = Modifier
+                    .padding(paddingInterno)
+                    .fillMaxSize(),
+            ) {
+                EstadoVacio(
+                    icono = Icons.Default.NotificationsOff,
+                    titulo = "Sin notificaciones",
+                    mensaje = "Aquí aparecerán tus actualizaciones y avisos importantes.",
+                )
+            }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier
+                    .padding(paddingInterno)
+                    .fillMaxSize(),
+            ) {
+                if (notificacionesHoy.isNotEmpty()) {
+                    item { EncabezadoSeccion("HOY") }
+                    items(notificacionesHoy) { NotificacionItem(it) }
+                }
 
-            item { Spacer(modifier = Modifier.height(8.dp)); EncabezadoSeccion("AYER") }
-            items(notificacionesAyer) { NotificacionItem(it) }
+                if (notificacionesAyer.isNotEmpty()) {
+                    item {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        EncabezadoSeccion("AYER")
+                    }
+                    items(notificacionesAyer) { NotificacionItem(it) }
+                }
 
-            item { Spacer(modifier = Modifier.height(8.dp)); EncabezadoSeccion("ESTA SEMANA") }
-            items(notificacionesEstaSemana) { NotificacionItem(it) }
+                if (notificacionesEstaSemana.isNotEmpty()) {
+                    item {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        EncabezadoSeccion("ESTA SEMANA")
+                    }
+                    items(notificacionesEstaSemana) { NotificacionItem(it) }
+                }
+            }
         }
     }
 }
@@ -68,8 +114,10 @@ fun NotificacionesScreen(navController: NavHostController) {
 private fun EncabezadoSeccion(texto: String) {
     Text(
         text = texto,
-        style = MaterialTheme.typography.labelMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        style = MaterialTheme.typography.titleSmall,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(vertical = 4.dp),
     )
 }
 

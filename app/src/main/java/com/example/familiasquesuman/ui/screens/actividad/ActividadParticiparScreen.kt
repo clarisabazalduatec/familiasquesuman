@@ -4,7 +4,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Groups
@@ -17,13 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.AzulOscuro
+import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 import com.example.familiasquesuman.ui.theme.FondoClaro
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,12 +34,14 @@ fun ActividadParticiparScreen(navController: NavHostController, actividadId: Int
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
+        navbar = false,
+        backButton = true,
         acciones = {
             IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
                 Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
             }
         }
-    ) {  paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -45,7 +49,7 @@ fun ActividadParticiparScreen(navController: NavHostController, actividadId: Int
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             
             // Placeholder para la ilustración de la familia
             Box(
@@ -58,11 +62,11 @@ fun ActividadParticiparScreen(navController: NavHostController, actividadId: Int
                     imageVector = Icons.Default.Groups, 
                     contentDescription = null, 
                     tint = AzulOscuro.copy(alpha = 0.5f), 
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier.size(200.dp)
                 )
             }
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(18.dp))
             
             Text(
                 text = "¿Es su primera vez participando?",
@@ -101,7 +105,7 @@ fun ActividadParticiparScreen(navController: NavHostController, actividadId: Int
                 color = Color.White,
                 border = BorderStroke(1.dp, Color(0xFFE8E8E8)),
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { /*TODO*/ }
+                onClick = { navController.navigate(Rutas.Login.ruta) }
             ) {
                 Row(
                     modifier = Modifier.padding(24.dp),
@@ -147,5 +151,16 @@ fun ActividadParticiparScreen(navController: NavHostController, actividadId: Int
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ActividadParticiparScreenPreview() {
+    FamiliasQueSumanTheme {
+        ActividadParticiparScreen(
+            navController = rememberNavController(),
+            actividadId = 1
+        )
     }
 }

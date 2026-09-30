@@ -40,11 +40,6 @@ import com.example.familiasquesuman.ui.components.MenuLateral
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
-import com.example.familiasquesuman.ui.screens.actividad.BannerSincronizarCalendario
-import com.example.familiasquesuman.ui.screens.actividad.HeaderDiaActividades
-import com.example.familiasquesuman.ui.screens.actividad.LeyendaFiltros
-import com.example.familiasquesuman.ui.screens.actividad.Separador
-import com.example.familiasquesuman.ui.screens.actividad.TarjetaActividadDia
 import com.example.familiasquesuman.ui.theme.AzulMarinoOscuro
 import com.example.familiasquesuman.ui.theme.GrisClaroFondo
 import kotlinx.coroutines.launch
