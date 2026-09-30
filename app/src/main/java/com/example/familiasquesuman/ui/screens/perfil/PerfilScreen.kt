@@ -1,48 +1,91 @@
 package com.example.familiasquesuman.ui.screens.perfil
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.theme.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PerfilScreen(navController: NavHostController) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
+fun PerfilScreen(
+    navController: NavHostController,
+    viewModel: PerfilViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsState()
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.ACTIVIDADES,
+        pantallaActual = PantallaPrincipal.PERFIL,
         acciones = {
             IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Notificaciones",
+                    tint = AzulMarino
+                )
             }
         }
-    ) { paddingValues ->
+    ) { paddingInterno ->
         LazyColumn(
             modifier = Modifier
+                .padding(paddingInterno)
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(bottom = 80.dp)
+                .background(CremaFondo),
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                end = 16.dp,
+                top = 2.dp,
+                bottom = 24.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item{Text("Proximamente :)")}
+            item {
+                // Mantiene "Mariana" como usuario activo fijo del perfil
+                HeaderPerfil(nombreUsuario = "Mariana")
+            }
+
+            item {
+                when {
+                    uiState.enModoEdicion -> {
+                        FormularioFamiliaCard(
+                            uiState = uiState,
+                            listaHijos = viewModel.listaHijos,
+                            onAgregarHijo = { viewModel.agregarHijo() },
+                            onEliminarHijo = { hijo -> viewModel.eliminarHijo(hijo) },
+                            onCancelar = { viewModel.cancelarEdicion() },
+                            onGuardar = { mama, papa, whatsapp, email, ciudad ->
+                                viewModel.guardarPerfil(mama, papa, whatsapp, email, ciudad)
+                            }
+                        )
+                    }
+                    uiState.esPerfilRegistrado -> {
+                        DatosFamiliaRegistradaCard(
+                            uiState = uiState,
+                            listaHijos = viewModel.listaHijos,
+                            onEditarClick = { viewModel.abrirEdicion() }
+                        )
+                    }
+                    else -> {
+                        DatosFamiliaVacioCard(
+                            onRegistrarClick = { viewModel.abrirEdicion() }
+                        )
+                    }
+                }
+            }
+
+            item {
+                MisInsigniasCard()
+            }
         }
     }
 }

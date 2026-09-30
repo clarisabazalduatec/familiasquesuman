@@ -12,7 +12,6 @@ import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalNavigationDrawer
@@ -185,6 +184,7 @@ fun PantallaPrincipalConMenu(
                                         PantallaPrincipal.DONAR -> Rutas.Donar.ruta
                                         PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
                                         PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
+                                        PantallaPrincipal.PERFIL -> Rutas.Perfil.ruta
                                     }
                                 navController.navigate(ruta) { launchSingleTop = true }
                             }
