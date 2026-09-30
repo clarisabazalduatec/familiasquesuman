@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -23,8 +24,8 @@ import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.actividad.components.BannerSincronizarCalendario
 import com.example.familiasquesuman.ui.screens.actividad.components.HeaderDiaActividades
 import com.example.familiasquesuman.ui.screens.actividad.components.TarjetaActividadDia
+import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
-import com.example.familiasquesuman.ui.theme.FondoClaro
 import com.example.familiasquesuman.ui.theme.GrisBordeClaro
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,10 +54,30 @@ fun ActividadScreen(navController: NavHostController) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .background(FondoClaro)
+                .background(CremaFondo)
                 .padding(paddingValues),
             contentPadding = PaddingValues(bottom = 80.dp)
         ) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    Text(
+                        text = "Actividades en Familia",
+                        style = MaterialTheme.typography.headlineLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Actividades en familia para ayudar durante el año.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
             item {
                 FiltrosChips(
                     opciones = categorias,
