@@ -67,7 +67,7 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         }
 
         composable(Rutas.Proyectos.ruta) {
-            PantallaProximamente(navController = navController)
+            ProyectosScreen(navController = navController)
         }
         composable(Rutas.Directorio.ruta) {
             DirectorioScreen(navController = navController)
@@ -168,9 +168,6 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         }
         composable(Rutas.Notificaciones.ruta) {
             NotificacionesScreen(navController = navController)
-        }
-        composable(Rutas.Proyectos.ruta) {
-            ProyectosScreen(navController = navController)
         }
         composable(
             route = Rutas.ProyectoDetalle.ruta,
