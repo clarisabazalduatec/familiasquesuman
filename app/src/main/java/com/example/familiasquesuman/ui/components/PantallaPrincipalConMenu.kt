@@ -104,7 +104,17 @@ fun PantallaPrincipalConMenu(
                 onBackClick = {
                     scope.launch { drawerState.close() }
                     navController.navigate(Rutas.Perfil.ruta)
-                }
+                },
+                onSobreNosotrosClick = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.SobreNosotros.ruta
+                    )
+                },
+                onContactoClick = {
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.ContactoAyuda.ruta
+                    )
+                },
             )
         }
     ) {

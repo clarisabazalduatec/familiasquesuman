@@ -8,7 +8,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-
+import com.example.familiasquesuman.ui.screens.informacion.SobreNosotrosScreen
+import com.example.familiasquesuman.ui.screens.informacion.ContactoAyudaScreen
 import com.example.familiasquesuman.ui.screens.chatbot.ChatbotScreen
 import com.example.familiasquesuman.ui.screens.comun.PantallaProximamente
 import com.example.familiasquesuman.ui.screens.comunidad.ComunidadScreen
@@ -26,6 +27,8 @@ import com.example.familiasquesuman.ui.screens.onboarding.OnboardingScreen
 import com.example.familiasquesuman.ui.screens.perfil.PerfilScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectoDetalleScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectosScreen
+import com.example.familiasquesuman.ui.screens.comunidad.MisPublicacionesScreen
+import com.example.familiasquesuman.ui.screens.comunidad.PublicacionDetalleScreen
 
 @Composable
 fun NavGraphFamilias(navController: NavHostController = rememberNavController(), mostrarOnboarding: Boolean, marcarOnboardingVisto: () -> Unit
@@ -96,6 +99,17 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         composable(Rutas.Perfil.ruta) {
             PerfilScreen(navController = navController)
         }
+        composable(Rutas.SobreNosotros.ruta) {
+            SobreNosotrosScreen(
+                navController = navController
+            )
+        }
+
+        composable(Rutas.ContactoAyuda.ruta) {
+            ContactoAyudaScreen(
+                navController = navController
+            )
+        }
         composable(
             route = Rutas.ActividadDetalle.ruta,
             arguments = listOf(navArgument("id") { type = NavType.IntType })
@@ -165,5 +179,37 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
             val proyectoId = backStackEntry.arguments?.getString("proyectoId") ?: return@composable
             ProyectoDetalleScreen(navController = navController, proyectoId = proyectoId)
         }
+        composable(Rutas.NuevaPublicacionOficial.ruta) {
+            NuevaPublicacionScreen(
+                navController = navController,
+                esOficial = true
+            )
+        }
+
+        composable(Rutas.MisPublicaciones.ruta) {
+            MisPublicacionesScreen(
+                navController = navController
+            )
+        }
+
+        composable(
+            route = Rutas.DetallePublicacion.ruta,
+            arguments = listOf(
+                navArgument("id") {
+                    type = NavType.StringType
+                }
+            )
+        ) { backStackEntry ->
+
+            val id = backStackEntry.arguments
+                ?.getString("id")
+                ?: ""
+
+            PublicacionDetalleScreen(
+                navController = navController,
+                publicacionId = id
+            )
+        }
+
     }
 }

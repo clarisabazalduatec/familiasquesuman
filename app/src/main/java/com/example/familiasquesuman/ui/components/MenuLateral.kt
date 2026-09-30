@@ -14,17 +14,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddModerator
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.ChatBubble
+import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Lightbulb
 import androidx.compose.material.icons.outlined.Login
 import androidx.compose.material.icons.outlined.Person
@@ -45,7 +45,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.familiasquesuman.R
@@ -54,7 +53,6 @@ import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.GrisBorde
-
 
 @Composable
 fun MenuLateral(
@@ -66,24 +64,28 @@ fun MenuLateral(
     onProyectosClick: () -> Unit = {},
     onDonarClick: () -> Unit = {},
     onDirectorioClick: () -> Unit = {},
-    onContactoClick: () -> Unit = {},
     onAdminClick: () -> Unit = {},
     onChatbotClick: () -> Unit,
     onBackClick: () -> Unit,
-    onPerfilClick: () -> Unit = {}
+    onPerfilClick: () -> Unit = {},
+    onSobreNosotrosClick: () -> Unit = {},
+    onContactoClick: () -> Unit = {}
 ) {
 
     ModalDrawerSheet(
         modifier = Modifier
             .width(330.dp)
             .fillMaxHeight(),
+
         drawerContainerColor = CremaFondo,
         drawerContentColor = AzulMarino,
+
         drawerShape = RoundedCornerShape(
             topEnd = 28.dp,
             bottomEnd = 28.dp
         )
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -91,10 +93,11 @@ fun MenuLateral(
                     horizontal = 18.dp,
                     vertical = 22.dp
                 )
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(
+                    rememberScrollState()
+                )
         ) {
 
-            //logo
             Image(
                 painter = painterResource(
                     id = R.drawable.logo2_onb
@@ -105,6 +108,7 @@ fun MenuLateral(
                     .height(70.dp),
                 contentScale = ContentScale.Fit
             )
+
             HorizontalDivider(
                 color = GrisBorde,
                 modifier = Modifier.padding(
@@ -118,6 +122,7 @@ fun MenuLateral(
                 icono = Icons.Outlined.ChatBubble,
                 onClick = onChatbotClick
             )
+
             HorizontalDivider(
                 color = GrisBorde,
                 modifier = Modifier.padding(
@@ -126,38 +131,52 @@ fun MenuLateral(
                 )
             )
 
-            //nav principal
             ItemMenuLateral(
                 texto = "Inicio",
                 icono = Icons.Outlined.Home,
                 onClick = onInicioClick
             )
+
             ItemMenuLateral(
                 texto = "Actividades en Familia",
                 icono = Icons.Outlined.CalendarMonth,
                 onClick = onActividadesClick
             )
+
             ItemMenuLateral(
                 texto = "Proyectos",
                 icono = Icons.Outlined.Lightbulb,
                 onClick = onProyectosClick
             )
+
             ItemMenuLateral(
                 texto = "Donar",
                 icono = Icons.Outlined.FavoriteBorder,
                 onClick = onDonarClick
             )
+
             ItemMenuLateral(
                 texto = "Comunidad",
                 icono = Icons.Outlined.Groups,
                 onClick = onComunidadClick
             )
+
             ItemMenuLateral(
                 texto = "Directorio de Visiteo",
                 icono = Icons.Outlined.Place,
                 onClick = onDirectorioClick
             )
-            Spacer(modifier = Modifier.height(8.dp))
+
+            ItemMenuLateral(
+                texto = "Sobre nosotros",
+                icono = Icons.Outlined.Info,
+                onClick = onSobreNosotrosClick
+            )
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
+
             HorizontalDivider(
                 color = GrisBorde,
                 modifier = Modifier.padding(
@@ -166,74 +185,101 @@ fun MenuLateral(
                 )
             )
 
-            //cuenta
+            // CUENTA
             ItemMenuLateral(
                 texto = "Iniciar sesión",
                 icono = Icons.Outlined.Login,
                 onClick = onIniciarSesionClick
             )
+
             ItemMenuLateral(
                 texto = "Crear cuenta",
                 icono = Icons.Outlined.PersonAdd,
                 onClick = onCrearCuentaClick
             )
+
+            // CONTACTO NUEVO
             ItemMenuLateral(
                 texto = "Contacto y ayuda",
-                icono = Icons.Outlined.HelpOutline,
+                icono = Icons.Outlined.Email,
                 onClick = onContactoClick
             )
+
             ItemMenuLateral(
                 texto = "Perfil",
                 icono = Icons.Outlined.Person,
                 onClick = onPerfilClick
             )
+
             ItemMenuLateral(
                 texto = "Admin",
                 icono = Icons.Outlined.AddModerator,
                 onClick = onAdminClick
             )
-            Spacer(modifier = Modifier.weight(1f))
 
-            //footer
+            Spacer(
+                modifier = Modifier.weight(1f)
+            )
+
+            // FOOTER
             HorizontalDivider(
                 color = GrisBorde,
                 modifier = Modifier.padding(
                     horizontal = 10.dp
                 )
             )
-            Spacer(modifier = Modifier.height(18.dp))
+
+            Spacer(
+                modifier = Modifier.height(18.dp)
+            )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Text(
                     text = "Aviso de privacidad",
                     style = MaterialTheme.typography.labelSmall,
-                    color = AzulMarino.copy(alpha = 0.65f)
+                    color = AzulMarino.copy(
+                        alpha = 0.65f
+                    )
                 )
+
                 Text(
                     text = "   |   ",
-                    color = AzulMarino.copy(alpha = 0.35f)
+                    color = AzulMarino.copy(
+                        alpha = 0.35f
+                    )
                 )
+
                 Text(
                     text = "Términos",
                     style = MaterialTheme.typography.labelSmall,
-                    color = AzulMarino.copy(alpha = 0.65f)
+                    color = AzulMarino.copy(
+                        alpha = 0.65f
+                    )
                 )
             }
-            Spacer(modifier = Modifier.height(14.dp))
+
+            Spacer(
+                modifier = Modifier.height(14.dp)
+            )
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+
                 Box(
                     modifier = Modifier
                         .width(55.dp)
                         .height(1.dp)
                         .background(GrisBorde)
                 )
+
                 Text(
                     text = "♡",
                     fontSize = 25.sp,
@@ -242,6 +288,7 @@ fun MenuLateral(
                         horizontal = 14.dp
                     )
                 )
+
                 Box(
                     modifier = Modifier
                         .width(55.dp)
@@ -249,11 +296,13 @@ fun MenuLateral(
                         .background(GrisBorde)
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
         }
     }
 }
-
 
 @Composable
 private fun ItemMenuLateral(
@@ -262,8 +311,10 @@ private fun ItemMenuLateral(
     selected: Boolean = false,
     onClick: () -> Unit
 ) {
+
     NavigationDrawerItem(
         label = {
+
             Text(
                 text = texto,
                 style = MaterialTheme.typography.bodyLarge,
@@ -275,16 +326,21 @@ private fun ItemMenuLateral(
                     }
             )
         },
+
         icon = {
+
             Icon(
                 imageVector = icono,
                 contentDescription = null,
                 modifier = Modifier.size(26.dp)
             )
         },
+
         selected = selected,
         onClick = onClick,
+
         shape = RoundedCornerShape(20.dp),
+
         colors = NavigationDrawerItemDefaults.colors(
             selectedContainerColor = AmbarClaro,
             selectedIconColor = AzulMarino,
@@ -293,8 +349,11 @@ private fun ItemMenuLateral(
             unselectedIconColor = AzulMarino,
             unselectedTextColor = AzulMarino
         ),
+
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp)
+            .padding(
+                vertical = 2.dp
+            )
     )
 }
