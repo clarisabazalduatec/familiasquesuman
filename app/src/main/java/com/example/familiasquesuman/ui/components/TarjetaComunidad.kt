@@ -2,72 +2,49 @@ package com.example.familiasquesuman.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.outlined.Campaign
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.familiasquesuman.R
+import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.Blanco
-import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
+import com.example.familiasquesuman.ui.theme.GrisBorde
 import com.example.familiasquesuman.ui.theme.GrisTexto
 
-/**
- * Componente de tarjeta de Comunidad reutilizable con pestañas para avisos oficiales y publicaciones.
- */
+
 @Composable
 fun TarjetaComunidad(
     onVerComunidad: () -> Unit,
-    modifier: Modifier = Modifier,
-    titulo: String = "Comunidad",
-    subtitulo: String = "Consulta avisos oficiales y\ncomparte experiencias de otras familias.",
-    pestanaOficialTexto: String = "Oficial",
-    pestanaComunidadTexto: String = "Comunidad",
-    anuncioEtiqueta: String = "Anuncio oficial",
-    anuncioTitulo: String = "Cambio de horario:",
-    anuncioDetalle: String = "Reforestación Parque Central\niniciará a las 9:00 AM.",
-    imagenResId: Int = R.drawable.parque_comunidad,
-    textoComunidadVacio: String = "Conoce experiencias y publicaciones compartidas por otras familias.",
-    textoBotonVerMas: String = "Ver comunidad",
-    onChatbot: (() -> Unit)? = null
+    onChatbot: () -> Unit = {}
 ) {
-    var pestanaSeleccionada by remember { mutableStateOf("Oficial") }
+
+
+    var pestanaSeleccionada by rememberSaveable {
+        mutableStateOf("Oficial")
+    }
 
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(
             containerColor = Blanco
@@ -76,179 +53,414 @@ fun TarjetaComunidad(
             defaultElevation = 2.dp
         )
     ) {
+
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(58.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFFBF5E4)),
-                    contentAlignment = Alignment.Center
+
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Surface(
+                    modifier = Modifier.size(54.dp),
+                    shape = CircleShape,
+                    color = AmbarClaro
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Groups,
-                        contentDescription = null,
-                        tint = AzulMarino,
-                        modifier = Modifier.size(30.dp)
-                    )
+
+                    Box(
+                        contentAlignment = Alignment.Center
+                    ) {
+
+                        Icon(
+                            imageVector = Icons.Default.Groups,
+                            contentDescription = null,
+                            tint = AzulMarino,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
-                Column {
+                Spacer(
+                    modifier = Modifier.width(12.dp)
+                )
+
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+
                     Text(
-                        text = titulo,
+                        text = "Comunidad",
                         style = MaterialTheme.typography.titleLarge,
                         color = AzulMarino
                     )
+
                     Text(
-                        text = subtitulo,
+                        text = "Consulta avisos oficiales y comparte experiencias de otras familias.",
                         style = MaterialTheme.typography.bodySmall,
                         color = GrisTexto
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(
+                modifier = Modifier.height(16.dp)
+            )
 
-            // Selector de pestañas
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Button(
-                    onClick = { pestanaSeleccionada = "Oficial" },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp),
-                    shape = RoundedCornerShape(
-                        topStart = 20.dp,
-                        bottomStart = 20.dp,
-                        topEnd = 0.dp,
-                        bottomEnd = 0.dp
-                    ),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (pestanaSeleccionada == "Oficial") AzulMarino else Blanco,
-                        contentColor = if (pestanaSeleccionada == "Oficial") Blanco else AzulMarino
-                    )
-                ) {
-                    Text(
-                        text = pestanaOficialTexto,
-                        style = MaterialTheme.typography.titleSmall
-                    )
-                }
-                OutlinedButton(
-                    onClick = { pestanaSeleccionada = "Comunidad" },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp),
-                    shape = RoundedCornerShape(
-                        topStart = 0.dp,
-                        bottomStart = 0.dp,
-                        topEnd = 20.dp,
-                        bottomEnd = 20.dp
-                    ),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = if (pestanaSeleccionada == "Comunidad") AzulMarino else Blanco,
-                        contentColor = if (pestanaSeleccionada == "Comunidad") Blanco else AzulMarino
-                    )
-                ) {
-                    Text(
-                        text = pestanaComunidadTexto,
-                        style = MaterialTheme.typography.titleSmall
-                    )
-                }
-            }
+            //tabs
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp),
+                color = Color.Transparent,
+                border = androidx.compose.foundation.BorderStroke(
+                    width = 1.dp,
+                    color = GrisBorde
+                )
+            ) {
 
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // Contenido de la pestaña
-            if (pestanaSeleccionada == "Oficial") {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Image(
-                        painter = painterResource(id = imagenResId),
-                        contentDescription = anuncioTitulo,
+
+                    // AVISOS OFICIALES
+                    Box(
                         modifier = Modifier
-                            .width(125.dp)
-                            .height(105.dp)
-                            .clip(RoundedCornerShape(14.dp)),
-                        contentScale = ContentScale.Crop
-                    )
-                    Spacer(modifier = Modifier.width(14.dp))
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = Icons.Outlined.Campaign,
-                                contentDescription = null,
-                                tint = AzulMarino,
-                                modifier = Modifier.size(18.dp)
+                            .weight(1f)
+                            .height(42.dp)
+                            .clip(
+                                RoundedCornerShape(
+                                    topStart = 22.dp,
+                                    bottomStart = 22.dp
+                                )
                             )
-                            Spacer(modifier = Modifier.width(5.dp))
-                            Text(
-                                text = anuncioEtiqueta,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = AzulMarino
+                            .background(
+                                if (pestanaSeleccionada == "Oficial") {
+                                    AzulMarino
+                                } else {
+                                    Blanco
+                                }
                             )
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
+                            .clickable {
+                                pestanaSeleccionada = "Oficial"
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+
                         Text(
-                            text = anuncioTitulo,
-                            style = MaterialTheme.typography.titleSmall,
-                            color = AzulMarino
+                            text = "Avisos Oficiales",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color =
+                                if (pestanaSeleccionada == "Oficial") {
+                                    Blanco
+                                } else {
+                                    AzulMarino
+                                }
                         )
+                    }
+
+                    // COMUNIDAD
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(42.dp)
+                            .clip(
+                                RoundedCornerShape(
+                                    topEnd = 22.dp,
+                                    bottomEnd = 22.dp
+                                )
+                            )
+                            .background(
+                                if (pestanaSeleccionada == "Comunidad") {
+                                    AzulMarino
+                                } else {
+                                    Blanco
+                                }
+                            )
+                            .clickable {
+                                pestanaSeleccionada = "Comunidad"
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+
                         Text(
-                            text = anuncioDetalle,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = GrisTexto
+                            text = "Comunidad",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color =
+                                if (pestanaSeleccionada == "Comunidad") {
+                                    Blanco
+                                } else {
+                                    AzulMarino
+                                }
                         )
                     }
                 }
+            }
+
+            Spacer(
+                modifier = Modifier.height(14.dp)
+            )
+
+
+            if (pestanaSeleccionada == "Oficial") {
+
+                ContenidoAvisoOficial(
+                    onClick = onVerComunidad
+                )
+
             } else {
-                Text(
-                    text = textoComunidadVacio,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = GrisTexto,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 28.dp)
+
+                ContenidoComunidad(
+                    onClick = onVerComunidad
                 )
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(
+                modifier = Modifier.height(10.dp)
+            )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+
+            TextButton(
+                onClick = onVerComunidad,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Spacer(modifier = Modifier.weight(1f))
-                TextButton(onClick = onVerComunidad) {
-                    Text(
-                        text = textoBotonVerMas,
-                        style = MaterialTheme.typography.titleSmall,
-                        color = AzulMarino
-                    )
-                    Text(
-                        text = "  ›",
-                        style = MaterialTheme.typography.titleLarge,
-                        color = AzulMarino
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
+
+                Spacer(
+                    modifier = Modifier.weight(1f)
+                )
+
+                Text(
+                    text = "Ver comunidad",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = AzulMarino
+                )
+
+                Spacer(
+                    modifier = Modifier.width(4.dp)
+                )
+
+                Icon(
+                    imageVector = Icons.Outlined.ChevronRight,
+                    contentDescription = null,
+                    tint = AzulMarino,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+//avisios oficiales
 @Composable
-private fun TarjetaComunidadPreview() {
-    FamiliasQueSumanTheme {
-        TarjetaComunidad(
-            onVerComunidad = {}
+private fun ContenidoAvisoOficial(
+    onClick: () -> Unit
+) {
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Image(
+            painter = painterResource(
+                id = R.drawable.parque_comunidad
+            ),
+            contentDescription = "Aviso oficial",
+            modifier = Modifier
+                .width(120.dp)
+                .height(92.dp)
+                .clip(
+                    RoundedCornerShape(14.dp)
+                ),
+            contentScale = ContentScale.Crop
         )
+
+        Spacer(
+            modifier = Modifier.width(12.dp)
+        )
+
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Icon(
+                    imageVector = Icons.Outlined.Campaign,
+                    contentDescription = null,
+                    tint = AzulMarino,
+                    modifier = Modifier.size(16.dp)
+                )
+
+                Spacer(
+                    modifier = Modifier.width(5.dp)
+                )
+
+                Text(
+                    text = "Aviso oficial",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = AzulMarino
+                )
+            }
+
+            Spacer(
+                modifier = Modifier.height(5.dp)
+            )
+
+            Text(
+                text = "Cambio de horario:",
+                style = MaterialTheme.typography.titleSmall,
+                color = AzulMarino
+            )
+
+            Text(
+                text = "Reforestación Parque Central iniciará a las 9:00 AM.",
+                style = MaterialTheme.typography.bodySmall,
+                color = GrisTexto,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+
+//comunidad
+@Composable
+private fun ContenidoComunidad(
+    onClick: () -> Unit
+) {
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
+    ) {
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Surface(
+                modifier = Modifier.size(36.dp),
+                shape = CircleShape,
+                color = AmbarClaro
+            ) {
+
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Icon(
+                        imageVector = Icons.Default.Groups,
+                        contentDescription = null,
+                        tint = AzulMarino,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
+
+            Spacer(
+                modifier = Modifier.width(9.dp)
+            )
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+
+                Text(
+                    text = "Carlos M.",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = AzulMarino
+                )
+
+                Text(
+                    text = "Hace 5 horas",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = GrisTexto
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            Image(
+                painter = painterResource(
+                    id = R.drawable.parque_comunidad
+                ),
+                contentDescription = "Publicación de comunidad",
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(92.dp)
+                    .clip(
+                        RoundedCornerShape(14.dp)
+                    ),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f))
+            {
+
+                Text(
+                    text = "Mil gracias a todos los que donaron alimentos hoy. Juntos alimentamos a 50 familias. 🌳💚",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = GrisTexto,
+                    maxLines = 4,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically)
+                {
+                    Icon(
+                        imageVector =
+                            Icons.Outlined.FavoriteBorder,
+                        contentDescription = null,
+                        tint = AzulMarino,
+                        modifier = Modifier.size(17.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    Text(
+                        text = "24",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AzulMarino
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Icon(
+                        imageVector =
+                            Icons.Outlined.ChatBubbleOutline,
+                        contentDescription = null,
+                        tint = AzulMarino,
+                        modifier = Modifier.size(17.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "5",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = AzulMarino
+                    )
+                }
+            }
+        }
     }
 }

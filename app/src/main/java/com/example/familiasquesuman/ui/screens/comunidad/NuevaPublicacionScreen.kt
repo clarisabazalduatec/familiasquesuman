@@ -1,183 +1,523 @@
 package com.example.familiasquesuman.ui.screens.comunidad
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddAPhoto
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.AddPhotoAlternate
+import androidx.compose.material.icons.outlined.Eco
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import com.example.familiasquesuman.R
+import com.example.familiasquesuman.ui.components.PantallaPrincipal
+import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
-import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
+import com.example.familiasquesuman.ui.theme.*
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NuevaPublicacionScreen(navController: NavHostController) {
-    var contenido by remember { mutableStateOf("") }
-    var tieneEvidenciaAdjunta by remember { mutableStateOf(false) } // simula "con datos" / "sin datos"
-    var estaEnviando by remember { mutableStateOf(false) }
+fun NuevaPublicacionScreen(
+    navController: NavHostController,
+    esOficial: Boolean = false
+) {
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Cancelar")
-                    }
-                },
-                title = { Text("Comunidad en Acción") }
-            )
+    var titulo by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var descripcion by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var ubicacion by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var categoria by rememberSaveable {
+        mutableStateOf("")
+    }
+
+    var menuCategoriasAbierto by remember {
+        mutableStateOf(false)
+    }
+
+    var tieneFotos by rememberSaveable {
+        mutableStateOf(false)
+    }
+
+    var estaEnviando by remember {
+        mutableStateOf(false)
+    }
+
+    val categorias = listOf(
+        "Medio Ambiente",
+        "Comedor Solidario",
+        "Educación",
+        "Voluntariado",
+        "Salud"
+    )
+
+    PantallaPrincipalConMenu(
+        navController = navController,
+        pantallaActual = PantallaPrincipal.INICIO,
+
+        chatbot = false,
+
+
+        acciones = {
+
+            IconButton(
+                onClick = {
+                    navController.navigate(
+                        Rutas.Notificaciones.ruta
+                    )
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Notifications,
+                    contentDescription = "Notificaciones",
+                    tint = AzulMarino
+                )
+            }
         }
     ) { paddingInterno ->
+
+        val scrollState =
+            androidx.compose.foundation.rememberScrollState()
+
         Column(
             modifier = Modifier
                 .padding(paddingInterno)
                 .fillMaxSize()
-                .padding(16.dp)
+                .background(CremaFondo)
+                .verticalScroll(scrollState)
+                .padding(18.dp)
         ) {
-            Text(
-                text = "Comparte y celebra el impacto de nuestra comunidad.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(18.dp),
+                color = Blanco,
+                tonalElevation = 1.dp
+            ) {
+
+                Row(
+                    modifier = Modifier.padding(
+                        horizontal = 6.dp,
+                        vertical = 10.dp
+                    ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    IconButton(
+                        onClick = {
+                            navController.popBackStack()
+                        }
+                    ) {
+                        Icon(
+                            imageVector =
+                                Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = "Regresar",
+                            tint = AzulMarino
+                        )
+                    }
+
+                    Spacer(
+                        modifier = Modifier.width(4.dp)
+                    )
+
+                    Column {
+
+                        Text(
+                            text =
+                                if (esOficial)
+                                    "Nueva publicación oficial"
+                                else
+                                    "Nueva publicación",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = AzulMarino
+                        )
+
+                        Text(
+                            text =
+                                if (esOficial)
+                                    "Crea un anuncio para las familias."
+                                else
+                                    "Comparte una experiencia con la comunidad.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = GrisTexto
+                        )
+                    }
+                }
+            }
+
+            Spacer(
+                modifier = Modifier.height(20.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Título *",
+                style = MaterialTheme.typography.titleSmall,
+                color = AzulMarino
+            )
+
+            Spacer(
+                modifier = Modifier.height(6.dp)
+            )
 
             OutlinedTextField(
-                value = contenido,
-                onValueChange = { contenido = it },
-                label = { Text("¿Qué sumaste hoy?") },
-                placeholder = { Text("Cuéntanos cómo fue tu experiencia...") },
-                minLines = 4,
+                value = titulo,
+                onValueChange = {
+                    titulo = it
+                },
                 modifier = Modifier.fillMaxWidth(),
-
+                placeholder = {
+                    Text("Escribe un título breve...")
+                },
+                shape = RoundedCornerShape(12.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(
+                modifier = Modifier.height(18.dp)
+            )
+
             Text(
-                text = "Elige una categoria.",
+                text = "Descripción *",
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = AzulMarino
             )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp) ) {
-                FilterChip(
-                    selected = false,
-                    onClick = { },
-                    label = { Text("Comedor Solidario") }
-                )
-                FilterChip(
-                    selected = false,
-                    onClick = { },
-                    label = { Text("Reforestacion") }
-                )
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.height(30.dp)) {
-                FilterChip(
-                    selected = false,
-                    onClick = { },
-                    label = { Text("Voluntariado") }
-                )
-                FilterChip(
-                    selected = false,
-                    onClick = { },
-                    label = { Text("Educacion") },
 
-                )
-            }
-            FilterChip(
-                selected = false,
-                onClick = { },
-                label = { Text("Salud") }
+            Spacer(
+                modifier = Modifier.height(6.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = descripcion,
+                onValueChange = {
+                    descripcion = it
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(130.dp),
+                placeholder = {
+                    Text(
+                        "Cuéntanos tu experiencia, qué aprendiste o qué fue lo más especial."
+                    )
+                },
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Spacer(
+                modifier = Modifier.height(18.dp)
+            )
+
             Text(
-                text = "Fotos",
+                text = "Fotos (opcional)",
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontFamily = FontFamily.SansSerif,
-
+                color = AzulMarino
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(
+                modifier = Modifier.height(8.dp)
+            )
 
-            // Zona de evidencia — "Con datos" (foto ya adjunta) vs "Sin datos" (vacío, invita a agregar)
-            if (tieneEvidenciaAdjunta) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(180.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.TopEnd
-                ) {
-                    // TODO: mostrar la imagen real seleccionada cuando conectemos selector de imágenes
-                    IconButton(onClick = { tieneEvidenciaAdjunta = false }) {
-                        Icon(Icons.Default.Close, contentDescription = "Quitar evidencia")
-                    }
+            Row(
+                horizontalArrangement =
+                    Arrangement.spacedBy(8.dp)
+            ) {
+
+                if (tieneFotos) {
+
+                    FotoNuevaPublicacion()
+                    FotoNuevaPublicacion()
                 }
-            } else {
+
                 OutlinedCard(
-                    onClick = { tieneEvidenciaAdjunta = true }, // simulado por ahora
-                    modifier = Modifier.fillMaxWidth().height(120.dp)
+                    modifier = Modifier
+                        .size(
+                            width = 95.dp,
+                            height = 110.dp
+                        )
+                        .clickable {
+                            tieneFotos = true
+                        },
+                    shape = RoundedCornerShape(12.dp)
                 ) {
+
                     Column(
                         modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        horizontalAlignment =
+                            Alignment.CenterHorizontally,
+                        verticalArrangement =
+                            Arrangement.Center
                     ) {
-                        Icon(Icons.Default.AddAPhoto, contentDescription = null)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text("Agregar evidencia (foto)", style = MaterialTheme.typography.bodySmall)
+
+                        Icon(
+                            imageVector =
+                                Icons.Outlined.AddPhotoAlternate,
+                            contentDescription = null,
+                            tint = AzulMarino
+                        )
+
+                        Spacer(
+                            modifier = Modifier.height(6.dp)
+                        )
+
+                        Text(
+                            text = "Agregar\nfotos",
+                            style =
+                                MaterialTheme.typography.bodySmall,
+                            color = GrisTexto
+                        )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(
+                modifier = Modifier.height(18.dp)
+            )
+
+            Text(
+                text = "Categoría *",
+                style =
+                    MaterialTheme.typography.titleSmall,
+                color = AzulMarino
+            )
+
+            Spacer(
+                modifier = Modifier.height(6.dp)
+            )
+
+            ExposedDropdownMenuBox(
+                expanded = menuCategoriasAbierto,
+                onExpandedChange = {
+                    menuCategoriasAbierto =
+                        !menuCategoriasAbierto
+                }
+            ) {
+
+                OutlinedTextField(
+                    value = categoria,
+                    onValueChange = {},
+                    readOnly = true,
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+
+                    placeholder = {
+                        Text(
+                            "Selecciona una categoría"
+                        )
+                    },
+
+                    leadingIcon = {
+
+                        Icon(
+                            imageVector = Icons.Outlined.Eco,
+                            contentDescription = null,
+                            tint = AzulMarino
+                        )
+                    },
+
+                    trailingIcon = {
+
+                        ExposedDropdownMenuDefaults
+                            .TrailingIcon(
+                                expanded =
+                                    menuCategoriasAbierto
+                            )
+                    },
+
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = menuCategoriasAbierto,
+
+                    onDismissRequest = {
+                        menuCategoriasAbierto = false
+                    }
+                ) {
+
+                    categorias.forEach { opcion ->
+
+                        DropdownMenuItem(
+                            text = {
+                                Text(opcion)
+                            },
+
+                            onClick = {
+
+                                categoria = opcion
+                                menuCategoriasAbierto = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Spacer(
+                modifier = Modifier.height(18.dp)
+            )
+
+            Text(
+                text = "Ubicación (opcional)",
+                style =
+                    MaterialTheme.typography.titleSmall,
+                color = AzulMarino
+            )
+
+            Spacer(
+                modifier = Modifier.height(6.dp)
+            )
+
+            OutlinedTextField(
+                value = ubicacion,
+
+                onValueChange = {
+                    ubicacion = it
+                },
+
+                modifier = Modifier.fillMaxWidth(),
+
+                placeholder = {
+                    Text(
+                        "Ej. Parque Central, Monterrey"
+                    )
+                },
+
+                leadingIcon = {
+
+                    Icon(
+                        imageVector =
+                            Icons.Outlined.LocationOn,
+                        contentDescription = null
+                    )
+                },
+
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Spacer(
+                modifier = Modifier.height(26.dp)
+            )
 
             Button(
                 onClick = {
-                    estaEnviando = true
+
+                    if (esOficial) {
+
+                        navController.navigate(
+                            Rutas.Comunidad.ruta
+                        ) {
+                            popUpTo(
+                                Rutas.Comunidad.ruta
+                            )
+                        }
+
+                    } else {
+
+                        estaEnviando = true
+                    }
                 },
-                enabled = contenido.isNotBlank() && !estaEnviando,
-                modifier = Modifier.fillMaxWidth()
+
+                enabled =
+                    titulo.isNotBlank() &&
+                            descripcion.isNotBlank() &&
+                            categoria.isNotBlank() &&
+                            !estaEnviando,
+
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(54.dp),
+
+                shape = RoundedCornerShape(16.dp),
+
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = Ambar,
+                        contentColor = AzulMarino
+                    )
             ) {
+
                 if (estaEnviando) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp))
+
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(22.dp),
+                        strokeWidth = 2.dp,
+                        color = AzulMarino
+                    )
+
                 } else {
-                    Text("Publicar")
+
+                    Text(
+                        text =
+                            if (esOficial)
+                                "Publicar anuncio"
+                            else
+                                "Enviar publicación",
+
+                        style =
+                            MaterialTheme.typography.titleSmall
+                    )
                 }
             }
+
+            Spacer(
+                modifier = Modifier.height(30.dp)
+            )
         }
     }
 
-    // Simulación temporal de red mientras no existe el endpoint real — se reemplaza por el repository/ViewModel real después
     LaunchedEffect(estaEnviando) {
-        if (estaEnviando) {
-            delay(1200)
-            val fueExitoso = contenido.length > 5 // regla falsa solo para poder probar ambos caminos
-            navController.navigate(Rutas.ResultadoPublicacion.crearRuta(fueExitoso)) {
-                popUpTo(Rutas.Comunidad.ruta)
-            }
+
+        if (
+            estaEnviando &&
+            !esOficial
+        ) {
+
+            delay(800)
+
+            navController.navigate(
+                Rutas.ResultadoPublicacion
+                    .crearRuta(true)
+            )
         }
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun NuevaPublicacionScreenPreview() {
-    FamiliasQueSumanTheme {
-        NuevaPublicacionScreen(navController = rememberNavController())
-    }
+private fun FotoNuevaPublicacion() {
+
+    Image(
+        painter = painterResource(
+            R.drawable.parque_comunidad
+        ),
+        contentDescription = null,
+        modifier = Modifier
+            .size(
+                width = 95.dp,
+                height = 110.dp
+            )
+            .clip(
+                RoundedCornerShape(12.dp)
+            ),
+        contentScale = ContentScale.Crop
+    )
 }

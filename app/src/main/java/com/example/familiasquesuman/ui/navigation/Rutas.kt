@@ -10,6 +10,10 @@ sealed class Rutas(val ruta: String) {
     object Chatbot : Rutas("chatbot")
     object Login : Rutas("login")
     object Comunidad : Rutas("comunidad")
+
+    object SobreNosotros : Rutas("sobre_nosotros")
+
+    object ContactoAyuda : Rutas("contacto_ayuda")
     object NuevaPublicacion : Rutas("nueva_publicacion")
     object Admin : Rutas("admin")
     object AdminModeracionComunidad : Rutas("admin_moderacion_comunidad")
@@ -39,5 +43,19 @@ sealed class Rutas(val ruta: String) {
     }
     object ProyectoDetalle : Rutas("proyecto_detalle/{proyectoId}") {
         fun crearRuta(proyectoId: String) = "proyecto_detalle/$proyectoId"
+    }
+
+    object MisPublicaciones :
+        Rutas("mis_publicaciones")
+
+    object NuevaPublicacionOficial :
+        Rutas("nueva_publicacion_oficial")
+
+    object DetallePublicacion :
+        Rutas("detalle_publicacion/{id}") {
+
+        fun crearRuta(id: String): String {
+            return "detalle_publicacion/$id"
+        }
     }
 }
