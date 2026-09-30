@@ -37,11 +37,7 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
         backButton = true,
         onBackClick = { navController.popBackStack() },
         titulo = "Moderación de actividades",
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.AdminCrearContenido.ruta) }) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar actividad", tint = AzulMarino)
-            }
-        }
+
     ) { paddingVal ->
         Box(
             modifier = Modifier
@@ -88,16 +84,7 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
                 }
             }
 
-            ExtendedFloatingActionButton(
-                onClick = { navController.navigate(Rutas.AdminCrearContenido.ruta) },
-                containerColor = Ambar,
-                contentColor = AzulMarino,
-                icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("Nueva Actividad", fontWeight = FontWeight.Bold) },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-            )
+
         }
     }
 }

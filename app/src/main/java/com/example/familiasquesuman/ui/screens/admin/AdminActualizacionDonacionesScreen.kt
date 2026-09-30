@@ -35,12 +35,8 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
         chatbot = false,
         backButton = true,
         onBackClick = { navController.popBackStack() },
-        titulo = "Actualización de donaciones",
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.AdminCrearContenido.ruta) }) {
-                Icon(Icons.Default.Add, contentDescription = "Agregar donación", tint = AzulMarino)
-            }
-        }
+        titulo = "Actualización de donaciones"
+
     ) { paddingVal ->
         Box(
             modifier = Modifier
@@ -87,17 +83,6 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                     }
                 }
             }
-
-            ExtendedFloatingActionButton(
-                onClick = { navController.navigate(Rutas.AdminCrearContenido.ruta) },
-                containerColor = Ambar,
-                contentColor = AzulMarino,
-                icon = { Icon(Icons.Default.Add, contentDescription = null) },
-                text = { Text("Nueva Donación", fontWeight = FontWeight.Bold) },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-            )
         }
     }
 }

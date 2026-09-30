@@ -233,12 +233,6 @@ fun PantallaPrincipalConMenu(
                         launchSingleTop = true
                     }
                 },
-
-
-                // =================================================
-                // SOBRE NOSOTROS
-                // =================================================
-
                 onSobreNosotrosClick = {
 
                     scope.launch {
@@ -251,12 +245,6 @@ fun PantallaPrincipalConMenu(
                         launchSingleTop = true
                     }
                 },
-
-
-                // =================================================
-                // CONTACTO
-                // =================================================
-
                 onContactoClick = {
 
                     scope.launch {
@@ -269,12 +257,6 @@ fun PantallaPrincipalConMenu(
                         launchSingleTop = true
                     }
                 },
-
-
-                // =================================================
-                // PERFIL
-                // =================================================
-
                 onPerfilClick = {
 
                     scope.launch {

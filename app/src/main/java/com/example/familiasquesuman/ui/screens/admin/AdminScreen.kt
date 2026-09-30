@@ -33,7 +33,7 @@ fun AdminScreen(navController: NavHostController) {
         pantallaActual = PantallaPrincipal.INICIO,
         navbar = false,
         chatbot = false,
-        backButton = true,
+        backButton = false,
         onBackClick = { navController.navigate(Rutas.Inicio.ruta) },
         acciones = {
             IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {

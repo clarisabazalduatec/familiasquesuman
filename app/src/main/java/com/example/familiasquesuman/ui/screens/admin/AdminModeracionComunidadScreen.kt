@@ -38,12 +38,7 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
         chatbot = false,
         backButton = true,
         onBackClick = { navController.popBackStack() },
-        titulo = "Moderación de comunidad",
-        acciones = {
-            IconButton(onClick = { /* Filtrar */ }) {
-                Icon(Icons.Default.FilterList, contentDescription = "Filtrar", tint = AzulMarino)
-            }
-        }
+        titulo = "Moderación de comunidad"
     ) { paddingVal ->
         Column(
             modifier = Modifier
