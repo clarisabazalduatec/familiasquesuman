@@ -420,19 +420,13 @@ fun NuevaPublicacionScreen(
 
             Button(
                 onClick = {
-
                     if (esOficial) {
-
-                        navController.navigate(
-                            Rutas.Comunidad.ruta
-                        ) {
-                            popUpTo(
-                                Rutas.Comunidad.ruta
-                            )
+                        navController.navigate(Rutas.Comunidad.ruta)
+                        {
+                            popUpTo(Rutas.Comunidad.ruta)
                         }
 
                     } else {
-
                         estaEnviando = true
                     }
                 },
@@ -486,14 +480,11 @@ fun NuevaPublicacionScreen(
     }
 
     LaunchedEffect(estaEnviando) {
-
         if (
             estaEnviando &&
             !esOficial
         ) {
-
             delay(800)
-
             navController.navigate(
                 Rutas.ResultadoPublicacion
                     .crearRuta(true)

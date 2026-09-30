@@ -18,6 +18,7 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
+import androidx.compose.foundation.BorderStroke
 
 @Composable
 fun ResultadoPublicacionScreen(
@@ -28,10 +29,8 @@ fun ResultadoPublicacionScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.INICIO,
-        chatbot = false,
 
         acciones = {
-
             IconButton(
                 onClick = {
                     navController.navigate(
@@ -44,8 +43,7 @@ fun ResultadoPublicacionScreen(
                     imageVector =
                         Icons.Default.Notifications,
                     contentDescription =
-                        "Notificaciones",
-                    tint = AzulMarino
+                        "Notificaciones", tint = AzulMarino
                 )
             }
         }
@@ -62,79 +60,23 @@ fun ResultadoPublicacionScreen(
                 Alignment.CenterHorizontally
         ) {
 
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(18.dp),
-                color = Blanco,
-                tonalElevation = 1.dp
-            ) {
 
-                Row(
-                    modifier = Modifier.padding(
-                        horizontal = 6.dp,
-                        vertical = 8.dp
-                    ),
-                    verticalAlignment =
-                        Alignment.CenterVertically
-                ) {
 
-                    IconButton(
-                        onClick = {
-                            navController.popBackStack()
-                        }
-                    ) {
-
-                        Icon(
-                            imageVector =
-                                Icons.AutoMirrored
-                                    .Outlined
-                                    .ArrowBack,
-                            contentDescription =
-                                "Regresar",
-                            tint = AzulMarino
-                        )
-                    }
-
-                    Spacer(
-                        modifier = Modifier.width(4.dp)
-                    )
-
-                    Text(
-                        text = "Estado de publicación",
-                        style =
-                            MaterialTheme
-                                .typography
-                                .titleLarge,
-                        color = AzulMarino
-                    )
-                }
-            }
-
-            Spacer(
-                modifier = Modifier.weight(.35f)
-            )
-
+            Spacer(modifier = Modifier.weight(.35f))
             Surface(
                 modifier = Modifier.size(108.dp),
                 shape = CircleShape,
                 color = AmbarClaro
             ) {
 
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    Icon(
-                        imageVector =
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(imageVector =
                             if (fueExitoso)
                                 Icons.Outlined.Send
                             else
                                 Icons.Outlined.ErrorOutline,
-
                         contentDescription = null,
-
                         modifier = Modifier.size(54.dp),
-
                         tint =
                             if (fueExitoso)
                                 AzulMarino
@@ -144,85 +86,48 @@ fun ResultadoPublicacionScreen(
                 }
             }
 
-            Spacer(
-                modifier = Modifier.height(22.dp)
-            )
-
-            Text(
-                text =
+            Spacer(modifier = Modifier.height(22.dp))
+            Text(text =
                     if (fueExitoso)
                         "¡Gracias por compartir!"
                     else
                         "No pudimos enviar tu publicación",
-
-                style =
-                    MaterialTheme.typography.headlineSmall,
-
+                style = MaterialTheme.typography.headlineSmall,
                 color = AzulMarino
             )
-
-            Spacer(
-                modifier = Modifier.height(10.dp)
-            )
-
-            Text(
-                text =
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(text =
                     if (fueExitoso)
                         "Tu publicación ha sido enviada al equipo para su revisión. Te avisaremos cuando sea aprobada."
                     else
                         "Revisa la información e inténtalo nuevamente.",
-
-                style =
-                    MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium,
 
                 color = GrisTexto
             )
-
-            Spacer(
-                modifier = Modifier.height(24.dp)
-            )
-
+            Spacer(modifier = Modifier.height(24.dp))
             if (fueExitoso) {
-
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-
-                    colors =
-                        CardDefaults.cardColors(
-                            containerColor = Blanco
-                        ),
-
-                    shape =
-                        RoundedCornerShape(20.dp)
-                ) {
-
+                    colors = CardDefaults.cardColors(containerColor = Blanco),
+                    shape = RoundedCornerShape(20.dp))
+                {
                     Column(
                         modifier = Modifier.padding(18.dp)
-                    ) {
-
-                        Text(
-                            text = "¿Qué sigue?",
-
+                    ) { Text(text = "¿Qué sigue?",
                             style =
                                 MaterialTheme
                                     .typography
                                     .titleMedium,
-
                             color = AzulMarino
                         )
 
-                        Spacer(
-                            modifier =
-                                Modifier.height(14.dp)
-                        )
+                        Spacer(modifier = Modifier.height(14.dp))
 
                         PasoRevision(
-                            icono =
-                                Icons.Outlined.Schedule,
-
+                            icono = Icons.Outlined.Schedule,
                             titulo =
                                 "En revisión",
-
                             descripcion =
                                 "Nuestro equipo revisará que tu publicación cumpla con las políticas de la comunidad."
                         )
@@ -252,69 +157,97 @@ fun ResultadoPublicacionScreen(
                 }
             }
 
-            Spacer(
-                modifier = Modifier.weight(1f)
-            )
+            Spacer(modifier = Modifier.weight(1f))
 
-            Button(
-                onClick = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
 
-                    if (fueExitoso) {
+                // BOTÓN PRINCIPAL
+                Button(
+                    onClick = {
+                        if (fueExitoso) {
+                            navController.navigate(
+                                Rutas.MisPublicaciones.ruta
+                            ) {
+                                popUpTo(Rutas.Comunidad.ruta) {
+                                    inclusive = false
+                                }
 
-                        navController.navigate(
-                            Rutas.MisPublicaciones.ruta
-                        )
+                                launchSingleTop = true
+                            }
+                        } else {
+                            navController.popBackStack()
+                        }
+                    },
 
-                    } else {
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
 
-                        navController.popBackStack()
-                    }
-                },
+                    shape = RoundedCornerShape(16.dp),
 
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(54.dp),
-
-                shape = RoundedCornerShape(16.dp),
-
-                colors =
-                    ButtonDefaults.buttonColors(
+                    colors = ButtonDefaults.buttonColors(
                         containerColor = Ambar,
-                        contentColor = AzulMarino
+                        contentColor = Blanco
                     )
-            ) {
+                ) {
 
-                Text(
-                    text =
-                        if (fueExitoso)
-                            "Ver mis publicaciones"
-                        else
-                            "Reintentar",
+                    Text(
+                        text =
+                            if (fueExitoso)
+                                "Ver mis publicaciones"
+                            else
+                                "Reintentar",
 
-                    style =
-                        MaterialTheme.typography.titleSmall
-                )
-            }
-
-            TextButton(
-                onClick = {
-
-                    navController.navigate(
-                        Rutas.Comunidad.ruta
-                    ) {
-                        popUpTo(
-                            Rutas.Comunidad.ruta
-                        )
-                    }
+                        style = MaterialTheme.typography.titleSmall
+                    )
                 }
-            ) {
 
-                Text(
-                    text = "Volver a Comunidad",
-                    style =
-                        MaterialTheme.typography.titleSmall,
-                    color = AzulMarino
-                )
+
+                // BOTÓN SECUNDARIO
+                OutlinedButton(
+                    onClick = {
+
+                        val regresoExitoso =
+                            navController.popBackStack(
+                                Rutas.Comunidad.ruta,
+                                inclusive = false
+                            )
+
+                        if (!regresoExitoso) {
+
+                            navController.navigate(
+                                Rutas.Comunidad.ruta
+                            ) {
+                                launchSingleTop = true
+                            }
+                        }
+                    },
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+
+                    shape = RoundedCornerShape(16.dp),
+
+                    border = BorderStroke(
+                        width = 1.5.dp,
+                        color = Ambar
+                    ),
+
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Blanco,
+                        contentColor = Ambar
+                    )
+                ) {
+
+                    Text(
+                        text = "Volver a Comunidad",
+                        style = MaterialTheme.typography.titleSmall
+                    )
+                }
             }
         }
     }
@@ -342,7 +275,6 @@ private fun PasoRevision(
             Box(
                 contentAlignment = Alignment.Center
             ) {
-
                 Icon(
                     imageVector = icono,
                     contentDescription = null,
