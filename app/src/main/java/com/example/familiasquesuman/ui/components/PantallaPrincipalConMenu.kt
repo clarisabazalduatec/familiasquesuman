@@ -179,17 +179,22 @@ fun PantallaPrincipalConMenu(
             bottomBar = {
                 if (navbar) {
                     BarraNavegacionInferior(
-                        pantallaActual = pantallaActual,
-                        onPantallaSeleccionada = { pantalla ->
-                            val ruta = when (pantalla) {
-                                PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
-                                PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
-                                PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
-                                PantallaPrincipal.DONAR -> Rutas.Donar.ruta
-                                PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
-                                PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
+                        pantallaActual =
+                            pantallaActual,
+                        onPantallaSeleccionada =
+                            { pantalla ->
+                                val ruta =
+                                    when (pantalla) {
+                                        PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
+                                        PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
+                                        PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
+                                        PantallaPrincipal.DONAR -> Rutas.Donar.ruta
+                                        PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
+                                        PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
+                                        PantallaPrincipal.PERFIL -> Rutas.Perfil.ruta
+                                    }
+                                navController.navigate(ruta) { launchSingleTop = true }
                             }
-                            navController.navigate(ruta) { launchSingleTop = true }
                         }
                     )
                 }

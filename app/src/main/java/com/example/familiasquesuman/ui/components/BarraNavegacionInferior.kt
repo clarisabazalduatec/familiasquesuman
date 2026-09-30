@@ -33,8 +33,8 @@ enum class PantallaPrincipal(
     PROYECTOS("Proyectos"),
     DONAR("Donar"),
     DIRECTORIO("Directorio"),
-    CHATBOT("Asistente")
-
+    CHATBOT("Asistente"),
+    PERFIL("Perfil")
 }
 
 @Composable
