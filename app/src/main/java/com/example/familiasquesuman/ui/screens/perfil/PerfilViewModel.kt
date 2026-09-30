@@ -2,7 +2,7 @@ package com.example.familiasquesuman.ui.screens.perfil
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import com.example.familiasquesuman.ui.screens.perfil.model.HijoState
+import com.example.familiasquesuman.ui.model.HijoState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

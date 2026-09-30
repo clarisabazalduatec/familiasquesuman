@@ -1,4 +1,4 @@
-package com.example.familiasquesuman.ui.screens.perfil
+package com.example.familiasquesuman.ui.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,7 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.familiasquesuman.ui.screens.perfil.model.HijoState
+import com.example.familiasquesuman.ui.model.HijoState
+import com.example.familiasquesuman.ui.screens.perfil.PerfilUiState
 import com.example.familiasquesuman.ui.theme.*
 import java.util.Calendar
 import java.util.TimeZone

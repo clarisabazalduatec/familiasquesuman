@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.familiasquesuman.ui.screens.perfil.model.HijoState
+import com.example.familiasquesuman.ui.model.HijoState
 import com.example.familiasquesuman.ui.theme.*
 
 @Composable
