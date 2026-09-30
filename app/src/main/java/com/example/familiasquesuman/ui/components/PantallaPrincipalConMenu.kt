@@ -195,7 +195,6 @@ fun PantallaPrincipalConMenu(
                                     }
                                 navController.navigate(ruta) { launchSingleTop = true }
                             }
-                        }
                     )
                 }
             }
