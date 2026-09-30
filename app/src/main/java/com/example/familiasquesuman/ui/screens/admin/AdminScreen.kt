@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
@@ -63,6 +64,17 @@ fun AdminScreen(navController: NavHostController) {
                     color = GrisTexto
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item {
+                AdminCardOption(
+                    titulo = "Crear nueva tarjeta de contenido",
+                    descripcion = "Publica nuevas actividades, proyectos o donaciones.",
+                    icono = Icons.Default.AddCircle,
+                    fondoIcono = AmbarClaro,
+                    colorIcono = Ambar,
+                    onClick = { navController.navigate(Rutas.AdminCrearContenido.ruta) }
+                )
             }
 
             item {

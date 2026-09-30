@@ -19,6 +19,7 @@ sealed class Rutas(val ruta: String) {
     object AdminModeracionComunidad : Rutas("admin_moderacion_comunidad")
     object AdminModeracionActividades : Rutas("admin_moderacion_actividades")
     object AdminActualizacionDonaciones : Rutas("admin_actualizacion_donaciones")
+    object AdminCrearContenido : Rutas("admin_crear_contenido")
     object Notificaciones : Rutas("notificaciones")
     object Perfil : Rutas("perfil")
     

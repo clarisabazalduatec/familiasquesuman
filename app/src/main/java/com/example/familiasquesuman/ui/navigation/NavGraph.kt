@@ -90,6 +90,9 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         composable(Rutas.AdminActualizacionDonaciones.ruta) {
             com.example.familiasquesuman.ui.screens.admin.AdminActualizacionDonacionesScreen(navController = navController)
         }
+        composable(Rutas.AdminCrearContenido.ruta) {
+            com.example.familiasquesuman.ui.screens.admin.AdminCrearContenidoScreen(navController = navController)
+        }
         composable(Rutas.Comunidad.ruta) {
             ComunidadScreen(navController = navController)
         }

@@ -5,10 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
 
 @Composable
@@ -37,51 +37,67 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
         onBackClick = { navController.popBackStack() },
         titulo = "Actualización de donaciones",
         acciones = {
-            IconButton(onClick = { /* Filtrar */ }) {
-                Icon(Icons.Default.FilterList, contentDescription = "Filtrar", tint = AzulMarino)
+            IconButton(onClick = { navController.navigate(Rutas.AdminCrearContenido.ruta) }) {
+                Icon(Icons.Default.Add, contentDescription = "Agregar donación", tint = AzulMarino)
             }
         }
     ) { paddingVal ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingVal)
-                .background(CremaFondo)
         ) {
-            Row(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .fillMaxSize()
+                    .background(CremaFondo)
             ) {
-                TabPill("Activas (4)", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
-                TabPill("Finalizadas", pestanaSeleccionada == 1) { pestanaSeleccionada = 1 }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TabPill("Activas (4)", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
+                    TabPill("Finalizadas", pestanaSeleccionada == 1) { pestanaSeleccionada = 1 }
+                }
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    item {
+                        TarjetaDonacionAdmin(
+                            titulo = "Despensas básicas para familias",
+                            progreso = 0.65f,
+                            porcentajeTexto = "65%",
+                            estadisticas = "1,300 / 2,000 despensas",
+                            fechaFin = "Finaliza: 31 oct. 2025"
+                        )
+                    }
+                    item {
+                        TarjetaDonacionAdmin(
+                            titulo = "Útiles escolares",
+                            progreso = 0.42f,
+                            porcentajeTexto = "42%",
+                            estadisticas = "420 / 1,000 paquetes",
+                            fechaFin = "Finaliza: 15 nov. 2025"
+                        )
+                    }
+                }
             }
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                item {
-                    TarjetaDonacionAdmin(
-                        titulo = "Despensas básicas para familias",
-                        progreso = 0.65f,
-                        porcentajeTexto = "65%",
-                        estadisticas = "1,300 / 2,000 despensas",
-                        fechaFin = "Finaliza: 31 oct. 2025"
-                    )
-                }
-                item {
-                    TarjetaDonacionAdmin(
-                        titulo = "Útiles escolares",
-                        progreso = 0.42f,
-                        porcentajeTexto = "42%",
-                        estadisticas = "420 / 1,000 paquetes",
-                        fechaFin = "Finaliza: 15 nov. 2025"
-                    )
-                }
-            }
+            ExtendedFloatingActionButton(
+                onClick = { navController.navigate(Rutas.AdminCrearContenido.ruta) },
+                containerColor = Ambar,
+                contentColor = AzulMarino,
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                text = { Text("Nueva Donación", fontWeight = FontWeight.Bold) },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            )
         }
     }
 }
