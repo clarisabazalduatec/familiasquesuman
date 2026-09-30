@@ -78,82 +78,45 @@ import com.example.familiasquesuman.ui.theme.GrisTexto
 
 @Composable
 fun MenuLateral(
-
-    // =========================================================
     // ESTADO DE SESIÓN
-    // =========================================================
-
     tipoSesion: TipoSesion,
-
     onTipoSesionChange: (TipoSesion) -> Unit,
-
     nombreUsuario: String = "María Gzz",
-
     @DrawableRes
     fotoPerfilRes: Int? = null,
-
-
-    // =========================================================
     // CALLBACKS EXISTENTES
-    // =========================================================
-
     onInicioClick: () -> Unit,
-
     onIniciarSesionClick: () -> Unit,
-
     onCrearCuentaClick: () -> Unit,
-
     onComunidadClick: () -> Unit,
-
     onActividadesClick: () -> Unit = {},
-
     onProyectosClick: () -> Unit = {},
-
     onDonarClick: () -> Unit = {},
-
     onDirectorioClick: () -> Unit = {},
-
     onChatbotClick: () -> Unit,
-
     onSobreNosotrosClick: () -> Unit = {},
-
     onContactoClick: () -> Unit = {},
-
     onPerfilClick: () -> Unit = {},
-
     onAdminClick: () -> Unit = {},
-
-    onConfiguracionClick: () -> Unit = {},
-
     onCerrarSesionClick: () -> Unit = {},
-
     // Cierra el drawer con la X
     onBackClick: () -> Unit
 ) {
 
-    val sesionIniciada =
-        tipoSesion == TipoSesion.USUARIO ||
-                tipoSesion == TipoSesion.ADMIN
-
-    val esAdmin =
-        tipoSesion == TipoSesion.ADMIN
-
+    val sesionIniciada = tipoSesion == TipoSesion.USUARIO || tipoSesion == TipoSesion.ADMIN
+    val esAdmin = tipoSesion == TipoSesion.ADMIN
 
     ModalDrawerSheet(
         modifier = Modifier
             .width(330.dp)
             .fillMaxHeight(),
-
         drawerContainerColor = CremaFondo,
-
         drawerContentColor = AzulMarino,
-
         drawerShape = RoundedCornerShape(
             topEnd = 28.dp,
             bottomEnd = 28.dp
         )
     ) {
-
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -162,30 +125,23 @@ fun MenuLateral(
                     vertical = 18.dp
                 )
         ) {
-
-            // =====================================================
             // HEADER
-            // =====================================================
-
             if (sesionIniciada) {
-
                 HeaderUsuario(
                     nombreUsuario = nombreUsuario,
                     fotoPerfilRes = fotoPerfilRes,
                     tipoSesion = tipoSesion,
-
-                    onTipoSesionChange = {
-                        onTipoSesionChange(it)
-                    },
-
+                    onTipoSesionChange = { onTipoSesionChange(it) },
                     onPerfilClick = onPerfilClick,
-
                     onCerrarDrawer = onBackClick
                 )
-
             } else {
-
-                HeaderInvitado(
+                HeaderUsuario(
+                    nombreUsuario = "Bienvenido",
+                    fotoPerfilRes = fotoPerfilRes,
+                    tipoSesion = TipoSesion.USUARIO,
+                    onTipoSesionChange = { onTipoSesionChange(it) },
+                    onPerfilClick = {},
                     onCerrarDrawer = onBackClick
                 )
             }
@@ -310,16 +266,6 @@ fun MenuLateral(
                     )
                 }
 
-
-                // =================================================
-                // CONFIGURACIÓN
-                // =================================================
-
-                ItemMenuLateral(
-                    texto = "Configuración",
-                    icono = Icons.Outlined.Settings,
-                    onClick = onConfiguracionClick
-                )
 
 
                 // =================================================
@@ -708,13 +654,10 @@ private fun HeaderUsuario(
 
                         seleccionado =
                             tipoSesion == TipoSesion.ADMIN,
-
                         onClick = {
-
                             onTipoSesionChange(
                                 TipoSesion.ADMIN
                             )
-
                             mostrarSelector = false
                         }
                     )
@@ -726,15 +669,12 @@ private fun HeaderUsuario(
         // =====================================================
         // X CERRAR DRAWER
         // =====================================================
-
         IconButton(
             onClick = onCerrarDrawer,
-
             modifier = Modifier.align(
                 Alignment.TopEnd
             )
         ) {
-
             Icon(
                 imageVector = Icons.Outlined.Close,
                 contentDescription = "Cerrar menú",
@@ -755,27 +695,20 @@ private fun AvatarUsuario(
     @DrawableRes
     fotoPerfilRes: Int?
 ) {
-
     Box(
         modifier = Modifier
             .size(58.dp)
             .clip(CircleShape)
             .background(AmbarClaro),
-
         contentAlignment = Alignment.Center
     ) {
-
         if (fotoPerfilRes != null) {
-
             Image(
                 painter = painterResource(
                     id = fotoPerfilRes
                 ),
-
                 contentDescription = "Foto de perfil",
-
                 modifier = Modifier.fillMaxSize(),
-
                 contentScale = ContentScale.Crop
             )
 
@@ -798,42 +731,29 @@ private fun AvatarUsuario(
 
 @Composable
 private fun OpcionTipoSesion(
-
     texto: String,
-
     seleccionado: Boolean,
-
     onClick: () -> Unit
 ) {
-
     DropdownMenuItem(
-
         text = {
-
             Text(
                 text = texto,
                 style = MaterialTheme.typography.bodyMedium,
                 color = AzulMarino
             )
         },
-
         leadingIcon = {
-
             RadioButton(
                 selected = seleccionado,
                 onClick = null
             )
         },
-
         onClick = onClick
     )
 }
 
-
-// =============================================================
 // ITEM DEL SIDEBAR
-// =============================================================
-
 @Composable
 private fun ItemMenuLateral(
 

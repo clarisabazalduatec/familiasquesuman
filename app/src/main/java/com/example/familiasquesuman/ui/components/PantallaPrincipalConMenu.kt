@@ -44,617 +44,159 @@ import kotlinx.coroutines.launch
 fun PantallaPrincipalConMenu(
 
     navController: NavHostController,
-
     pantallaActual: PantallaPrincipal,
-
     titulo: String = "Familias que Suman+",
 
-    // =========================================================
-    // ESTOS PARÁMETROS YA LOS USABAN OTRAS PANTALLAS
-    // NO LOS QUITAMOS
-    // =========================================================
-
     navbar: Boolean = true,
-
-    chatbot: Boolean = true,
-
+    chatbot: Boolean = false,
     backButton: Boolean = false,
-
     onBackClick: () -> Unit = {},
 
     acciones: @Composable RowScope.() -> Unit = {},
+    contenido: @Composable (paddingInterno: PaddingValues) -> Unit) {
 
-    contenido: @Composable (
-        paddingInterno: PaddingValues
-    ) -> Unit
-) {
-
-    val drawerState =
-        rememberDrawerState(
-            initialValue = DrawerValue.Closed
-        )
-
-    val scope =
-        rememberCoroutineScope()
-
-
-    // =========================================================
-    // SESIÓN TEMPORAL PARA EL FRONTEND
-    // =========================================================
-
-    val tipoSesion =
-        SesionDemoState.tipoSesion
-
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    val tipoSesion = SesionDemoState.tipoSesion
 
     ModalNavigationDrawer(
-
         drawerState = drawerState,
-
         drawerContent = {
 
             MenuLateral(
-
-                // =================================================
-                // TIPO DE SESIÓN
-                // =================================================
-
                 tipoSesion = tipoSesion,
-
-                nombreUsuario = "María Gzz",
-
-                onTipoSesionChange = { nuevoTipo ->
-
-                    SesionDemoState.tipoSesion =
-                        nuevoTipo
+                nombreUsuario = "Usuario Generico",
+                onChatbotClick = { scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Chatbot.ruta) },
+                onTipoSesionChange = { nuevoTipo -> SesionDemoState.tipoSesion = nuevoTipo },
+                onInicioClick = { scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Inicio.ruta) { launchSingleTop = true }
                 },
-
-
-                // =================================================
-                // INICIO
-                // =================================================
-
-                onInicioClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.Inicio.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
+                onActividadesClick = { scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Actividades.ruta) { launchSingleTop = true }
                 },
-
-
-                // =================================================
-                // ACTIVIDADES
-                // =================================================
-
-                onActividadesClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.Actividades.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-
-                // =================================================
-                // PROYECTOS
-                // =================================================
-
                 onProyectosClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.Proyectos.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Proyectos.ruta) { launchSingleTop = true }
                 },
-
-
-                // =================================================
-                // DONAR
-                // =================================================
-
-                onDonarClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.Donar.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
+                onDonarClick = { scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Donar.ruta) { launchSingleTop = true }
                 },
-
-
-                // =================================================
-                // COMUNIDAD
-                // =================================================
-
-                onComunidadClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.Comunidad.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
+                onComunidadClick = { scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Comunidad.ruta) { launchSingleTop = true }
                 },
-
-
-                // =================================================
-                // DIRECTORIO
-                // =================================================
-
-                onDirectorioClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.Directorio.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
+                onDirectorioClick = { scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Directorio.ruta) { launchSingleTop = true }
                 },
-
-
-                // =================================================
-                // CHATBOT
-                // =================================================
-
-                onChatbotClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.Chatbot.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-                onSobreNosotrosClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.SobreNosotros.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
+                onSobreNosotrosClick = { scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.SobreNosotros.ruta) { launchSingleTop = true }
                 },
                 onContactoClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.ContactoAyuda.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.ContactoAyuda.ruta) { launchSingleTop = true }
                 },
-                onPerfilClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.Perfil.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
+                onPerfilClick = { scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Perfil.ruta) { launchSingleTop = true }
+                },
+                onAdminClick = { scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Admin.ruta) { launchSingleTop = true }
+                },
+                onIniciarSesionClick = { scope.launch { drawerState.close() }
+                    SesionDemoState.tipoSesion = TipoSesion.USUARIO
+                    navController.navigate(Rutas.Login.ruta) { launchSingleTop = true }
                 },
 
-
-                // =================================================
-                // ADMIN
-                // =================================================
-
-                onAdminClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.Admin.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
+                onCrearCuentaClick = { scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Login.ruta) { launchSingleTop = true }
                 },
 
-
-                // =================================================
-                // CONFIGURACIÓN
-                // =================================================
-
-                onConfiguracionClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    /*
-                     * Ahorita solo cerramos el drawer.
-                     *
-                     * Cuando exista la pantalla de configuración:
-                     *
-                     * navController.navigate(
-                     *     Rutas.Configuracion.ruta
-                     * )
-                     */
+                onCerrarSesionClick = { SesionDemoState.tipoSesion = TipoSesion.INVITADO
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Inicio.ruta) { launchSingleTop = true }
                 },
-
-
-                // =================================================
-                // INICIAR SESIÓN
-                // =================================================
-
-                onIniciarSesionClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    /*
-                     * DEMO FRONTEND.
-                     *
-                     * Más adelante esto lo manejará
-                     * el AuthViewModel.
-                     */
-
-                    SesionDemoState.tipoSesion =
-                        TipoSesion.USUARIO
-
-                    navController.navigate(
-                        Rutas.Login.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-
-                // =================================================
-                // CREAR CUENTA
-                // =================================================
-
-                onCrearCuentaClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    /*
-                     * Temporalmente abre Login.
-                     * Cuando tengan Registro,
-                     * aquí se cambia la ruta.
-                     */
-
-                    navController.navigate(
-                        Rutas.Login.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-
-                // =================================================
-                // CERRAR SESIÓN
-                // =================================================
-
-                onCerrarSesionClick = {
-
-                    SesionDemoState.tipoSesion =
-                        TipoSesion.INVITADO
-
-                    scope.launch {
-                        drawerState.close()
-                    }
-
-                    navController.navigate(
-                        Rutas.Inicio.ruta
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-
-
-                // =================================================
-                // X DEL SIDEBAR
-                // =================================================
-
-                onBackClick = {
-
-                    scope.launch {
-                        drawerState.close()
-                    }
+                onBackClick = { scope.launch { drawerState.close() }
                 }
             )
         }
     ) {
 
         Scaffold(
-
             containerColor = CremaFondo,
-
-
-            // =====================================================
-            // TOP BAR
-            // =====================================================
-
-            topBar = {
-
-                TopAppBar(
-
-                    colors =
-                        TopAppBarDefaults
-                            .topAppBarColors(
-
-                                containerColor =
-                                    CremaFondo,
-
-                                navigationIconContentColor =
-                                    AzulMarino,
-
-                                actionIconContentColor =
-                                    AzulMarino
-                            ),
-
-
-                    // =================================================
-                    // AQUÍ DECIDIMOS SI SALE ← O ☰
-                    // =================================================
+            topBar = { TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
+                                containerColor = CremaFondo,
+                                navigationIconContentColor = AzulMarino,
+                                actionIconContentColor = AzulMarino),
 
                     navigationIcon = {
-
                         if (backButton) {
-
-                            // -----------------------------------------
-                            // BOTÓN REGRESAR
-                            // -----------------------------------------
-
-                            IconButton(
-                                onClick = onBackClick
-                            ) {
-
-                                Icon(
-                                    imageVector =
-                                        Icons.AutoMirrored
-                                            .Filled
-                                            .ArrowBack,
-
-                                    contentDescription =
-                                        "Regresar",
-
-                                    tint =
-                                        AzulMarino
+                            IconButton(onClick = onBackClick) {
+                                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Regresar",
+                                    tint = AzulMarino
                                 )
                             }
-
-                        } else {
-
-                            // -----------------------------------------
-                            // BOTÓN SIDEBAR
-                            // -----------------------------------------
-
-                            IconButton(
-                                onClick = {
-
-                                    scope.launch {
-                                        drawerState.open()
-                                    }
-                                }
+                        } else { IconButton(onClick = { scope.launch { drawerState.open() } }
                             ) {
-
-                                Icon(
-                                    imageVector =
-                                        Icons.Default.Menu,
-
-                                    contentDescription =
-                                        "Menú",
-
-                                    tint =
-                                        AzulMarino
+                                Icon( imageVector = Icons.Default.Menu,
+                                    contentDescription = "Menú",
+                                    tint = AzulMarino
                                 )
                             }
                         }
                     },
 
 
-                    // =================================================
-                    // LOGO
-                    // =================================================
-
                     title = {
-
-                        Image(
-                            painter =
-                                painterResource(
-                                    id =
-                                        R.drawable.logo2_onb
-                                ),
-
-                            contentDescription =
-                                titulo,
-
-                            modifier =
-                                Modifier
-                                    .width(300.dp)
-                                    .height(62.dp),
-
-                            contentScale =
-                                ContentScale.Fit
+                        Image(painter = painterResource(id = R.drawable.logo2_onb),
+                            contentDescription = titulo,
+                            modifier = Modifier.width(300.dp).height(62.dp),
+                            contentScale = ContentScale.Fit
                         )
                     },
 
-
-                    // =================================================
-                    // ACCIONES: NOTIFICACIONES, ETC.
-                    // =================================================
-
-                    actions =
-                        acciones
+                    actions = acciones
                 )
             },
 
+            floatingActionButton = {if (chatbot) {
 
-            // =====================================================
-            // CHATBOT FLOTANTE
-            // =====================================================
-
-            floatingActionButton = {
-
-                if (chatbot) {
-
-                    FloatingActionButton(
-
-                        onClick = {
-
-                            navController.navigate(
-                                Rutas.Chatbot.ruta
-                            ) {
-                                launchSingleTop = true
-                            }
-                        },
-
-                        containerColor =
-                            AzulMarino,
-
-                        contentColor =
-                            Color.White,
-
-                        shape =
-                            CircleShape,
-
-                        elevation =
-                            FloatingActionButtonDefaults
-                                .elevation(
-
-                                    defaultElevation =
-                                        6.dp,
-
-                                    pressedElevation =
-                                        9.dp
-                                ),
-
-                        modifier =
-                            Modifier.size(68.dp)
-                    ) {
-
-                        Icon(
-                            imageVector =
-                                Icons.Outlined.SmartToy,
-
-                            contentDescription =
-                                "Abrir chatbot",
-
-                            modifier =
-                                Modifier.size(34.dp),
-
-                            tint =
-                                Color.White
-                        )
-                    }
+                FloatingActionButton(
+                    onClick = { navController.navigate(Rutas.Chatbot.ruta) { launchSingleTop = true } },
+                    containerColor = AzulMarino,
+                    contentColor = Color.White,
+                    modifier = Modifier.size(68.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.SmartToy,
+                        contentDescription = "Abrir chatbot",
+                        modifier = Modifier.size(34.dp),
+                        tint = Color.White
+                    )
                 }
-            },
-
-
-            // =====================================================
-            // NAVBAR INFERIOR
-            // =====================================================
-
+            } },
             bottomBar = {
-
-                /*
-                 * IMPORTANTE:
-                 *
-                 * Algunas pantallas como Confirmación
-                 * usan navbar = false.
-                 */
-
                 if (navbar) {
-
                     BarraNavegacionInferior(
-
-                        pantallaActual =
-                            pantallaActual,
-
-                        onPantallaSeleccionada = {
-                                pantalla ->
-
-
+                        pantallaActual = pantallaActual,
+                        onPantallaSeleccionada = { pantalla ->
                             val ruta =
                                 when (pantalla) {
-
-                                    PantallaPrincipal.INICIO ->
-                                        Rutas.Inicio.ruta
-
-
-                                    PantallaPrincipal.ACTIVIDADES ->
-                                        Rutas.Actividades.ruta
-
-
-                                    PantallaPrincipal.PROYECTOS ->
-                                        Rutas.Proyectos.ruta
-
-
-                                    PantallaPrincipal.DONAR ->
-                                        Rutas.Donar.ruta
-
-
-                                    PantallaPrincipal.DIRECTORIO ->
-                                        Rutas.Directorio.ruta
-
-
-                                    PantallaPrincipal.CHATBOT ->
-                                        Rutas.Chatbot.ruta
-
-
-                                    PantallaPrincipal.PERFIL ->
-                                        Rutas.Perfil.ruta
+                                    PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
+                                    PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
+                                    PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
+                                    PantallaPrincipal.DONAR -> Rutas.Donar.ruta
+                                    PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta
+                                    PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
+                                    PantallaPrincipal.PERFIL -> Rutas.Perfil.ruta
                                 }
-
-
-                            navController.navigate(
-                                ruta
-                            ) {
-                                launchSingleTop = true
+                            navController.navigate(ruta) { launchSingleTop = true
                             }
                         }
                     )
                 }
             }
 
-        ) { paddingInterno ->
-
-            contenido(
-                paddingInterno
-            )
-        }
+        )
+        { paddingInterno -> contenido(paddingInterno) }
     }
 }
