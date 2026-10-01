@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -106,17 +107,19 @@ fun MenuLateral(
     val sesionIniciada = tipoSesion == TipoSesion.USUARIO || tipoSesion == TipoSesion.ADMIN
     val esAdmin = tipoSesion == TipoSesion.ADMIN
 
-    ModalDrawerSheet(
-        modifier = Modifier
-            .width(330.dp)
-            .fillMaxHeight(),
-        drawerContainerColor = CremaFondo,
-        drawerContentColor = AzulMarino,
-        drawerShape = RoundedCornerShape(
-            topEnd = 28.dp,
-            bottomEnd = 28.dp
-        )
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxHeight()
     ) {
+        val drawerWidth = minOf(maxWidth * 0.9f, 400.dp)
+        ModalDrawerSheet(
+            modifier = Modifier.width(drawerWidth),
+            drawerContainerColor = CremaFondo,
+            drawerContentColor = AzulMarino,
+            drawerShape = RoundedCornerShape(
+                topEnd = 28.dp,
+                bottomEnd = 28.dp
+            )
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
@@ -317,6 +320,7 @@ fun MenuLateral(
             }
         }
     }
+  }
 }
 
 
