@@ -68,7 +68,6 @@ fun ProyectoDetalleScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.PROYECTOS,
-        chatbot = true
     ) { paddingInterno ->
         Column(
             modifier = Modifier

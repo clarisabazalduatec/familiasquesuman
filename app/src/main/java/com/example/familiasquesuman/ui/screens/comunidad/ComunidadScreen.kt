@@ -46,6 +46,9 @@ fun ComunidadScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.INICIO,
+        navbar = false,
+        backButton = true,
+        onBackClick = { navController.popBackStack() }
     ) { paddingInterno -> LazyColumn(
             modifier = Modifier
                 .padding(paddingInterno)

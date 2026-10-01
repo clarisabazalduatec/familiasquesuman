@@ -44,7 +44,6 @@ fun ProyectosScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.PROYECTOS,
-        chatbot = false
     ) { paddingInterno ->
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
