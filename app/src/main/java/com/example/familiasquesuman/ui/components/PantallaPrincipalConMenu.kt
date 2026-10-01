@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
@@ -107,7 +108,7 @@ fun PantallaPrincipalConMenu(
 
         Scaffold(
             containerColor = CremaFondo,
-            topBar = { TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
+            topBar = { CenterAlignedTopAppBar(colors = TopAppBarDefaults.topAppBarColors(
                                 containerColor = CremaFondo,
                                 navigationIconContentColor = AzulMarino,
                                 actionIconContentColor = AzulMarino),
@@ -129,16 +130,13 @@ fun PantallaPrincipalConMenu(
                             }
                         }
                     },
-
-
                     title = {
                         Image(painter = painterResource(id = R.drawable.logo2_onb),
                             contentDescription = titulo,
-                            modifier = Modifier.width(300.dp).height(62.dp),
+                            modifier = Modifier.width(180.dp).height(62.dp),
                             contentScale = ContentScale.Fit
                         )
                     },
-
                     actions = {
                         if (tipoSesion != TipoSesion.INVITADO) {
                             IconButton(

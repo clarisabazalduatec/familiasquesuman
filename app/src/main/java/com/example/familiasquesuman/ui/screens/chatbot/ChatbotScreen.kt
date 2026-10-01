@@ -38,6 +38,9 @@ fun ChatbotScreen(
     var textoActual by remember { mutableStateOf("") }
 
     PantallaPrincipalConMenu(
+        backButton = true,
+        onBackClick = { navController.popBackStack() },
+        navbar = false,
         navController = navController,
         pantallaActual = PantallaPrincipal.CHATBOT
     ) { paddingInterno -> Column(
