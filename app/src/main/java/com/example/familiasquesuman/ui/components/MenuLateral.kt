@@ -128,25 +128,14 @@ fun MenuLateral(
                     vertical = 18.dp
                 )
         ) {
-            if (sesionIniciada) {
-                HeaderUsuario(
-                    nombreUsuario = nombreUsuario,
-                    fotoPerfilRes = fotoPerfilRes,
-                    tipoSesion = tipoSesion,
-                    onTipoSesionChange = { onTipoSesionChange(it) },
-                    onPerfilClick = onPerfilClick,
-                    onCerrarDrawer = onBackClick
-                )
-            } else {
-                HeaderUsuario(
-                    nombreUsuario = "Bienvenido",
-                    fotoPerfilRes = fotoPerfilRes,
-                    tipoSesion = TipoSesion.USUARIO,
-                    onTipoSesionChange = { onTipoSesionChange(it) },
-                    onPerfilClick = {},
-                    onCerrarDrawer = onBackClick
-                )
-            }
+            HeaderUsuario(
+                nombreUsuario = if (sesionIniciada) nombreUsuario else "Bienvenido",
+                fotoPerfilRes = fotoPerfilRes,
+                tipoSesion = tipoSesion,
+                onTipoSesionChange = { onTipoSesionChange(it) },
+                onPerfilClick = { if (sesionIniciada) onPerfilClick() },
+                onCerrarDrawer = onBackClick
+            )
 
 
             HorizontalDivider(color = GrisBorde, modifier = Modifier.padding(
