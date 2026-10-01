@@ -4,17 +4,8 @@ import androidx.annotation.DrawableRes
 import com.example.familiasquesuman.R
 
 
-enum class TipoPublicacion {
-    OFICIAL,
-    COMUNIDAD
-}
-
-
-enum class EstadoPublicacion {
-    EN_REVISION,
-    PUBLICADA,
-    RECHAZADA
-}
+enum class TipoPublicacion { OFICIAL, COMUNIDAD }
+enum class EstadoPublicacion { EN_REVISION, PUBLICADA, RECHAZADA }
 
 
 data class ComentarioUi(
@@ -36,19 +27,14 @@ data class PublicacionComunidadUi(
 
     @DrawableRes
     val imagenRes: Int? = null,
-
     val numeroLikes: Int = 0,
     val numeroComentarios: Int = 0,
-
     val fechaEvento: String? = null,
     val horarioEvento: String? = null,
     val ubicacion: String? = null,
-
     val documentoNombre: String? = null,
     val documentoDetalle: String? = null,
-
     val estado: EstadoPublicacion? = null,
-
     val comentarios: List<ComentarioUi> = emptyList()
 )
 
@@ -93,7 +79,6 @@ val publicacionesOficialesMock = listOf(
 
 
 val publicacionesComunidadMock = listOf(
-
     PublicacionComunidadUi(
         id = "comunidad_carlos",
         tipo = TipoPublicacion.COMUNIDAD,
@@ -141,7 +126,6 @@ val publicacionesComunidadMock = listOf(
 
 
 val misPublicacionesMock = listOf(
-
     PublicacionComunidadUi(
         id = "m_publicacion_revision",
         tipo = TipoPublicacion.COMUNIDAD,
@@ -186,7 +170,6 @@ val misPublicacionesMock = listOf(
 
 
 fun buscarPublicacion(id: String): PublicacionComunidadUi? {
-
     return (
             publicacionesOficialesMock +
                     publicacionesComunidadMock +

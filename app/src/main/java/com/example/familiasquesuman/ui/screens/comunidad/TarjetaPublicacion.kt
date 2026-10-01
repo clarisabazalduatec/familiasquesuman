@@ -25,20 +25,13 @@ fun TarjetaPublicacion(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-
-    if (
-        publicacion.tipo ==
-        TipoPublicacion.OFICIAL
-    ) {
-
+    if (publicacion.tipo == TipoPublicacion.OFICIAL) {
         TarjetaPublicacionOficial(
             publicacion = publicacion,
             onClick = onClick,
             modifier = modifier
         )
-
     } else {
-
         TarjetaPublicacionComunidad(
             publicacion = publicacion,
             onClick = onClick,
@@ -54,32 +47,13 @@ private fun TarjetaPublicacionOficial(
     modifier: Modifier
 ) {
 
-    Card(
-        onClick = onClick,
-        modifier =
-            modifier.fillMaxWidth(),
-
-        shape =
-            RoundedCornerShape(22.dp),
-
-        colors =
-            CardDefaults.cardColors(
-                containerColor = Blanco
-            ),
-
-        elevation =
-            CardDefaults.cardElevation(
-                defaultElevation = 2.dp
-            )
+    Card(onClick = onClick, modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = Blanco),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-
-        Column {
-
-            publicacion.imagenRes?.let { imagen ->
-
-                Image(
-                    painter =
-                        painterResource(imagen),
+        Column { publicacion.imagenRes?.let { imagen ->
+                Image(painter = painterResource(imagen),
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -88,109 +62,46 @@ private fun TarjetaPublicacionOficial(
                         ContentScale.Crop
                 )
             }
-
-            Column(
-                modifier =
-                    Modifier.padding(16.dp)
-            ) {
-
-                Text(
-                    text =
-                        publicacion.titulo.orEmpty(),
-                    style =
-                        MaterialTheme.typography
-                            .titleLarge,
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(text = publicacion.titulo.orEmpty(),
+                    style = MaterialTheme.typography.titleLarge,
                     color = AzulMarino
                 )
-
-                Spacer(
-                    Modifier.height(5.dp)
-                )
-
-                Text(
-                    text =
-                        publicacion.contenido,
-
-                    style =
-                        MaterialTheme.typography
-                            .bodyMedium,
-
+                Spacer(Modifier.height(5.dp))
+                Text(text = publicacion.contenido,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = GrisTexto,
-
                     maxLines = 3,
-
-                    overflow =
-                        TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis
                 )
-
-                Spacer(
-                    Modifier.height(12.dp)
-                )
-
+                Spacer(Modifier.height(12.dp))
                 publicacion
                     .fechaEvento
                     ?.let {
-
-                        FilaDato(
-                            Icons.Outlined
-                                .CalendarMonth,
-                            it
-                        )
+                        FilaDato(Icons.Outlined.CalendarMonth, it)
                     }
-
                 publicacion
                     .horarioEvento
                     ?.let {
-
-                        FilaDato(
-                            Icons.Outlined.Schedule,
-                            it
-                        )
+                        FilaDato(Icons.Outlined.Schedule, it)
                     }
-
                 publicacion
                     .ubicacion
                     ?.let {
-
-                        FilaDato(
-                            Icons.Outlined.LocationOn,
-                            it
+                        FilaDato(Icons.Outlined.LocationOn, it
                         )
                     }
-
-                Spacer(
-                    Modifier.height(8.dp)
-                )
-
-                HorizontalDivider(
-                    color =
-                        GrisBorde.copy(
-                            alpha = .7f
-                        )
-                )
-
-                TextButton(
-                    onClick = onClick,
-                    modifier =
-                        Modifier.fillMaxWidth()
+                Spacer(Modifier.height(8.dp))
+                HorizontalDivider(color = GrisBorde.copy(alpha = .7f))
+                TextButton(onClick = onClick,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-
-                    Text(
-                        text = "Ver anuncio",
-                        style =
-                            MaterialTheme.typography
-                                .titleSmall,
+                    Text(text = "Ver anuncio",
+                        style = MaterialTheme.typography.titleSmall,
                         color = AzulMarino
                     )
-
-                    Spacer(
-                        Modifier.weight(1f)
-                    )
-
-                    Icon(
-                        imageVector =
-                            Icons.Outlined
-                                .ChevronRight,
+                    Spacer(Modifier.weight(1f))
+                    Icon(imageVector = Icons.Outlined.ChevronRight,
                         contentDescription = null,
                         tint = AzulMarino
                     )
@@ -207,107 +118,47 @@ private fun TarjetaPublicacionComunidad(
     modifier: Modifier
 ) {
 
-    var tieneLike by rememberSaveable(
-        publicacion.id
-    ) {
-        mutableStateOf(false)
-    }
-
-    var likes by rememberSaveable(
-        publicacion.id
-    ) {
-        mutableIntStateOf(
+    var tieneLike by rememberSaveable(publicacion.id) { mutableStateOf(false) }
+    var likes by rememberSaveable(publicacion.id) { mutableIntStateOf(
             publicacion.numeroLikes
         )
     }
 
-    Card(
-        onClick = onClick,
-
-        modifier =
-            modifier.fillMaxWidth(),
-
-        shape =
-            RoundedCornerShape(22.dp),
-
-        colors =
-            CardDefaults.cardColors(
-                containerColor = Blanco
-            ),
-
-        elevation =
-            CardDefaults.cardElevation(
-                defaultElevation = 2.dp
-            )
+    Card(onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = Blanco),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-
         Column {
-
-            Row(
-                modifier =
+            Row(modifier =
                     Modifier.padding(
                         start = 14.dp,
                         end = 14.dp,
                         top = 14.dp,
                         bottom = 10.dp
                     ),
-
-                verticalAlignment =
-                    Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Surface(
-                    modifier =
-                        Modifier.size(42.dp),
-
+                Surface(modifier = Modifier.size(42.dp),
                     shape = CircleShape,
-
                     color = AmbarClaro
                 ) {
-
-                    Box(
-                        contentAlignment =
-                            Alignment.Center
-                    ) {
-
-                        Icon(
-                            imageVector =
-                                Icons.Outlined.Person,
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(imageVector = Icons.Outlined.Person,
                             contentDescription = null,
                             tint = AzulMarino
                         )
                     }
                 }
-
-                Spacer(
-                    Modifier.width(9.dp)
-                )
-
-                Column(
-                    modifier =
-                        Modifier.weight(1f)
-                ) {
-
-                    Text(
-                        text =
-                            publicacion.autor,
-
-                        style =
-                            MaterialTheme.typography
-                                .titleSmall,
-
+                Spacer(Modifier.width(9.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = publicacion.autor,
+                        style = MaterialTheme.typography.titleSmall,
                         color = AzulMarino
                     )
-
-                    Text(
-                        text =
-                            publicacion
-                                .tiempoRelativo,
-
-                        style =
-                            MaterialTheme.typography
-                                .bodySmall,
-
+                    Text(text = publicacion.tiempoRelativo,
+                        style = MaterialTheme.typography.bodySmall,
                         color = GrisTexto
                     )
                 }
@@ -315,34 +166,15 @@ private fun TarjetaPublicacionComunidad(
                 publicacion
                     .categoria
                     ?.let {
-
-                        Surface(
-                            shape =
-                                RoundedCornerShape(
-                                    50
-                                ),
-
-                            color =
-                                Ambar.copy(
-                                    alpha = .28f
-                                )
+                        Surface(shape = RoundedCornerShape(50),
+                            color = Ambar.copy(alpha = .28f)
                         ) {
-
-                            Text(
-                                text = it,
-
-                                modifier =
-                                    Modifier.padding(
-                                        horizontal =
-                                            10.dp,
+                            Text(text = it,
+                                modifier = Modifier.padding(horizontal = 10.dp,
                                         vertical =
                                             5.dp
                                     ),
-
-                                style =
-                                    MaterialTheme.typography
-                                        .labelSmall,
-
+                                style = MaterialTheme.typography.labelSmall,
                                 color = AzulMarino
                             )
                         }
@@ -352,79 +184,45 @@ private fun TarjetaPublicacionComunidad(
             publicacion
                 .imagenRes
                 ?.let {
-
-                    Image(
-                        painter =
-                            painterResource(it),
-
+                    Image(painter = painterResource(it),
                         contentDescription = null,
-
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(215.dp),
-
-                        contentScale =
-                            ContentScale.Crop
+                        contentScale = ContentScale.Crop
                     )
                 }
 
-            Column(
-                modifier =
-                    Modifier.padding(14.dp)
+            Column(modifier = Modifier.padding(14.dp)
             ) {
-
-                Text(
-                    text =
-                        publicacion.contenido,
-
-                    style =
-                        MaterialTheme.typography
+                Text(text = publicacion.contenido,
+                    style = MaterialTheme.typography
                             .bodyMedium,
-
                     color = AzulMarino,
-
                     maxLines = 3,
-
-                    overflow =
-                        TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(
-                    Modifier.height(9.dp)
-                )
-
-                Row(
-                    verticalAlignment =
-                        Alignment.CenterVertically
-                ) {
-
-                    IconButton(
-                        onClick = {
-
+                Spacer(Modifier.height(9.dp))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = {
                             tieneLike =
                                 !tieneLike
-
                             likes +=
                                 if (tieneLike)
                                     1
                                 else
                                     -1
                         },
-                        modifier =
-                            Modifier.size(36.dp)
+                        modifier = Modifier.size(36.dp)
                     ) {
-
-                        Icon(
-                            imageVector =
+                        Icon(imageVector =
                                 if (tieneLike)
                                     Icons.Filled.Favorite
                                 else
                                     Icons.Outlined
                                         .FavoriteBorder,
-
-                            contentDescription =
-                                "Me gusta",
-
+                            contentDescription = "Me gusta",
                             tint =
                                 if (tieneLike)
                                     ColorError
@@ -432,61 +230,30 @@ private fun TarjetaPublicacionComunidad(
                                     AzulMarino
                         )
                     }
-
-                    Text(
-                        text = likes.toString(),
-                        style =
-                            MaterialTheme.typography
-                                .bodySmall,
+                    Text(text = likes.toString(),
+                        style = MaterialTheme.typography.bodySmall,
                         color = AzulMarino
                     )
-
-                    Spacer(
-                        Modifier.width(14.dp)
-                    )
-
-                    IconButton(
-                        onClick = onClick,
-                        modifier =
-                            Modifier.size(36.dp)
+                    Spacer(Modifier.width(14.dp))
+                    IconButton(onClick = onClick,
+                        modifier = Modifier.size(36.dp)
                     ) {
-
-                        Icon(
-                            imageVector =
-                                Icons.Outlined
-                                    .ChatBubbleOutline,
-                            contentDescription =
-                                "Comentarios",
+                        Icon(imageVector = Icons.Outlined.ChatBubbleOutline,
+                            contentDescription = "Comentarios",
                             tint = AzulMarino
                         )
                     }
-
-                    Text(
-                        text =
-                            publicacion
+                    Text(text = publicacion
                                 .numeroComentarios
                                 .toString(),
-
-                        style =
-                            MaterialTheme.typography
+                        style = MaterialTheme.typography
                                 .bodySmall,
-
                         color = AzulMarino
                     )
-
-                    Spacer(
-                        Modifier.weight(1f)
-                    )
-
-                    IconButton(
-                        onClick = {}
-                    ) {
-
-                        Icon(
-                            imageVector =
-                                Icons.Outlined.Share,
-                            contentDescription =
-                                "Compartir",
+                    Spacer(Modifier.weight(1f))
+                    IconButton(onClick = {}) {
+                        Icon(imageVector = Icons.Outlined.Share,
+                            contentDescription = "Compartir",
                             tint = AzulMarino
                         )
                     }
@@ -502,34 +269,17 @@ private fun FilaDato(
     androidx.compose.ui.graphics.vector.ImageVector,
     texto: String
 ) {
-
-    Row(
-        modifier =
-            Modifier.padding(
-                vertical = 3.dp
-            ),
-
-        verticalAlignment =
-            Alignment.CenterVertically
+    Row(modifier = Modifier.padding(vertical = 3.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-
-        Icon(
-            imageVector = icono,
+        Icon(imageVector = icono,
             contentDescription = null,
-            modifier =
-                Modifier.size(18.dp),
+            modifier = Modifier.size(18.dp),
             tint = AzulMarino
         )
-
-        Spacer(
-            Modifier.width(8.dp)
-        )
-
-        Text(
-            text = texto,
-            style =
-                MaterialTheme.typography
-                    .bodySmall,
+        Spacer(Modifier.width(8.dp))
+        Text(text = texto,
+            style = MaterialTheme.typography.bodySmall,
             color = AzulMarino
         )
     }
