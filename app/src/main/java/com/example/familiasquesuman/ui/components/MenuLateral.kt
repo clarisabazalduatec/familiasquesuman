@@ -99,7 +99,6 @@ fun MenuLateral(
     onPerfilClick: () -> Unit = {},
     onAdminClick: () -> Unit = {},
     onCerrarSesionClick: () -> Unit = {},
-    // Cierra el drawer con la X
     onBackClick: () -> Unit
 ) {
 
@@ -125,7 +124,6 @@ fun MenuLateral(
                     vertical = 18.dp
                 )
         ) {
-            // HEADER
             if (sesionIniciada) {
                 HeaderUsuario(
                     nombreUsuario = nombreUsuario,
@@ -147,20 +145,9 @@ fun MenuLateral(
             }
 
 
-            HorizontalDivider(
-                color = GrisBorde,
-
-                modifier = Modifier.padding(
-                    horizontal = 10.dp,
-                    vertical = 10.dp
-                )
-            )
-
-
-            // =====================================================
-            // CONTENIDO SCROLLEABLE
-            // =====================================================
-
+            HorizontalDivider(color = GrisBorde, modifier = Modifier.padding(
+                horizontal = 10.dp,
+                vertical = 10.dp))
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -168,110 +155,72 @@ fun MenuLateral(
                         rememberScrollState()
                     )
             ) {
-
-                // =================================================
-                // NAVEGACIÓN PRINCIPAL
-                // =================================================
-
                 ItemMenuLateral(
                     texto = "Inicio",
                     icono = Icons.Outlined.Home,
                     onClick = onInicioClick
                 )
-
                 ItemMenuLateral(
                     texto = "Actividades en familia",
                     icono = Icons.Outlined.CalendarMonth,
                     onClick = onActividadesClick
                 )
-
                 ItemMenuLateral(
                     texto = "Proyectos",
                     icono = Icons.Outlined.Lightbulb,
                     onClick = onProyectosClick
                 )
-
                 ItemMenuLateral(
                     texto = "Donar",
                     icono = Icons.Outlined.FavoriteBorder,
                     onClick = onDonarClick
                 )
-
                 ItemMenuLateral(
                     texto = "Comunidad",
                     icono = Icons.Outlined.Groups,
                     onClick = onComunidadClick
                 )
-
                 ItemMenuLateral(
                     texto = "Directorio de Visitas",
                     icono = Icons.Outlined.Place,
                     onClick = onDirectorioClick
                 )
-
-
                 HorizontalDivider(
                     color = GrisBorde,
-
                     modifier = Modifier.padding(
                         horizontal = 10.dp,
                         vertical = 10.dp
                     )
                 )
-
-
-                // =================================================
-                // INFORMACIÓN / AYUDA
-                // =================================================
-
                 ItemMenuLateral(
                     texto = "Chatbot",
                     icono = Icons.Outlined.ChatBubble,
                     onClick = onChatbotClick
                 )
-
                 ItemMenuLateral(
                     texto = "Sobre nosotros",
                     icono = Icons.Outlined.Groups,
                     onClick = onSobreNosotrosClick
                 )
-
                 ItemMenuLateral(
                     texto = "Contacto",
                     icono = Icons.Outlined.Email,
                     onClick = onContactoClick
                 )
-
-
                 HorizontalDivider(
                     color = GrisBorde,
-
                     modifier = Modifier.padding(
                         horizontal = 10.dp,
                         vertical = 10.dp
                     )
                 )
-
-
-                // =================================================
-                // ADMIN
-                // =================================================
-
                 if (esAdmin) {
-
                     ItemMenuLateral(
                         texto = "Admin",
                         icono = Icons.Outlined.AddModerator,
                         onClick = onAdminClick
                     )
                 }
-
-
-
-                // =================================================
-                // PERFIL
-                // =================================================
-
                 if (sesionIniciada) {
 
                     ItemMenuLateral(
@@ -282,30 +231,13 @@ fun MenuLateral(
                 }
             }
 
-
-            // =====================================================
-            // PARTE INFERIOR
-            // =====================================================
-
             if (!sesionIniciada) {
-
-                // ===============================================
-                // INVITADO
-                // ===============================================
-
-                Spacer(
-                    modifier = Modifier.height(12.dp)
-                )
-
-                Button(
-                    onClick = onIniciarSesionClick,
-
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(onClick = onIniciarSesionClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
-
                     shape = RoundedCornerShape(14.dp),
-
                     colors = ButtonDefaults.buttonColors(
                         containerColor = AzulMarino,
                         contentColor = Blanco
@@ -317,32 +249,20 @@ fun MenuLateral(
                         contentDescription = null,
                         modifier = Modifier.size(24.dp)
                     )
-
-                    Spacer(
-                        modifier = Modifier.width(10.dp)
-                    )
-
+                    Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = "Iniciar sesión",
                         style = MaterialTheme.typography.titleSmall
                     )
                 }
-
-
-                Spacer(
-                    modifier = Modifier.height(10.dp)
-                )
-
-
+                Spacer(modifier = Modifier.height(10.dp))
                 OutlinedButton(
                     onClick = onCrearCuentaClick,
-
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
 
                     shape = RoundedCornerShape(14.dp),
-
                     border = BorderStroke(
                         width = 1.dp,
                         color = GrisBorde
@@ -355,11 +275,7 @@ fun MenuLateral(
                         tint = AzulMarino,
                         modifier = Modifier.size(22.dp)
                     )
-
-                    Spacer(
-                        modifier = Modifier.width(10.dp)
-                    )
-
+                    Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = "Crear cuenta",
                         style = MaterialTheme.typography.titleSmall,
@@ -368,46 +284,29 @@ fun MenuLateral(
                 }
 
             } else {
-
-                // ===============================================
-                // USUARIO O ADMIN
-                // ===============================================
-
                 HorizontalDivider(
                     color = GrisBorde,
-
                     modifier = Modifier.padding(
                         bottom = 12.dp
                     )
                 )
-
-
-                OutlinedButton(
-                    onClick = onCerrarSesionClick,
-
+                OutlinedButton(onClick = onCerrarSesionClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
-
                     shape = RoundedCornerShape(14.dp),
-
                     border = BorderStroke(
                         width = 1.dp,
                         color = GrisBorde
                     )
                 ) {
-
                     Icon(
                         imageVector = Icons.Outlined.Logout,
                         contentDescription = null,
                         tint = AzulMarino,
                         modifier = Modifier.size(24.dp)
                     )
-
-                    Spacer(
-                        modifier = Modifier.width(10.dp)
-                    )
-
+                    Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = "Cerrar sesión",
                         style = MaterialTheme.typography.titleSmall,
@@ -420,21 +319,12 @@ fun MenuLateral(
 }
 
 
-// =============================================================
-// HEADER INVITADO
-// =============================================================
-
 @Composable
 private fun HeaderInvitado(
     onCerrarDrawer: () -> Unit
 ) {
-
-    Box(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-
-        Row(
-            modifier = Modifier
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier
                 .fillMaxWidth()
                 .padding(
                     start = 6.dp,
@@ -442,12 +332,8 @@ private fun HeaderInvitado(
                     top = 8.dp,
                     bottom = 8.dp
                 ),
-
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Box(
-                modifier = Modifier
+            verticalAlignment = Alignment.CenterVertically) {
+            Box(modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
                     .background(
@@ -455,10 +341,8 @@ private fun HeaderInvitado(
                             alpha = 0.08f
                         )
                     ),
-
                 contentAlignment = Alignment.Center
             ) {
-
                 Icon(
                     imageVector = Icons.Outlined.Person,
                     contentDescription = null,
@@ -466,22 +350,14 @@ private fun HeaderInvitado(
                     modifier = Modifier.size(38.dp)
                 )
             }
-
-
-            Spacer(
-                modifier = Modifier.width(14.dp)
-            )
-
-
+            Spacer(modifier = Modifier.width(14.dp))
             Column {
-
                 Text(
                     text = "Bienvenido",
                     style = MaterialTheme.typography.titleMedium,
                     color = AzulMarino,
                     fontWeight = FontWeight.Bold
                 )
-
                 Text(
                     text = "Explora sin iniciar sesión",
                     style = MaterialTheme.typography.bodyMedium,
@@ -491,9 +367,7 @@ private fun HeaderInvitado(
         }
 
 
-        IconButton(
-            onClick = onCerrarDrawer,
-
+        IconButton(onClick = onCerrarDrawer,
             modifier = Modifier.align(
                 Alignment.TopEnd
             )
@@ -509,39 +383,23 @@ private fun HeaderInvitado(
     }
 }
 
-
-// =============================================================
-// HEADER USUARIO / ADMIN
-// =============================================================
-
 @Composable
 private fun HeaderUsuario(
-
     nombreUsuario: String,
-
     @DrawableRes
     fotoPerfilRes: Int?,
-
     tipoSesion: TipoSesion,
-
     onTipoSesionChange: (TipoSesion) -> Unit,
-
     onPerfilClick: () -> Unit,
-
     onCerrarDrawer: () -> Unit
 ) {
-
     var mostrarSelector by remember {
         mutableStateOf(false)
     }
 
 
-    Box(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-
-        Row(
-            modifier = Modifier
+    Box(modifier = Modifier.fillMaxWidth()) {
+        Row(modifier = Modifier
                 .fillMaxWidth()
                 .padding(
                     start = 6.dp,
@@ -549,22 +407,12 @@ private fun HeaderUsuario(
                     top = 10.dp,
                     bottom = 10.dp
                 ),
+            verticalAlignment = Alignment.CenterVertically)
+        {
+            AvatarUsuario(fotoPerfilRes = fotoPerfilRes)
+            Spacer(modifier = Modifier.width(12.dp))
 
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            AvatarUsuario(
-                fotoPerfilRes = fotoPerfilRes
-            )
-
-
-            Spacer(
-                modifier = Modifier.width(12.dp)
-            )
-
-
-            Column(
-                modifier = Modifier
+            Column(modifier = Modifier
                     .weight(1f)
                     .clickable {
                         onPerfilClick()
@@ -586,18 +434,7 @@ private fun HeaderUsuario(
             }
 
 
-            // =================================================
-            // FLECHA SELECTOR DE SESIÓN DEMO
-            // =================================================
-
-            Box {
-
-                IconButton(
-                    onClick = {
-                        mostrarSelector = true
-                    }
-                ) {
-
+            Box { IconButton( onClick = { mostrarSelector = true }) {
                     Icon(
                         imageVector = Icons.Outlined.ChevronRight,
                         contentDescription = "Cambiar vista de sesión",
@@ -609,66 +446,35 @@ private fun HeaderUsuario(
 
                 DropdownMenu(
                     expanded = mostrarSelector,
-
                     onDismissRequest = {
                         mostrarSelector = false
                     }
                 ) {
-
                     OpcionTipoSesion(
                         texto = "Sin iniciar sesión",
-
                         seleccionado =
                             tipoSesion == TipoSesion.INVITADO,
-
-                        onClick = {
-
-                            onTipoSesionChange(
-                                TipoSesion.INVITADO
-                            )
-
+                        onClick = { onTipoSesionChange(TipoSesion.INVITADO)
                             mostrarSelector = false
                         }
                     )
-
-
                     OpcionTipoSesion(
                         texto = "Usuario",
-
-                        seleccionado =
-                            tipoSesion == TipoSesion.USUARIO,
-
-                        onClick = {
-
-                            onTipoSesionChange(
-                                TipoSesion.USUARIO
-                            )
-
+                        seleccionado = tipoSesion == TipoSesion.USUARIO,
+                        onClick = { onTipoSesionChange(TipoSesion.USUARIO)
                             mostrarSelector = false
                         }
                     )
-
-
                     OpcionTipoSesion(
                         texto = "Administrador",
-
-                        seleccionado =
-                            tipoSesion == TipoSesion.ADMIN,
-                        onClick = {
-                            onTipoSesionChange(
-                                TipoSesion.ADMIN
-                            )
+                        seleccionado = tipoSesion == TipoSesion.ADMIN,
+                        onClick = { onTipoSesionChange(TipoSesion.ADMIN)
                             mostrarSelector = false
                         }
                     )
                 }
             }
         }
-
-
-        // =====================================================
-        // X CERRAR DRAWER
-        // =====================================================
         IconButton(
             onClick = onCerrarDrawer,
             modifier = Modifier.align(
@@ -685,10 +491,6 @@ private fun HeaderUsuario(
     }
 }
 
-
-// =============================================================
-// AVATAR
-// =============================================================
 
 @Composable
 private fun AvatarUsuario(
@@ -713,7 +515,6 @@ private fun AvatarUsuario(
             )
 
         } else {
-
             Icon(
                 imageVector = Icons.Outlined.Person,
                 contentDescription = null,
@@ -723,11 +524,6 @@ private fun AvatarUsuario(
         }
     }
 }
-
-
-// =============================================================
-// OPCIÓN SELECTOR DEMO
-// =============================================================
 
 @Composable
 private fun OpcionTipoSesion(
@@ -753,28 +549,19 @@ private fun OpcionTipoSesion(
     )
 }
 
-// ITEM DEL SIDEBAR
 @Composable
 private fun ItemMenuLateral(
-
     texto: String,
-
     icono: ImageVector,
-
     selected: Boolean = false,
-
     onClick: () -> Unit
 ) {
 
     NavigationDrawerItem(
-
         label = {
-
             Text(
                 text = texto,
-
                 style = MaterialTheme.typography.bodyLarge,
-
                 fontWeight =
                     if (selected) {
                         FontWeight.SemiBold
@@ -785,7 +572,6 @@ private fun ItemMenuLateral(
         },
 
         icon = {
-
             Icon(
                 imageVector = icono,
                 contentDescription = null,
@@ -794,27 +580,15 @@ private fun ItemMenuLateral(
         },
 
         selected = selected,
-
         onClick = onClick,
-
         shape = RoundedCornerShape(20.dp),
-
         colors = NavigationDrawerItemDefaults.colors(
-
             selectedContainerColor = AmbarClaro,
-
             selectedIconColor = AzulMarino,
-
             selectedTextColor = AzulMarino,
-
-            unselectedContainerColor =
-                Color.Transparent,
-
-            unselectedIconColor =
-                AzulMarino,
-
-            unselectedTextColor =
-                AzulMarino
+            unselectedContainerColor = Color.Transparent,
+            unselectedIconColor = AzulMarino,
+            unselectedTextColor = AzulMarino
         ),
 
         modifier = Modifier
