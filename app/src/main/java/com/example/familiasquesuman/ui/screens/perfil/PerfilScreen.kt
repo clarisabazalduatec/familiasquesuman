@@ -26,16 +26,7 @@ fun PerfilScreen(
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.PERFIL,
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notificaciones",
-                    tint = AzulMarino
-                )
-            }
-        }
+        pantallaActual = PantallaPrincipal.PERFIL
     ) { paddingInterno ->
         LazyColumn(
             modifier = Modifier

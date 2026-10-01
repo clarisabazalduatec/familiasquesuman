@@ -103,22 +103,7 @@ fun InicioScreen(
 ) {
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.INICIO,
-        acciones = {
-            IconButton(
-                onClick = {
-                    navController.navigate(
-                        Rutas.Notificaciones.ruta
-                    )
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notificaciones",
-                    tint = AzulMarino
-                )
-            }
-        }
+        pantallaActual = PantallaPrincipal.INICIO
     ) { paddingInterno ->
         LazyColumn(
             modifier = Modifier

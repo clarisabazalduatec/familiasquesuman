@@ -19,6 +19,8 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 
 @Composable
 fun ResultadoPublicacionScreen(
@@ -29,24 +31,7 @@ fun ResultadoPublicacionScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.INICIO,
-
-        acciones = {
-            IconButton(
-                onClick = {
-                    navController.navigate(
-                        Rutas.Notificaciones.ruta
-                    )
-                }
-            ) {
-
-                Icon(
-                    imageVector =
-                        Icons.Default.Notifications,
-                    contentDescription =
-                        "Notificaciones", tint = AzulMarino
-                )
-            }
-        }
+        chatbot = false
     ) { paddingInterno ->
 
         Column(
@@ -56,11 +41,8 @@ fun ResultadoPublicacionScreen(
                 .background(CremaFondo)
                 .padding(18.dp),
 
-            horizontalAlignment =
-                Alignment.CenterHorizontally
-        ) {
-
-
+            horizontalAlignment = Alignment.CenterHorizontally
+        )  {
 
             Spacer(modifier = Modifier.weight(.35f))
             Surface(
@@ -69,19 +51,28 @@ fun ResultadoPublicacionScreen(
                 color = AmbarClaro
             ) {
 
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(imageVector =
-                            if (fueExitoso)
+                Box(
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Icon(
+                        imageVector =
+                            if (fueExitoso) {
                                 Icons.Outlined.Send
-                            else
-                                Icons.Outlined.ErrorOutline,
+                            } else {
+                                Icons.Outlined.ErrorOutline
+                            },
+
                         contentDescription = null,
+
                         modifier = Modifier.size(54.dp),
+
                         tint =
-                            if (fueExitoso)
+                            if (fueExitoso) {
                                 AzulMarino
-                            else
+                            } else {
                                 ColorError
+                            }
                     )
                 }
             }

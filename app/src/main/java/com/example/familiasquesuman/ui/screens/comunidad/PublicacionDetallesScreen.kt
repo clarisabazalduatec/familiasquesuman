@@ -39,27 +39,7 @@ fun PublicacionDetalleScreen(
         pantallaActual = PantallaPrincipal.INICIO,
 
         // Ya está en el sidebar
-        chatbot = false,
-
-        // Conservamos navbar del proyecto
-
-        // Campana igual que Inicio
-        acciones = {
-
-            IconButton(
-                onClick = {
-                    navController.navigate(
-                        Rutas.Notificaciones.ruta
-                    )
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Notifications,
-                    contentDescription = "Notificaciones",
-                    tint = AzulMarino
-                )
-            }
-        }
+        chatbot = false
     ) { paddingInterno ->
 
         if (publicacion == null) {

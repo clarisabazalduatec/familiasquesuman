@@ -39,16 +39,7 @@ fun ChatbotScreen(
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.CHATBOT,
-        acciones = {
-            IconButton(
-                onClick = {
-                    navController.navigate(Rutas.Notificaciones.ruta)
-                }
-            ) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-            }
-        }
+        pantallaActual = PantallaPrincipal.CHATBOT
     ) { paddingInterno -> Column(
             modifier = Modifier
                 .padding(paddingInterno)

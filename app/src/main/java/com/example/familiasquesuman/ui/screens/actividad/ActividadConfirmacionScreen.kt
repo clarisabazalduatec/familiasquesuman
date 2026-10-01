@@ -61,12 +61,7 @@ fun ActividadConfirmacionScreen(navController: NavHostController, actividadId: I
         navbar = false,
         chatbot = false,
         backButton = true,
-        onBackClick = regresarAlDetalle,
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-            }
-        }
+        onBackClick = regresarAlDetalle
     ) { paddingValues ->
         val scrollState = rememberScrollState()
 

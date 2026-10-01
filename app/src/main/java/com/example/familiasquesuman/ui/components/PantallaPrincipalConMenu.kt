@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,7 +53,6 @@ fun PantallaPrincipalConMenu(
     backButton: Boolean = false,
     onBackClick: () -> Unit = {},
 
-    acciones: @Composable RowScope.() -> Unit = {},
     contenido: @Composable (paddingInterno: PaddingValues) -> Unit) {
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
@@ -154,12 +154,26 @@ fun PantallaPrincipalConMenu(
                         )
                     },
 
-                    actions = acciones
+                    actions = {
+                        if (tipoSesion != TipoSesion.INVITADO) {
+                            IconButton(
+                                onClick = {
+                                    navController.navigate(
+                                        Rutas.Notificaciones.ruta
+                                    )
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Notifications,
+                                    contentDescription = "Notificaciones",
+                                    tint = AzulMarino
+                                )
+                            }
+                        }
+                    }
                 )
             },
-
             floatingActionButton = {if (chatbot) {
-
                 FloatingActionButton(
                     onClick = { navController.navigate(Rutas.Chatbot.ruta) { launchSingleTop = true } },
                     containerColor = AzulMarino,
@@ -189,13 +203,11 @@ fun PantallaPrincipalConMenu(
                                     PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
                                     PantallaPrincipal.PERFIL -> Rutas.Perfil.ruta
                                 }
-                            navController.navigate(ruta) { launchSingleTop = true
-                            }
+                            navController.navigate(ruta) { launchSingleTop = true }
                         }
                     )
                 }
             }
-
         )
         { paddingInterno -> contenido(paddingInterno) }
     }

@@ -58,12 +58,7 @@ fun DirectorioScreen(navController: NavHostController) {
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.DIRECTORIO,
-        acciones = {
-            IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                Icon(Icons.Default.Notifications, contentDescription = "Notificaciones")
-            }
-        },
+        pantallaActual = PantallaPrincipal.DIRECTORIO
     ) { paddingInterno ->
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
