@@ -155,7 +155,7 @@ fun AdminCrearContenidoScreen(navController: NavHostController) {
                     descripcionLarga = descripcionLargaText.ifBlank { descripcionCortaText },
                     fundacion = categoriaDonacionText.ifBlank { "Comunidad" },
                     imagenUrl = "https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=600&auto=format&fit=crop",
-                    tipo = if (esCampana) TipoDonacion.CAMPANA else TipoDonacion.ARTICULO,
+                    tipo = if (esCampana) TipoDonacion.CAMPANA else TipoDonacion.ESPECIE,
                     categoria = categoriaDonacionText,
                     recaudado = 0f,
                     meta = metaText.toFloatOrNull() ?: 1000f,
