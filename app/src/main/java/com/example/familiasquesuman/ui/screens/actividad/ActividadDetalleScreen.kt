@@ -26,6 +26,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.model.SesionDemoState
+import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.actividad.components.CategoriaChip
 import com.example.familiasquesuman.ui.screens.actividad.components.TarjetaInfoActividad
@@ -261,11 +263,17 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                     ) {
                         Button(
                             onClick = {
-                                navController.navigate(
-                                    Rutas.ActividadParticipar.crearRuta(
-                                        actividadId
+                                if (SesionDemoState.tipoSesion == TipoSesion.INVITADO) {
+                                    navController.navigate(Rutas.Login.ruta) {
+                                        launchSingleTop = true
+                                    }
+                                } else {
+                                    navController.navigate(
+                                        Rutas.ActividadSeleccionParticipantes.crearRuta(
+                                            actividadId
+                                        )
                                     )
-                                )
+                                }
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Ambar),
                             shape = RoundedCornerShape(24.dp),
