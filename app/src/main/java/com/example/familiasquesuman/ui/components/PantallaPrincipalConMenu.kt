@@ -63,12 +63,16 @@ fun PantallaPrincipalConMenu(
     val navigateTo: (String) -> Unit = { route ->
         scope.launch { drawerState.close() }
         if (navController.currentDestination?.route != route) {
-            navController.navigate(route) {
-                popUpTo(navController.graph.startDestinationId) {
-                    saveState = true
+            try {
+                navController.navigate(route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
                 }
-                launchSingleTop = true
-                restoreState = true
+            } catch (_: Exception) {
+                // Previene bloqueos por toques rápidos durante animaciones
             }
         }
     }
@@ -187,12 +191,16 @@ fun PantallaPrincipalConMenu(
                                     PantallaPrincipal.PERFIL -> Rutas.Perfil.ruta
                                 }
                             if (navController.currentDestination?.route != ruta) {
-                                navController.navigate(ruta) {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
+                                try {
+                                    navController.navigate(ruta) {
+                                        popUpTo(navController.graph.startDestinationId) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
+                                } catch (_: Exception) {
+                                    // Previene bloqueos por toques rápidos durante animaciones
                                 }
                             }
                         }
