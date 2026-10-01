@@ -163,8 +163,6 @@ fun ResultadoPublicacionScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-
-                // BOTÓN PRINCIPAL
                 Button(
                     onClick = {
                         if (fueExitoso) {
@@ -206,7 +204,6 @@ fun ResultadoPublicacionScreen(
                 }
 
 
-                // BOTÓN SECUNDARIO
                 OutlinedButton(
                     onClick = {
 
