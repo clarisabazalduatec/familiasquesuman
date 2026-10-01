@@ -174,7 +174,7 @@ fun AdminEditarContenidoScreen(
                         descripcionCorta = descripcionCortaText,
                         descripcionLarga = descripcionLargaText,
                         fundacion = categoriaDonacionText,
-                        tipo = if (tipoDonacionIndex == 0) TipoDonacion.CAMPANA else TipoDonacion.ARTICULO,
+                        tipo = if (tipoDonacionIndex == 0) TipoDonacion.CAMPANA else TipoDonacion.ESPECIE,
                         categoria = categoriaDonacionText,
                         recaudado = nuevoRecaudado,
                         meta = metaText.toFloatOrNull() ?: vieja.meta,
