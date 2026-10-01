@@ -52,7 +52,7 @@ fun PantallaPrincipalConMenu(
     navbar: Boolean = true,
     chatbot: Boolean = false,
     backButton: Boolean = false,
-    onBackClick: () -> Unit = {},
+    onBackClick: () -> Unit = { navController.popBackStack() },
 
     contenido: @Composable (paddingInterno: PaddingValues) -> Unit) {
 
