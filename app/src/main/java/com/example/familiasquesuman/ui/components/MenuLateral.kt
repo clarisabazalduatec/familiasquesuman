@@ -1,5 +1,6 @@
 package com.example.familiasquesuman.ui.components
 
+import android.R
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -325,22 +326,22 @@ private fun HeaderInvitado(
 ) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 6.dp,
-                    end = 42.dp,
-                    top = 8.dp,
-                    bottom = 8.dp
-                ),
+            .fillMaxWidth()
+            .padding(
+                start = 6.dp,
+                end = 42.dp,
+                top = 8.dp,
+                bottom = 8.dp
+            ),
             verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .background(
-                        AzulMarino.copy(
-                            alpha = 0.08f
-                        )
-                    ),
+                .size(64.dp)
+                .clip(CircleShape)
+                .background(
+                    AzulMarino.copy(
+                        alpha = 0.08f
+                    )
+                ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -400,20 +401,21 @@ private fun HeaderUsuario(
 
     Box(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 6.dp,
-                    end = 34.dp,
-                    top = 10.dp,
-                    bottom = 10.dp
-                ),
+            .fillMaxWidth()
+            .padding(
+                start = 6.dp,
+                end = 6.dp,
+                top = 10.dp,
+                bottom = 10.dp
+            ),
             verticalAlignment = Alignment.CenterVertically)
         {
-            AvatarUsuario(fotoPerfilRes = fotoPerfilRes)
-            Spacer(modifier = Modifier.width(12.dp))
-
+            Box(modifier = Modifier.weight(2f)){
+                AvatarUsuario(fotoPerfilRes = fotoPerfilRes)
+            }
+            Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier
-                    .weight(1f)
+                    .weight(4f)
                     .clickable {
                         onPerfilClick()
                     }
@@ -433,16 +435,19 @@ private fun HeaderUsuario(
                 )
             }
 
+            Spacer(modifier = Modifier.width(16.dp))
 
-            Box { IconButton( onClick = { mostrarSelector = true }) {
-                    Icon(
-                        imageVector = Icons.Outlined.ChevronRight,
-                        contentDescription = "Cambiar vista de sesión",
-                        tint = AzulMarino,
-                        modifier = Modifier.size(25.dp)
-                    )
-                }
+            Box(modifier = Modifier
+                .weight(1f)) {
 
+                IconButton( onClick = { mostrarSelector = true }) {
+                        Icon(
+                            imageVector = Icons.Outlined.ChevronRight,
+                            contentDescription = "Cambiar vista de sesión",
+                            tint = AzulMarino,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
 
                 DropdownMenu(
                     expanded = mostrarSelector,
@@ -474,19 +479,16 @@ private fun HeaderUsuario(
                     )
                 }
             }
-        }
-        IconButton(
-            onClick = onCerrarDrawer,
-            modifier = Modifier.align(
-                Alignment.TopEnd
-            )
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Close,
-                contentDescription = "Cerrar menú",
-                tint = AzulMarino,
-                modifier = Modifier.size(24.dp)
-            )
+            IconButton(
+                onClick = onCerrarDrawer,
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Close,
+                    contentDescription = "Cerrar menú",
+                    tint = AzulMarino,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }

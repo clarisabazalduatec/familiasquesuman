@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonAddAlt1
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -116,23 +117,33 @@ fun ActividadSeleccionParticipantesScreen(navController: NavHostController, acti
                 }
                 
                 Spacer(modifier = Modifier.height(32.dp))
-                
-                // Botón Agregar Persona
+
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = Color.Transparent,
-                    border = BorderStroke(1.dp, AmarilloOscuro),
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = { /*TODO*/ }
                 ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
+                    Button(
+                        onClick = { navController.navigate(Rutas.Perfil.ruta) { launchSingleTop = true } },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        border = BorderStroke(1.dp, AmarilloOscuro),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
                     ) {
-                        Icon(Icons.Default.Add, contentDescription = null, tint = AmarilloOscuro)
+                        Icon(
+                            Icons.Default.PersonAddAlt1,
+                            contentDescription = null,
+                            tint = AzulOscuro
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Agregar persona", color = AmarilloOscuro, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(
+                            "Agregar persona",
+                            color = AzulOscuro,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }

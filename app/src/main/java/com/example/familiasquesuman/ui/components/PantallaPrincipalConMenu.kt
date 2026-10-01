@@ -59,6 +59,19 @@ fun PantallaPrincipalConMenu(
     val scope = rememberCoroutineScope()
     val tipoSesion = SesionDemoState.tipoSesion
 
+    val navigateTo: (String) -> Unit = { route ->
+        scope.launch { drawerState.close() }
+        if (navController.currentDestination?.route != route) {
+            navController.navigate(route) {
+                popUpTo(navController.graph.startDestinationId) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -66,56 +79,28 @@ fun PantallaPrincipalConMenu(
             MenuLateral(
                 tipoSesion = tipoSesion,
                 nombreUsuario = "Usuario Generico",
-                onChatbotClick = { scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Chatbot.ruta) },
+                onChatbotClick = { navigateTo(Rutas.Chatbot.ruta) },
                 onTipoSesionChange = { nuevoTipo -> SesionDemoState.tipoSesion = nuevoTipo },
-                onInicioClick = { scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Inicio.ruta) { launchSingleTop = true }
-                },
-                onActividadesClick = { scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Actividades.ruta) { launchSingleTop = true }
-                },
-                onProyectosClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Proyectos.ruta) { launchSingleTop = true }
-                },
-                onDonarClick = { scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Donar.ruta) { launchSingleTop = true }
-                },
-                onComunidadClick = { scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Comunidad.ruta) { launchSingleTop = true }
-                },
-                onDirectorioClick = { scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Directorio.ruta) { launchSingleTop = true }
-                },
-                onSobreNosotrosClick = { scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.SobreNosotros.ruta) { launchSingleTop = true }
-                },
-                onContactoClick = {
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.ContactoAyuda.ruta) { launchSingleTop = true }
-                },
-                onPerfilClick = { scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Perfil.ruta) { launchSingleTop = true }
-                },
-                onAdminClick = { scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Admin.ruta) { launchSingleTop = true }
-                },
-                onIniciarSesionClick = { scope.launch { drawerState.close() }
+                onInicioClick = { navigateTo(Rutas.Inicio.ruta) },
+                onActividadesClick = { navigateTo(Rutas.Actividades.ruta) },
+                onProyectosClick = { navigateTo(Rutas.Proyectos.ruta) },
+                onDonarClick = { navigateTo(Rutas.Donar.ruta) },
+                onComunidadClick = { navigateTo(Rutas.Comunidad.ruta) },
+                onDirectorioClick = { navigateTo(Rutas.Directorio.ruta) },
+                onSobreNosotrosClick = { navigateTo(Rutas.SobreNosotros.ruta) },
+                onContactoClick = { navigateTo(Rutas.ContactoAyuda.ruta) },
+                onPerfilClick = { navigateTo(Rutas.Perfil.ruta) },
+                onAdminClick = { navigateTo(Rutas.Admin.ruta) },
+                onIniciarSesionClick = {
                     SesionDemoState.tipoSesion = TipoSesion.USUARIO
-                    navController.navigate(Rutas.Login.ruta) { launchSingleTop = true }
+                    navigateTo(Rutas.Login.ruta)
                 },
-
-                onCrearCuentaClick = { scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Login.ruta) { launchSingleTop = true }
+                onCrearCuentaClick = { navigateTo(Rutas.Login.ruta) },
+                onCerrarSesionClick = {
+                    SesionDemoState.tipoSesion = TipoSesion.INVITADO
+                    navigateTo(Rutas.Inicio.ruta)
                 },
-
-                onCerrarSesionClick = { SesionDemoState.tipoSesion = TipoSesion.INVITADO
-                    scope.launch { drawerState.close() }
-                    navController.navigate(Rutas.Inicio.ruta) { launchSingleTop = true }
-                },
-                onBackClick = { scope.launch { drawerState.close() }
-                }
+                onBackClick = { scope.launch { drawerState.close() } }
             )
         }
     ) {
@@ -203,7 +188,15 @@ fun PantallaPrincipalConMenu(
                                     PantallaPrincipal.CHATBOT -> Rutas.Chatbot.ruta
                                     PantallaPrincipal.PERFIL -> Rutas.Perfil.ruta
                                 }
-                            navController.navigate(ruta) { launchSingleTop = true }
+                            if (navController.currentDestination?.route != ruta) {
+                                navController.navigate(ruta) {
+                                    popUpTo(navController.graph.startDestinationId) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
                         }
                     )
                 }

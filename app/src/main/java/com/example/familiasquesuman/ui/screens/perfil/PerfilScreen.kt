@@ -15,6 +15,7 @@ import com.example.familiasquesuman.ui.components.FormularioFamiliaCard
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.screens.inicio.SaludoConUbicacion
 import com.example.familiasquesuman.ui.theme.*
 
 @Composable
@@ -42,8 +43,10 @@ fun PerfilScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                // Mantiene "Mariana" como usuario activo fijo del perfil
-                HeaderPerfil(nombreUsuario = "Mariana")
+                SaludoConUbicacion(
+                    nombreUsuario = "Mariana",
+                    ciudad = "Monterrey, NL"
+                )
             }
 
             item {

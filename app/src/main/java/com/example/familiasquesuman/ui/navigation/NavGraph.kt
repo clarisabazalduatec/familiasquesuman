@@ -1,6 +1,11 @@
 
 package com.example.familiasquesuman.ui.navigation
 
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -33,9 +38,24 @@ import com.example.familiasquesuman.ui.screens.comunidad.PublicacionDetalleScree
 @Composable
 fun NavGraphFamilias(navController: NavHostController = rememberNavController(), mostrarOnboarding: Boolean, marcarOnboardingVisto: () -> Unit
 ) {
-    NavHost(navController = navController, startDestination = if (mostrarOnboarding) { Rutas.Onboarding.ruta
+    NavHost(
+        navController = navController,
+        startDestination = if (mostrarOnboarding) {
+            Rutas.Onboarding.ruta
         } else {
             Rutas.Inicio.ruta
+        },
+        enterTransition = {
+            fadeIn(animationSpec = tween(250))
+        },
+        exitTransition = {
+            fadeOut(animationSpec = tween(250))
+        },
+        popEnterTransition = {
+            fadeIn(animationSpec = tween(250))
+        },
+        popExitTransition = {
+            fadeOut(animationSpec = tween(250))
         }
     ) {
         composable(Rutas.Onboarding.ruta) {
