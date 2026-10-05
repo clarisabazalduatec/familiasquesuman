@@ -7,6 +7,11 @@ sealed class Rutas(val ruta: String) {
     object Donar : Rutas("donar_screen")
     object Proyectos : Rutas("proyectos")
     object Directorio : Rutas("directorio")
+    
+    object DirectorioDetalle : Rutas("directorio_detalle/{centroId}") {
+        fun crearRuta(centroId: String) = "directorio_detalle/$centroId"
+    }
+
     object Chatbot : Rutas("chatbot")
     object Login : Rutas("login")
     object Comunidad : Rutas("comunidad")

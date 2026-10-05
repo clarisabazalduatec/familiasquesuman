@@ -14,5 +14,9 @@ data class CentroVisiteo(
     val informacionGeneral: String,
     val necesidades: List<String>,
     val direccion: String,
-    val logoUrl: String? = null
+    val logoUrl: String? = null,
+    val comoAyudar: String? = "Donación en especie. Visita a los ancianos para convivir y platicar.",
+    val recomendaciones: String? = "Hablar con anticipación para ver que actividades se recomiendan y en que horario.",
+    val telefono: String? = "8282844311",
+    val whatsapp: String? = "528282844311"
 )

@@ -26,7 +26,6 @@ import com.example.familiasquesuman.ui.theme.AzulMarino
 fun TarjetaCentro(
     centro: CentroVisiteo,
     onComoAyudarClick: () -> Unit,
-    onVerDetallesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -140,20 +139,6 @@ fun TarjetaCentro(
                         text = "Cómo ayudar",
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
-                    )
-                }
-                Button(
-                    onClick = onVerDetallesClick,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Ambar,
-                        contentColor = AzulMarino,
-                    ),
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(
-                        text = "Ver detalles",
-                        fontWeight = FontWeight.Bold,
                     )
                 }
             }

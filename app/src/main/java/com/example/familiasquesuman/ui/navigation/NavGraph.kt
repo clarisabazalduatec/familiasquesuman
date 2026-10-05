@@ -92,6 +92,16 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         composable(Rutas.Directorio.ruta) {
             DirectorioScreen(navController = navController)
         }
+        composable(
+            route = Rutas.DirectorioDetalle.ruta,
+            arguments = listOf(navArgument("centroId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val centroId = backStackEntry.arguments?.getString("centroId") ?: "1"
+            com.example.familiasquesuman.ui.screens.directorio.DirectorioDetalleScreen(
+                navController = navController,
+                centroId = centroId
+            )
+        }
         composable(Rutas.Chatbot.ruta) {
             ChatbotScreen(navController)
         }

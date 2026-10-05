@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,13 +19,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.domain.CentroVisiteo
 import com.example.familiasquesuman.domain.TipoCentro
 import com.example.familiasquesuman.ui.components.BarraBusqueda
+import com.example.familiasquesuman.ui.components.EstadoVacio
 import com.example.familiasquesuman.ui.components.FiltrosChips
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 
-private val centrosDeEjemplo = listOf(
+val centrosDeEjemplo = listOf(
     CentroVisiteo(
         id = "1",
         tipo = TipoCentro.ASILO,
@@ -40,7 +41,10 @@ private val centrosDeEjemplo = listOf(
     ),
 )
 
-@OptIn(ExperimentalMaterial3Api::class)
+fun obtenerCentroPorId(id: String): CentroVisiteo? {
+    return centrosDeEjemplo.find { it.id == id } ?: centrosDeEjemplo.firstOrNull()
+}
+
 @Composable
 fun DirectorioScreen(navController: NavHostController) {
     var textoBusqueda by remember { mutableStateOf("") }
@@ -58,7 +62,7 @@ fun DirectorioScreen(navController: NavHostController) {
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.DIRECTORIO
+        pantallaActual = PantallaPrincipal.DIRECTORIO,
     ) { paddingInterno ->
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
@@ -104,8 +108,9 @@ fun DirectorioScreen(navController: NavHostController) {
                 items(centrosFiltrados) { centro ->
                     TarjetaCentro(
                         centro = centro,
-                        onComoAyudarClick = { },
-                        onVerDetallesClick = { },
+                        onComoAyudarClick = {
+                            navController.navigate(Rutas.DirectorioDetalle.crearRuta(centro.id))
+                        }
                     )
                 }
             }
@@ -134,6 +139,19 @@ fun DirectorioScreen(navController: NavHostController) {
             }
         }
     }
+}
+
+@Composable
+fun EstadoVacioDirectorio(
+    modifier: Modifier = Modifier,
+    mensaje: String = "No hay centros en esta categoría por el momento.",
+) {
+    EstadoVacio(
+        icono = Icons.Default.LocationOn,
+        titulo = "Sin centros de visiteo",
+        mensaje = mensaje,
+        modifier = modifier,
+    )
 }
 
 @Preview(showBackground = true)
