@@ -21,9 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.data.ActividadMock
 import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
@@ -215,5 +217,15 @@ fun TarjetaActividadAdmin(
                 Text("Editar", fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AdminModeracionActividadesScreenPreview() {
+    FamiliasQueSumanTheme {
+        AdminModeracionActividadesScreen(
+            navController = rememberNavController()
+        )
     }
 }

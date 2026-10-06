@@ -16,9 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.theme.*
@@ -248,5 +250,14 @@ fun TarjetaModeracionComunidad(
                 }
             }
         }
+    }
+}
+@Preview(showBackground = true)
+@Composable
+private fun AdminModeracionComunidadScreenPreview() {
+    FamiliasQueSumanTheme {
+        AdminModeracionComunidadScreen(
+            navController = rememberNavController()
+        )
     }
 }
