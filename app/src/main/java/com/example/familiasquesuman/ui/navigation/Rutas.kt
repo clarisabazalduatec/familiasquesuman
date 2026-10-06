@@ -33,6 +33,8 @@ sealed class Rutas(val ruta: String) {
 
     object Notificaciones : Rutas("notificaciones")
     object Perfil : Rutas("perfil")
+    object EditarFamilia : Rutas("editar_familia")
+    object RegistrarFamilia : Rutas("registrar_familia")
     
     object ActividadDetalle : Rutas("actividad_detalle/{id}") {
         fun crearRuta(id: Int) = "actividad_detalle/$id"

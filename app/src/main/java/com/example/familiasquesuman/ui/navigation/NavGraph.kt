@@ -30,6 +30,7 @@ import com.example.familiasquesuman.ui.screens.admin.AdminScreen
 import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScreen
 import com.example.familiasquesuman.ui.screens.onboarding.OnboardingScreen
 import com.example.familiasquesuman.ui.screens.perfil.PerfilScreen
+import com.example.familiasquesuman.ui.screens.perfil.RegistrarFamiliaScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectoDetalleScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectosScreen
 import com.example.familiasquesuman.ui.screens.comunidad.MisPublicacionesScreen
@@ -149,6 +150,9 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         }
         composable(Rutas.Perfil.ruta) {
             PerfilScreen(navController = navController)
+        }
+        composable(Rutas.RegistrarFamilia.ruta) {
+            RegistrarFamiliaScreen(navController = navController)
         }
         composable(Rutas.SobreNosotros.ruta) {
             SobreNosotrosScreen(

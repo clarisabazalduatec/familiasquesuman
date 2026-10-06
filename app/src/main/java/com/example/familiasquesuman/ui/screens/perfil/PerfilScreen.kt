@@ -72,7 +72,9 @@ fun PerfilScreen(
                     }
                     else -> {
                         DatosFamiliaVacioCard(
-                            onRegistrarClick = { viewModel.abrirEdicion() }
+                            onRegistrarClick = {
+                                navController.navigate(Rutas.RegistrarFamilia.ruta)
+                            }
                         )
                     }
                 }
