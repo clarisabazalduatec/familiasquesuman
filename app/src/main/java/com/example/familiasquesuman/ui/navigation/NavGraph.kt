@@ -7,6 +7,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -30,6 +32,8 @@ import com.example.familiasquesuman.ui.screens.admin.AdminScreen
 import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScreen
 import com.example.familiasquesuman.ui.screens.onboarding.OnboardingScreen
 import com.example.familiasquesuman.ui.screens.perfil.PerfilScreen
+import com.example.familiasquesuman.ui.screens.perfil.PerfilViewModel
+import com.example.familiasquesuman.ui.screens.perfil.RegistrarFamiliaScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectoDetalleScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectosScreen
 import com.example.familiasquesuman.ui.screens.comunidad.MisPublicacionesScreen
@@ -147,8 +151,20 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         composable(Rutas.NuevaPublicacion.ruta) {
             NuevaPublicacionScreen(navController = navController)
         }
-        composable(Rutas.Perfil.ruta) {
-            PerfilScreen(navController = navController)
+        composable(Rutas.Perfil.ruta) { backStackEntry ->
+            val viewModel: PerfilViewModel = viewModel(backStackEntry)
+            PerfilScreen(navController = navController, viewModel = viewModel)
+        }
+        composable(Rutas.RegistrarFamilia.ruta) {
+            val parentEntry = remember(navController.currentBackStackEntry) {
+                try {
+                    navController.getBackStackEntry(Rutas.Perfil.ruta)
+                } catch (_: Exception) {
+                    null
+                }
+            }
+            val viewModel: PerfilViewModel = if (parentEntry != null) viewModel(parentEntry) else viewModel()
+            RegistrarFamiliaScreen(navController = navController, viewModel = viewModel)
         }
         composable(Rutas.SobreNosotros.ruta) {
             SobreNosotrosScreen(
