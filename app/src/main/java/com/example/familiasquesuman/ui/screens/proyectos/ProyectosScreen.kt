@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -34,7 +33,7 @@ fun ProyectosScreen(
     var textoBusqueda by remember { mutableStateOf("") }
 
     val proyectosFiltrados = remember(pestanaActiva, textoBusqueda) {
-        viewModel.obtenerProyectosPorEstado(pestanaActiva).filter {
+        viewModel.obtenerProyectosPorEstado(pestanaActiva).filter { it.activo }.filter {
             textoBusqueda.isBlank() ||
                     it.nombre.contains(textoBusqueda, ignoreCase = true) ||
                     it.descripcionCorta.contains(textoBusqueda, ignoreCase = true)

@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -34,11 +32,9 @@ fun ActividadScreen(navController: NavHostController) {
     var categoriaSeleccionada by remember { mutableStateOf<String?>(null) }
     val categorias = remember { listOf("Medio Ambiente", "Educación", "Apoyo Social", "Otros") }
 
-    val actividadesFiltradas = remember(categoriaSeleccionada) {
-        if (categoriaSeleccionada == null) {
-            actividadesMockData
-        } else {
-            actividadesMockData.filter { it.categoria == categoriaSeleccionada }
+    val actividadesFiltradas = remember(categoriaSeleccionada, actividadesMockData) {
+        actividadesMockData.filter { it.activa }.filter { actividad ->
+            categoriaSeleccionada == null || actividad.categoria == categoriaSeleccionada
         }
     }
 
@@ -51,13 +47,13 @@ fun ActividadScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .background(CremaFondo)
                 .padding(paddingValues),
-            contentPadding = PaddingValues(bottom = 80.dp)
+            contentPadding = PaddingValues(bottom = 80.dp),
         ) {
             item {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
                     Text(
                         text = "Actividades en Familia",
@@ -82,14 +78,14 @@ fun ActividadScreen(navController: NavHostController) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .horizontalScroll(rememberScrollState())
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                 )
             }
             item {
                 HorizontalDivider(
                     color = GrisBordeClaro,
                     thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier.padding(vertical = 4.dp),
                 )
             }
             item { HeaderDiaActividades() }
@@ -98,7 +94,7 @@ fun ActividadScreen(navController: NavHostController) {
                     actividad = actividad,
                     onActividadClick = { id ->
                         navController.navigate(Rutas.ActividadDetalle.crearRuta(id))
-                    }
+                    },
                 )
             }
             item { BannerSincronizarCalendario() }
