@@ -1,9 +1,11 @@
 package com.example.familiasquesuman.ui.screens.admin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -31,6 +33,7 @@ import com.example.familiasquesuman.domain.TipoDonacion
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.screens.admin.formulario.TipoContenidoAdmin
 import com.example.familiasquesuman.ui.theme.*
 
 @Composable
@@ -62,21 +65,30 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
                         .padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    TabPill("Activas (${donacionesMockData.size})", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
-                    TabPill("Finalizadas", pestanaSeleccionada == 1) { pestanaSeleccionada = 1 }
+                    TabPill("Activas (${donacionesMockData.count { it.activa }})", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
+                    TabPill("Desactivadas (${donacionesMockData.count { !it.activa }})", pestanaSeleccionada == 1) { pestanaSeleccionada = 1 }
                 }
 
-                if (donacionesMockData.isEmpty()) {
+                val donacionesFiltradas = remember(pestanaSeleccionada, donacionesMockData.size) {
+                    if (pestanaSeleccionada == 1) {
+                        donacionesMockData.filter { !it.activa }
+                    } else {
+                        donacionesMockData.filter { it.activa }
+                    }
+                }
+
+                if (donacionesFiltradas.isEmpty()) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(24.dp),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text(text = "No hay donaciones para mostrar.", color = GrisTexto, fontSize = 14.sp)
+                        Text(text = "No hay donaciones en esta categoría.", color = GrisTexto, fontSize = 14.sp)
                     }
                 } else {
                     LazyColumn(
@@ -84,18 +96,18 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        items(donacionesMockData) { donacion ->
+                        items(donacionesFiltradas) { donacion ->
                             TarjetaDonacionAdmin(
                                 donacion = donacion,
                                 onEditarClick = {
                                     navController.navigate(
-                                        Rutas.AdminEditarContenido.crearRuta("donacion", donacion.id),
+                                        Rutas.AdminEditarContenido.crearRuta(TipoContenidoAdmin.DONACION, donacion.id),
                                     )
                                 },
                                 onSumarAporteClick = {
                                     montoAporteText = if (donacion.tipo == TipoDonacion.CAMPANA) "250" else "1"
                                     donacionParaAporte = donacion
-                                }
+                                },
                             )
                         }
                     }
@@ -126,7 +138,7 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                     imageVector = Icons.Default.AddCircle,
                     contentDescription = null,
                     tint = Ambar,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(40.dp),
                 )
             },
             title = {
@@ -134,7 +146,7 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                     text = "Registrar Donación Recibida",
                     fontWeight = FontWeight.Bold,
                     color = AzulMarino,
-                    fontSize = 18.sp
+                    fontSize = 18.sp,
                 )
             },
             text = {
@@ -142,34 +154,34 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                     Text(
                         text = "Ingresa la cantidad recibida para sumarla al avance oficial de: ${don.titulo}",
                         color = GrisTexto,
-                        fontSize = 13.sp
+                        fontSize = 13.sp,
                     )
 
                     if (esCampana) {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             listOf("100", "250", "500", "1000").forEach { monto ->
                                 FilterChip(
                                     selected = montoAporteText == monto,
                                     onClick = { montoAporteText = monto },
                                     label = { Text("+$monto", fontSize = 11.sp) },
-                                    shape = RoundedCornerShape(10.dp)
+                                    shape = RoundedCornerShape(10.dp),
                                 )
                             }
                         }
                     } else {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         ) {
                             listOf("1", "2", "5", "10").forEach { cant ->
                                 FilterChip(
                                     selected = montoAporteText == cant,
                                     onClick = { montoAporteText = cant },
                                     label = { Text("+$cant", fontSize = 12.sp) },
-                                    shape = RoundedCornerShape(10.dp)
+                                    shape = RoundedCornerShape(10.dp),
                                 )
                             }
                         }
@@ -182,7 +194,7 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
                     )
                 }
             },
@@ -197,7 +209,7 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Ambar, contentColor = AzulMarino),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
                 ) {
                     Text("Sumar al Avance", fontWeight = FontWeight.Bold)
                 }
@@ -206,7 +218,7 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                 TextButton(onClick = { donacionParaAporte = null }) {
                     Text("Cancelar", color = GrisTexto)
                 }
-            }
+            },
         )
     }
 
@@ -218,31 +230,31 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
                     tint = VerdeExito,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(48.dp),
                 )
             },
             title = {
                 Text(
                     text = "¡Avance Actualizado!",
                     fontWeight = FontWeight.Bold,
-                    color = AzulMarino
+                    color = AzulMarino,
                 )
             },
             text = {
                 Text(
                     text = "La donación recibida ha sido registrada exitosamente y el progreso es visible para la comunidad.",
-                    color = GrisTexto
+                    color = GrisTexto,
                 )
             },
             confirmButton = {
                 Button(
                     onClick = { mostrarExitoDialog = false },
                     colors = ButtonDefaults.buttonColors(containerColor = AzulMarino, contentColor = Color.White),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
                 ) {
                     Text("Aceptar", fontWeight = FontWeight.Bold)
                 }
-            }
+            },
         )
     }
 }
@@ -251,7 +263,7 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
 fun TarjetaDonacionAdmin(
     donacion: Donacion,
     onEditarClick: () -> Unit,
-    onSumarAporteClick: () -> Unit
+    onSumarAporteClick: () -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -292,11 +304,11 @@ fun TarjetaDonacionAdmin(
                         )
                         Surface(
                             shape = RoundedCornerShape(12.dp),
-                            color = FondoVerde,
+                            color = if (donacion.activa) FondoVerde else Color(0xFFFFEBEE),
                         ) {
                             Text(
-                                text = "Activa",
-                                color = TextoVerde,
+                                text = if (donacion.activa) "Activa" else "Desactivada",
+                                color = if (donacion.activa) TextoVerde else ColorError,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
@@ -334,17 +346,17 @@ fun TarjetaDonacionAdmin(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 OutlinedButton(
                     onClick = onSumarAporteClick,
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-                    modifier = Modifier.height(34.dp)
+                    modifier = Modifier.height(34.dp),
                 ) {
                     Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(14.dp), tint = AzulMarino)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Sumar Aporte", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = AzulMarino)
+                    Text("Sumar Aporte", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = AzulMarino, maxLines = 1)
                 }
 
                 Spacer(modifier = Modifier.width(8.dp))
@@ -354,11 +366,11 @@ fun TarjetaDonacionAdmin(
                     colors = ButtonDefaults.buttonColors(containerColor = AzulMarino, contentColor = Color.White),
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-                    modifier = Modifier.height(34.dp)
+                    modifier = Modifier.height(34.dp),
                 ) {
                     Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Editar", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text("Editar", fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
             }
         }

@@ -29,6 +29,8 @@ import com.example.familiasquesuman.ui.screens.inicio.InicioScreen
 import com.example.familiasquesuman.ui.screens.login.LoginScreen
 import com.example.familiasquesuman.ui.screens.actividad.ActividadScreen
 import com.example.familiasquesuman.ui.screens.admin.AdminScreen
+import com.example.familiasquesuman.ui.screens.admin.formulario.AdminFormularioScreen
+import com.example.familiasquesuman.ui.screens.admin.formulario.TipoContenidoAdmin
 import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScreen
 import com.example.familiasquesuman.ui.screens.onboarding.OnboardingScreen
 import com.example.familiasquesuman.ui.screens.perfil.PerfilScreen
@@ -124,12 +126,17 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         composable(Rutas.AdminActualizacionDonaciones.ruta) {
             com.example.familiasquesuman.ui.screens.admin.AdminActualizacionDonacionesScreen(navController = navController)
         }
-        composable(Rutas.AdminCrearContenido.ruta) {
-            com.example.familiasquesuman.ui.screens.admin.AdminCrearContenidoScreen(navController = navController)
-        }
+
         composable(Rutas.AdminModeracionProyectos.ruta) {
             com.example.familiasquesuman.ui.screens.admin.AdminModeracionProyectosScreen(navController = navController)
         }
+
+        // CREAR: sin id
+        composable(Rutas.AdminCrearContenido.ruta) {
+            AdminFormularioScreen(navController = navController)
+        }
+
+// EDITAR: con tipo e id
         composable(
             route = Rutas.AdminEditarContenido.ruta,
             arguments = listOf(
@@ -137,14 +144,17 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
                 navArgument("id") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val tipo = backStackEntry.arguments?.getString("tipo") ?: "actividad"
-            val id = backStackEntry.arguments?.getString("id") ?: ""
-            com.example.familiasquesuman.ui.screens.admin.AdminEditarContenidoScreen(
+            val tipo = backStackEntry.arguments?.getString("tipo").orEmpty()
+            val id = backStackEntry.arguments?.getString("id")
+            AdminFormularioScreen(
                 navController = navController,
-                tipo = tipo,
+                tipoInicial = TipoContenidoAdmin.desdeRuta(tipo),
                 id = id
             )
         }
+
+
+
         composable(Rutas.Comunidad.ruta) {
             ComunidadScreen(navController = navController)
         }
