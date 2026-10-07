@@ -2,29 +2,20 @@ package com.example.familiasquesuman.ui.screens.perfil
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import com.example.familiasquesuman.ui.model.HijoState
+import com.example.familiasquesuman.ui.model.AdultoState
+import com.example.familiasquesuman.ui.model.MenorState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-
-data class PerfilUiState(
-    val enModoEdicion: Boolean = false,
-    val esPerfilRegistrado: Boolean = false,
-    val mama: String = "",
-    val papa: String = "",
-    val whatsapp: String = "",
-    val email: String = "",
-    val ciudad: String = ""
-)
 
 class PerfilViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(PerfilUiState())
     val uiState: StateFlow<PerfilUiState> = _uiState.asStateFlow()
 
-    // Lista observable para los hijos
-    val listaHijos = mutableStateListOf<HijoState>()
+    val listaAdultos = mutableStateListOf<AdultoState>()
+    val listaMenores = mutableStateListOf<MenorState>()
 
     fun abrirEdicion() {
         _uiState.update { it.copy(enModoEdicion = true) }
@@ -34,30 +25,40 @@ class PerfilViewModel : ViewModel() {
         _uiState.update { it.copy(enModoEdicion = false) }
     }
 
-    fun agregarHijo() {
-        listaHijos.add(HijoState())
+    // --- ADULTOS ---
+    fun agregarAdulto(adulto: AdultoState = AdultoState()) {
+        listaAdultos.add(adulto)
     }
 
-    fun eliminarHijo(hijo: HijoState) {
-        listaHijos.remove(hijo)
+    fun eliminarAdulto(adulto: AdultoState) {
+        listaAdultos.remove(adulto)
     }
 
-    fun guardarPerfil(
-        mama: String,
-        papa: String,
-        whatsapp: String,
-        email: String,
-        ciudad: String
-    ) {
+    fun actualizarAdulto(adultoActualizado: AdultoState) {
+        val index = listaAdultos.indexOfFirst { it.id == adultoActualizado.id }
+        if (index != -1) listaAdultos[index] = adultoActualizado
+    }
+
+    // --- MENORES ---
+    fun agregarMenor(menor: MenorState = MenorState()) {
+        listaMenores.add(menor)
+    }
+
+    fun eliminarMenor(menor: MenorState) {
+        listaMenores.remove(menor)
+    }
+
+    fun actualizarMenor(menorActualizado: MenorState) {
+        val index = listaMenores.indexOfFirst { it.id == menorActualizado.id }
+        if (index != -1) listaMenores[index] = menorActualizado
+    }
+
+    // --- GUARDAR ---
+    fun guardarPerfil() {
         _uiState.update {
             it.copy(
                 enModoEdicion = false,
-                esPerfilRegistrado = true,
-                mama = mama,
-                papa = papa,
-                whatsapp = whatsapp,
-                email = email,
-                ciudad = ciudad
+                esPerfilRegistrado = true
             )
         }
     }

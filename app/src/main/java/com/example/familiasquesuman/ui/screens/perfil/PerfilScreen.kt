@@ -3,9 +3,6 @@ package com.example.familiasquesuman.ui.screens.perfil
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,7 +11,6 @@ import androidx.navigation.NavHostController
 import com.example.familiasquesuman.ui.components.FormularioFamiliaCard
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
-import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.inicio.SaludoConUbicacion
 import com.example.familiasquesuman.ui.theme.*
 
@@ -54,19 +50,23 @@ fun PerfilScreen(
                     uiState.enModoEdicion -> {
                         FormularioFamiliaCard(
                             uiState = uiState,
-                            listaHijos = viewModel.listaHijos,
-                            onAgregarHijo = { viewModel.agregarHijo() },
-                            onEliminarHijo = { hijo -> viewModel.eliminarHijo(hijo) },
+                            listaAdultos = viewModel.listaAdultos,
+                            listaMenores = viewModel.listaMenores,
+                            onAgregarAdulto = { viewModel.agregarAdulto() },
+                            onEliminarAdulto = { adulto -> viewModel.eliminarAdulto(adulto) },
+                            onActualizarAdulto = { adulto -> viewModel.actualizarAdulto(adulto) },
+                            onAgregarMenor = { viewModel.agregarMenor() },
+                            onEliminarMenor = { menor -> viewModel.eliminarMenor(menor) },
+                            onActualizarMenor = { menor -> viewModel.actualizarMenor(menor) },
                             onCancelar = { viewModel.cancelarEdicion() },
-                            onGuardar = { mama, papa, whatsapp, email, ciudad ->
-                                viewModel.guardarPerfil(mama, papa, whatsapp, email, ciudad)
-                            }
+                            onGuardar = { viewModel.guardarPerfil() }
                         )
                     }
                     uiState.esPerfilRegistrado -> {
                         DatosFamiliaRegistradaCard(
                             uiState = uiState,
-                            listaHijos = viewModel.listaHijos,
+                            listaAdultos = viewModel.listaAdultos,
+                            listaMenores = viewModel.listaMenores,
                             onEditarClick = { viewModel.abrirEdicion() }
                         )
                     }
