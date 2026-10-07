@@ -22,5 +22,7 @@ data class Proyecto(
     val descripcionLarga: String,
     val opcionesApoyo: List<OpcionApoyo>,
     val telefonoWhatsapp: String? = null,
-    val telefonoLlamada: String? = null
+    val telefonoLlamada: String? = null,
+    val imagenesUrl: List<String> = emptyList(),
+    val activo: Boolean = true
 )

@@ -38,5 +38,7 @@ data class Donacion(
     val destinatarios: List<String>? = null,
     val condicionesArticulos: List<String>? = null,
     val metodosEntrega: List<String>? = null,
-    val condicionesRecepcion: String? = null
+    val condicionesRecepcion: String? = null,
+    val imagenesUrl: List<String> = emptyList(),
+    val activa: Boolean = true
 )
