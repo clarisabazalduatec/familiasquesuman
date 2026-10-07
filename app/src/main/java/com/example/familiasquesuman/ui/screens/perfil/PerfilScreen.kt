@@ -8,9 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.familiasquesuman.ui.components.FormularioFamiliaCard
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
-import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.inicio.SaludoConUbicacion
 import com.example.familiasquesuman.ui.theme.*
 
@@ -46,20 +46,35 @@ fun PerfilScreen(
             }
 
             item {
-                if (uiState.esPerfilRegistrado) {
-                    DatosFamiliaRegistradaCard(
-                        uiState = uiState,
-                        listaHijos = viewModel.listaHijos,
-                        onEditarClick = {
-                            navController.navigate(Rutas.RegistrarFamilia.ruta)
-                        }
-                    )
-                } else {
-                    DatosFamiliaVacioCard(
-                        onRegistrarClick = {
-                            navController.navigate(Rutas.RegistrarFamilia.ruta)
-                        }
-                    )
+                when {
+                    uiState.enModoEdicion -> {
+                        FormularioFamiliaCard(
+                            uiState = uiState,
+                            listaAdultos = viewModel.listaAdultos,
+                            listaMenores = viewModel.listaMenores,
+                            onAgregarAdulto = { viewModel.agregarAdulto() },
+                            onEliminarAdulto = { adulto -> viewModel.eliminarAdulto(adulto) },
+                            onActualizarAdulto = { adulto -> viewModel.actualizarAdulto(adulto) },
+                            onAgregarMenor = { viewModel.agregarMenor() },
+                            onEliminarMenor = { menor -> viewModel.eliminarMenor(menor) },
+                            onActualizarMenor = { menor -> viewModel.actualizarMenor(menor) },
+                            onCancelar = { viewModel.cancelarEdicion() },
+                            onGuardar = { viewModel.guardarPerfil() }
+                        )
+                    }
+                    uiState.esPerfilRegistrado -> {
+                        DatosFamiliaRegistradaCard(
+                            uiState = uiState,
+                            listaAdultos = viewModel.listaAdultos,
+                            listaMenores = viewModel.listaMenores,
+                            onEditarClick = { viewModel.abrirEdicion() }
+                        )
+                    }
+                    else -> {
+                        DatosFamiliaVacioCard(
+                            onRegistrarClick = { viewModel.abrirEdicion() }
+                        )
+                    }
                 }
             }
 
