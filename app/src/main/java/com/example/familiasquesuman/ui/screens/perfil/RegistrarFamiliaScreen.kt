@@ -41,12 +41,17 @@ fun RegistrarFamiliaScreen(
         ) {
             FormularioFamiliaCard(
                 uiState = uiState,
-                listaHijos = viewModel.listaHijos,
-                onAgregarHijo = { viewModel.agregarHijo() },
-                onEliminarHijo = { hijo -> viewModel.eliminarHijo(hijo) },
+                listaAdultos = viewModel.listaAdultos,
+                listaMenores = viewModel.listaMenores,
+                onAgregarAdulto = { viewModel.agregarAdulto() },
+                onEliminarAdulto = { adulto -> viewModel.eliminarAdulto(adulto) },
+                onActualizarAdulto = { adulto -> viewModel.actualizarAdulto(adulto) },
+                onAgregarMenor = { viewModel.agregarMenor() },
+                onEliminarMenor = { menor -> viewModel.eliminarMenor(menor) },
+                onActualizarMenor = { menor -> viewModel.actualizarMenor(menor) },
                 onCancelar = { navController.popBackStack() },
-                onGuardar = { mama, papa, whatsapp, email, ciudad ->
-                    viewModel.guardarPerfil(mama, papa, whatsapp, email, ciudad)
+                onGuardar = {
+                    viewModel.guardarPerfil()
                     navController.popBackStack()
                 }
             )
