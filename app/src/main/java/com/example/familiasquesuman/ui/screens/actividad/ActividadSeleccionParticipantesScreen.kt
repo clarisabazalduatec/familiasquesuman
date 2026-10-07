@@ -124,7 +124,7 @@ fun ActividadSeleccionParticipantesScreen(navController: NavHostController, acti
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Button(
-                        onClick = { navController.navigate(Rutas.Perfil.ruta) { launchSingleTop = true } },
+                        onClick = { navController.navigate(Rutas.RegistrarFamilia.ruta ) { launchSingleTop = true } },
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                         border = BorderStroke(1.dp, AmarilloOscuro),
@@ -139,7 +139,7 @@ fun ActividadSeleccionParticipantesScreen(navController: NavHostController, acti
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Agregar persona",
+                            "Editar familia",
                             color = AzulOscuro,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold

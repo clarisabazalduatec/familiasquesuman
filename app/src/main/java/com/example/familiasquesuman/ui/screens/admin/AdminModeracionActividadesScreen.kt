@@ -1,9 +1,11 @@
 package com.example.familiasquesuman.ui.screens.admin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -27,6 +29,7 @@ import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.screens.admin.formulario.TipoContenidoAdmin
 import com.example.familiasquesuman.ui.theme.*
 
 @Composable
@@ -40,52 +43,61 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
         chatbot = false,
         backButton = true,
         onBackClick = { navController.popBackStack() },
-        titulo = "Gestión de actividades"
+        titulo = "Gestión de actividades",
     ) { paddingVal ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingVal)
+                .padding(paddingVal),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(CremaFondo)
+                    .background(CremaFondo),
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
                         .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    TabPill("Activas (${actividadesMockData.size})", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
+                    TabPill("Activas (${actividadesMockData.count { it.activa }})", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
                     TabPill("Pasadas", pestanaSeleccionada == 1) { pestanaSeleccionada = 1 }
-                    TabPill("Canceladas", pestanaSeleccionada == 2) { pestanaSeleccionada = 2 }
+                    TabPill("Desactivadas (${actividadesMockData.count { !it.activa }})", pestanaSeleccionada == 2) { pestanaSeleccionada = 2 }
                 }
 
-                if (actividadesMockData.isEmpty()) {
+                val listaAMostrar = remember(pestanaSeleccionada, actividadesMockData.size) {
+                    if (pestanaSeleccionada == 2) {
+                        actividadesMockData.filter { !it.activa }
+                    } else {
+                        actividadesMockData.filter { it.activa }
+                    }
+                }
+
+                if (listaAMostrar.isEmpty()) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(24.dp),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
-                        Text(text = "No hay actividades para mostrar.", color = GrisTexto, fontSize = 14.sp)
+                        Text(text = "No hay actividades en esta categoría.", color = GrisTexto, fontSize = 14.sp)
                     }
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        items(actividadesMockData) { actividad ->
+                        items(listaAMostrar) { actividad ->
                             TarjetaActividadAdmin(
                                 actividad = actividad,
                                 onEditarClick = {
                                     navController.navigate(
-                                        Rutas.AdminEditarContenido.crearRuta("actividad", actividad.id.toString())
+                                        Rutas.AdminEditarContenido.crearRuta(TipoContenidoAdmin.ACTIVIDAD, actividad.id.toString()),
                                     )
-                                }
+                                },
                             )
                         }
                     }
@@ -100,7 +112,7 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
                 text = { Text("Nueva Actividad", fontWeight = FontWeight.Bold) },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(16.dp)
+                    .padding(16.dp),
             )
         }
     }
@@ -109,25 +121,25 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
 @Composable
 fun TarjetaActividadAdmin(
     actividad: ActividadMock,
-    onEditarClick: () -> Unit
+    onEditarClick: () -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
             modifier = Modifier
                 .padding(12.dp)
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
                 modifier = Modifier
                     .size(80.dp)
                     .background(GrisClaroFondo, RoundedCornerShape(12.dp)),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(Icons.Default.Image, contentDescription = null, tint = GrisTexto)
             }
@@ -138,7 +150,7 @@ fun TarjetaActividadAdmin(
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = actividad.titulo,
@@ -147,18 +159,18 @@ fun TarjetaActividadAdmin(
                         fontSize = 14.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                     Surface(
                         shape = RoundedCornerShape(12.dp),
-                        color = FondoVerde
+                        color = if (actividad.activa) FondoVerde else Color(0xFFFFEBEE),
                     ) {
                         Text(
-                            text = "Activa",
-                            color = TextoVerde,
+                            text = if (actividad.activa) "Activa" else "Desactivada",
+                            color = if (actividad.activa) TextoVerde else ColorError,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                         )
                     }
                 }
@@ -179,7 +191,7 @@ fun TarjetaActividadAdmin(
                         fontSize = 11.sp,
                         color = GrisTexto,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
                 Spacer(modifier = Modifier.height(2.dp))
@@ -196,11 +208,11 @@ fun TarjetaActividadAdmin(
                 onClick = onEditarClick,
                 colors = ButtonDefaults.buttonColors(containerColor = AzulMarino, contentColor = Color.White),
                 shape = RoundedCornerShape(10.dp),
-                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp)
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
             ) {
                 Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
                 Spacer(modifier = Modifier.width(4.dp))
-                Text("Editar", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                Text("Editar", fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
             }
         }
     }

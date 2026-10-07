@@ -7,6 +7,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -27,9 +29,13 @@ import com.example.familiasquesuman.ui.screens.inicio.InicioScreen
 import com.example.familiasquesuman.ui.screens.login.LoginScreen
 import com.example.familiasquesuman.ui.screens.actividad.ActividadScreen
 import com.example.familiasquesuman.ui.screens.admin.AdminScreen
+import com.example.familiasquesuman.ui.screens.admin.formulario.AdminFormularioScreen
+import com.example.familiasquesuman.ui.screens.admin.formulario.TipoContenidoAdmin
 import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScreen
 import com.example.familiasquesuman.ui.screens.onboarding.OnboardingScreen
 import com.example.familiasquesuman.ui.screens.perfil.PerfilScreen
+import com.example.familiasquesuman.ui.screens.perfil.PerfilViewModel
+import com.example.familiasquesuman.ui.screens.perfil.RegistrarFamiliaScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectoDetalleScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectosScreen
 import com.example.familiasquesuman.ui.screens.comunidad.MisPublicacionesScreen
@@ -120,12 +126,17 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         composable(Rutas.AdminActualizacionDonaciones.ruta) {
             com.example.familiasquesuman.ui.screens.admin.AdminActualizacionDonacionesScreen(navController = navController)
         }
-        composable(Rutas.AdminCrearContenido.ruta) {
-            com.example.familiasquesuman.ui.screens.admin.AdminCrearContenidoScreen(navController = navController)
-        }
+
         composable(Rutas.AdminModeracionProyectos.ruta) {
             com.example.familiasquesuman.ui.screens.admin.AdminModeracionProyectosScreen(navController = navController)
         }
+
+        // CREAR: sin id
+        composable(Rutas.AdminCrearContenido.ruta) {
+            AdminFormularioScreen(navController = navController)
+        }
+
+// EDITAR: con tipo e id
         composable(
             route = Rutas.AdminEditarContenido.ruta,
             arguments = listOf(
@@ -133,22 +144,37 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
                 navArgument("id") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val tipo = backStackEntry.arguments?.getString("tipo") ?: "actividad"
-            val id = backStackEntry.arguments?.getString("id") ?: ""
-            com.example.familiasquesuman.ui.screens.admin.AdminEditarContenidoScreen(
+            val tipo = backStackEntry.arguments?.getString("tipo").orEmpty()
+            val id = backStackEntry.arguments?.getString("id")
+            AdminFormularioScreen(
                 navController = navController,
-                tipo = tipo,
+                tipoInicial = TipoContenidoAdmin.desdeRuta(tipo),
                 id = id
             )
         }
+
+
+
         composable(Rutas.Comunidad.ruta) {
             ComunidadScreen(navController = navController)
         }
         composable(Rutas.NuevaPublicacion.ruta) {
             NuevaPublicacionScreen(navController = navController)
         }
-        composable(Rutas.Perfil.ruta) {
-            PerfilScreen(navController = navController)
+        composable(Rutas.Perfil.ruta) { backStackEntry ->
+            val viewModel: PerfilViewModel = viewModel(backStackEntry)
+            PerfilScreen(navController = navController, viewModel = viewModel)
+        }
+        composable(Rutas.RegistrarFamilia.ruta) {
+            val parentEntry = remember(navController.currentBackStackEntry) {
+                try {
+                    navController.getBackStackEntry(Rutas.Perfil.ruta)
+                } catch (_: Exception) {
+                    null
+                }
+            }
+            val viewModel: PerfilViewModel = if (parentEntry != null) viewModel(parentEntry) else viewModel()
+            RegistrarFamiliaScreen(navController = navController, viewModel = viewModel)
         }
         composable(Rutas.SobreNosotros.ruta) {
             SobreNosotrosScreen(

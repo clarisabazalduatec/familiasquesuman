@@ -32,7 +32,9 @@ data class ActividadMock(
     val acercaDe: String,
     val lugaresDisponibles: Int,
     val lugaresTotales: Int,
-    val participantesAdicionales: Int
+    val participantesAdicionales: Int,
+    val imagenesUrl: List<String> = emptyList(),
+    val activa: Boolean = true
 )
 
 val actividadesMockData = mutableStateListOf(

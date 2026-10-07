@@ -1,5 +1,7 @@
 package com.example.familiasquesuman.ui.navigation
 
+import com.example.familiasquesuman.ui.screens.admin.formulario.TipoContenidoAdmin
+
 sealed class Rutas(val ruta: String) {
     object Onboarding : Rutas ("onborading")
     object Inicio : Rutas("inicio")
@@ -26,13 +28,19 @@ sealed class Rutas(val ruta: String) {
     object AdminModeracionProyectos : Rutas("admin_moderacion_proyectos")
     object AdminActualizacionDonaciones : Rutas("admin_actualizacion_donaciones")
     object AdminCrearContenido : Rutas("admin_crear_contenido")
-    
+
     object AdminEditarContenido : Rutas("admin_editar_contenido/{tipo}/{id}") {
-        fun crearRuta(tipo: String, id: String) = "admin_editar_contenido/$tipo/$id"
+        fun crearRuta(tipo: TipoContenidoAdmin, id: String) =
+            "admin_editar_contenido/${tipo.claveRuta}/$id"
+
+        fun crearRuta(tipo: String, id: String) =
+            "admin_editar_contenido/$tipo/$id"
     }
 
     object Notificaciones : Rutas("notificaciones")
     object Perfil : Rutas("perfil")
+    object EditarFamilia : Rutas("editar_familia")
+    object RegistrarFamilia : Rutas("registrar_familia")
     
     object ActividadDetalle : Rutas("actividad_detalle/{id}") {
         fun crearRuta(id: Int) = "actividad_detalle/$id"
