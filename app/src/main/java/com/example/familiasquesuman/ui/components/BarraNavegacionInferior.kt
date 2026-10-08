@@ -1,5 +1,6 @@
 package com.example.familiasquesuman.ui.components
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -62,7 +63,7 @@ fun BarraNavegacionInferior(
 
 
     NavigationBar(
-        modifier = Modifier.height(90.dp),
+        modifier = Modifier.fillMaxWidth(),
         containerColor = CremaFondo,
         tonalElevation = 0.dp
     ) {
