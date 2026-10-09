@@ -115,7 +115,7 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
             }
 
             ExtendedFloatingActionButton(
-                onClick = { navController.navigate(Rutas.AdminCrearContenido.ruta) },
+                onClick = { navController.navigate(TipoContenidoAdmin.DONACION.rutaCrear()) },
                 containerColor = Ambar,
                 contentColor = AzulMarino,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },

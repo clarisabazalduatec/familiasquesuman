@@ -26,7 +26,7 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 
-val centrosDeEjemplo = listOf(
+val centrosDeEjemplo = mutableStateListOf(
     CentroVisiteo(
         id = "1",
         tipo = TipoCentro.ASILO,
@@ -38,8 +38,17 @@ val centrosDeEjemplo = listOf(
             "Limpieza: trapeadores, cubetas, botes de basura, guantes, cloro, fabuloso, pino, jabón líquido, shampoo, desengrasantes, bolsas de basura",
         ),
         direccion = "Blvd Jose Maria Gonzalez #1000, Cadereyta",
+        activo = true
     ),
 )
+
+fun agregarCentroMock(centro: CentroVisiteo) {
+    centrosDeEjemplo.add(0, centro)
+}
+
+fun eliminarCentroMock(id: String) {
+    centrosDeEjemplo.removeAll { it.id == id }
+}
 
 fun obtenerCentroPorId(id: String): CentroVisiteo? {
     return centrosDeEjemplo.find { it.id == id } ?: centrosDeEjemplo.firstOrNull()
@@ -50,7 +59,7 @@ fun DirectorioScreen(navController: NavHostController) {
     var textoBusqueda by remember { mutableStateOf("") }
     var tipoSeleccionado by remember { mutableStateOf<TipoCentro?>(null) }
 
-    val centrosFiltrados = remember(textoBusqueda, tipoSeleccionado) {
+    val centrosFiltrados = remember(textoBusqueda, tipoSeleccionado, centrosDeEjemplo.size) {
         centrosDeEjemplo.filter { centro ->
             val coincideTipo = (tipoSeleccionado == null) || (centro.tipo == tipoSeleccionado)
             val coincideBusqueda = textoBusqueda.isBlank() ||

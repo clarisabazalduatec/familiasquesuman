@@ -10,6 +10,7 @@ data class CentroVisiteo(
     val id: String,
     val tipo: TipoCentro,
     val nombre: String,
+    val activo : Boolean,
     val descripcionCorta: String,
     val informacionGeneral: String,
     val necesidades: List<String>,
@@ -18,5 +19,6 @@ data class CentroVisiteo(
     val comoAyudar: String? = "Donación en especie. Visita a los ancianos para convivir y platicar.",
     val recomendaciones: String? = "Hablar con anticipación para ver que actividades se recomiendan y en que horario.",
     val telefono: String? = "8282844311",
-    val whatsapp: String? = "528282844311"
+    val whatsapp: String? = "528282844311",
+    val verificado: Boolean = true
 )

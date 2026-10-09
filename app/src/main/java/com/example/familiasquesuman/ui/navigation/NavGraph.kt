@@ -127,8 +127,12 @@ fun NavGraphFamilias(
         composable(Rutas.AdminModeracionProyectos.ruta) {
             com.example.familiasquesuman.ui.screens.admin.AdminModeracionProyectosScreen(navController = navController)
         }
+
         composable(Rutas.AdminActualizacionDonaciones.ruta) {
             com.example.familiasquesuman.ui.screens.admin.AdminActualizacionDonacionesScreen(navController = navController)
+        }
+        composable(Rutas.AdminModeracionDirectorio.ruta) {
+            com.example.familiasquesuman.ui.screens.admin.AdminModeracionDirectorioScreen(navController = navController)
         }
         composable(
             route = Rutas.AsistenciaActividades.ruta,
@@ -141,9 +145,14 @@ fun NavGraphFamilias(
             )
         }
 
-        // CREAR: sin id
-        composable(Rutas.AdminCrearContenido.ruta) {
-            AdminFormularioScreen(navController = navController)
+
+        composable(
+            route = "${Rutas.AdminCrearContenido.ruta}?tipo={tipo}",
+            arguments = listOf(navArgument("tipo") { type = NavType.StringType; nullable = true; defaultValue = null })
+        ) { entry ->
+            val tipo = entry.arguments?.getString("tipo")
+                ?.let { TipoContenidoAdmin.desdeRuta(it) } ?: TipoContenidoAdmin.ACTIVIDAD
+            AdminFormularioScreen(navController = navController, tipoInicial = tipo)
         }
 
         // EDITAR: con tipo e id

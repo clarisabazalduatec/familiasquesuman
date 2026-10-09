@@ -113,7 +113,7 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
             }
 
             ExtendedFloatingActionButton(
-                onClick = { navController.navigate(Rutas.AdminCrearContenido.ruta) },
+                onClick = { navController.navigate(TipoContenidoAdmin.ACTIVIDAD.rutaCrear()) },
                 containerColor = Ambar,
                 contentColor = AzulMarino,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },

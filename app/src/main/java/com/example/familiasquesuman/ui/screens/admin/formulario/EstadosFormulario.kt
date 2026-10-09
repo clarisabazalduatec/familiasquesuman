@@ -1,10 +1,12 @@
 package com.example.familiasquesuman.ui.screens.admin.formulario
 
 import com.example.familiasquesuman.data.ActividadMock
+import com.example.familiasquesuman.domain.CentroVisiteo
 import com.example.familiasquesuman.domain.Donacion
 import com.example.familiasquesuman.domain.EstadoProyecto
 import com.example.familiasquesuman.domain.Proyecto
 import com.example.familiasquesuman.domain.TipoApoyo
+import com.example.familiasquesuman.domain.TipoCentro
 import com.example.familiasquesuman.domain.TipoDonacion
 
 // ---------------------------------------------------------------------------
@@ -51,6 +53,22 @@ data class DonacionForm(
     val condiciones: String = "",
 )
 
+/**
+ * Centro de visiteo. Campos de la tabla centros_visiteo; nombre, descripción corta, dirección y
+ * "activo" viajan en ComunForm (titulo, descripcionCorta, ubicacion, activa).
+ * `necesidades` = filas de centro_necesidades; el orden de la lista es la columna `orden`.
+ */
+data class CentroForm(
+    val tipo: TipoCentro = TipoCentro.ASILO,
+    val informacionGeneral: String = "",
+    val necesidades: List<String> = listOf(""),
+    val comoAyudar: String = "",
+    val recomendaciones: String = "",
+    val telefono: String = "",
+    val whatsapp: String = "",
+    val verificado: Boolean = true,
+)
+
 // ---------------------------------------------------------------------------
 // Modelo -> formulario (para precargar al editar)
 // ---------------------------------------------------------------------------
@@ -89,6 +107,18 @@ fun Donacion.aFormulario(): Pair<ComunForm, DonacionForm> =
         condiciones = condiciones.orEmpty(),
     )
 
+fun CentroVisiteo.aFormulario(): Pair<ComunForm, CentroForm> =
+    ComunForm(nombre, descripcionCorta, direccion, activo) to CentroForm(
+        tipo = tipo,
+        informacionGeneral = informacionGeneral.orEmpty(),
+        necesidades = necesidades.ifEmpty { listOf("") },
+        comoAyudar = comoAyudar.orEmpty(),
+        recomendaciones = recomendaciones.orEmpty(),
+        telefono = telefono.orEmpty(),
+        whatsapp = whatsapp.orEmpty(),
+        verificado = verificado,
+    )
+
 // ---------------------------------------------------------------------------
 // Validación: devuelve el mensaje de error, o null si todo está bien.
 // Reemplaza los valores inventados que antes se guardaban en silencio.
@@ -105,6 +135,7 @@ fun validarFormulario(
     actividad: ActividadForm,
     proyecto: ProyectoForm,
     donacion: DonacionForm,
+    centro: CentroForm,
     imagenes: List<String>,
 ): String? {
     if (comun.titulo.isBlank()) return "El título no puede estar vacío."
@@ -137,6 +168,14 @@ fun validarFormulario(
             donacion.tipo == TipoDonacion.ESPECIE && comun.ubicacion.isBlank() -> "Indica el centro de acopio."
             donacion.tipo == TipoDonacion.CAMPANA && donacion.whatsapp.isBlank() -> "Indica el WhatsApp para donar."
             !telefonoValido(donacion.whatsapp) -> MSG_TELEFONO
+            else -> null
+        }
+
+        TipoContenidoAdmin.DIRECTORIO -> when {
+            comun.ubicacion.isBlank() -> "Indica la dirección del centro."
+            centro.informacionGeneral.isBlank() -> "Agrega la información general del centro."
+            centro.comoAyudar.isBlank() -> "Explica cómo se puede ayudar al centro."
+            !telefonoValido(centro.telefono) || !telefonoValido(centro.whatsapp) -> MSG_TELEFONO
             else -> null
         }
     }

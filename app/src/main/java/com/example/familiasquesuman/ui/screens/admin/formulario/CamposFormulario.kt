@@ -1,7 +1,10 @@
 package com.example.familiasquesuman.ui.screens.admin.formulario
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,17 +15,22 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Domain
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +40,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.familiasquesuman.domain.EstadoProyecto
+import com.example.familiasquesuman.domain.TipoCentro
 import com.example.familiasquesuman.domain.TipoDonacion
 import com.example.familiasquesuman.ui.components.SelectorCategoria
 import com.example.familiasquesuman.ui.theme.AzulMarino
@@ -99,25 +108,26 @@ fun SelectorTipoContenido(tipo: TipoContenidoAdmin, onSeleccion: (TipoContenidoA
                 border = if (!seleccionado) BorderStroke(1.dp, GrisBorde) else null,
                 modifier = Modifier.weight(1f),
             ) {
-                Row(
-                    modifier = Modifier.padding(vertical = 12.dp, horizontal = 8.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                 ) {
                     Icon(
                         imageVector = when (opcion) {
                             TipoContenidoAdmin.ACTIVIDAD -> Icons.Default.DateRange
                             TipoContenidoAdmin.PROYECTO -> Icons.Default.Lightbulb
                             TipoContenidoAdmin.DONACION -> Icons.Default.Favorite
+                            TipoContenidoAdmin.DIRECTORIO -> Icons.Default.Domain
                         },
                         contentDescription = null,
                         tint = if (seleccionado) Color.White else AzulMarino,
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(18.dp),
                     )
-                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = opcion.titulo,
-                        fontSize = 12.sp,
+                        fontSize = 11.sp,
+                        maxLines = 1,
                         fontWeight = FontWeight.Bold,
                         color = if (seleccionado) Color.White else AzulMarino,
                     )
@@ -187,11 +197,18 @@ fun CamposComunes(
         TipoContenidoAdmin.ACTIVIDAD -> "Limpieza de Parque"
         TipoContenidoAdmin.PROYECTO -> "Voluntariado Juvenil"
         TipoContenidoAdmin.DONACION -> "Colecta de Alimentos"
+        TipoContenidoAdmin.DIRECTORIO -> "Casa Hogar Esperanza"
+    }
+    val etiquetaTitulo = when (tipo) {
+        TipoContenidoAdmin.ACTIVIDAD -> "Título de la actividad"
+        TipoContenidoAdmin.PROYECTO -> "Nombre del proyecto"
+        TipoContenidoAdmin.DONACION -> "Título de la donación"
+        TipoContenidoAdmin.DIRECTORIO -> "Nombre del centro"
     }
     CampoTexto(
         valor = form.titulo,
         onCambio = { onCambio(form.copy(titulo = it)) },
-        etiqueta = "Título / Nombre de la ${tipo.titulo}",
+        etiqueta = etiquetaTitulo,
         placeholder = "Ej. $ejemplo",
     )
     CampoTexto(
@@ -204,8 +221,9 @@ fun CamposComunes(
     CampoTexto(
         valor = form.ubicacion,
         onCambio = { onCambio(form.copy(ubicacion = it)) },
-        etiqueta = "Ubicación / Ciudad",
-        placeholder = "Ej. Parque Central, Monterrey",
+        etiqueta = if (tipo == TipoContenidoAdmin.DIRECTORIO) "Dirección" else "Ubicación / Ciudad",
+        placeholder = if (tipo == TipoContenidoAdmin.DIRECTORIO) "Ej. Blvd. José María González #1000, Cadereyta"
+        else "Ej. Parque Central, Monterrey",
         ayuda = ayudaUbicacion,
     )
 }
@@ -378,4 +396,87 @@ fun CamposDonacion(
             placeholder = "Ej. Nuevo o en buen estado",
         )
     }
+}
+
+@Composable
+fun CamposCentro(form: CentroForm, onCambio: (CentroForm) -> Unit) {
+    EtiquetaSeccion("Tipo de centro")
+    Row(
+        modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        TipoCentro.entries.forEach { opcion ->
+            FilterChip(
+                selected = form.tipo == opcion,
+                onClick = { onCambio(form.copy(tipo = opcion)) },
+                label = { Text(opcion.etiqueta) },
+            )
+        }
+    }
+
+    CampoTexto(
+        valor = form.informacionGeneral,
+        onCambio = { onCambio(form.copy(informacionGeneral = it)) },
+        etiqueta = "Información general",
+        placeholder = "A quién atiende el centro y qué ofrece",
+        minLineas = 3,
+        maxLineas = Int.MAX_VALUE,
+    )
+
+    // Cada fila es un registro de centro_necesidades; la posición en la lista es su `orden`.
+    EtiquetaSeccion("Necesidades del centro")
+    form.necesidades.forEachIndexed { index, texto ->
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            CampoTexto(
+                valor = texto,
+                onCambio = { nuevo ->
+                    onCambio(form.copy(necesidades = form.necesidades.toMutableList().also { it[index] = nuevo }))
+                },
+                etiqueta = "Necesidad ${index + 1}",
+                modifier = Modifier.weight(1f),
+                placeholder = "Ej. Alimentos como: azúcar, leche, aceite",
+                maxLineas = 3,
+            )
+            IconButton(
+                onClick = { onCambio(form.copy(necesidades = form.necesidades.filterIndexed { i, _ -> i != index })) },
+            ) {
+                Icon(Icons.Default.Delete, contentDescription = "Quitar necesidad", tint = ColorError)
+            }
+        }
+    }
+    TextButton(onClick = { onCambio(form.copy(necesidades = form.necesidades + "")) }) {
+        Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.width(6.dp))
+        Text("Agregar necesidad")
+    }
+
+    CampoTexto(
+        valor = form.comoAyudar,
+        onCambio = { onCambio(form.copy(comoAyudar = it)) },
+        etiqueta = "Cómo ayudar",
+        placeholder = "Formas de colaborar: donativos, voluntariado, visitas…",
+        minLineas = 2,
+        maxLineas = Int.MAX_VALUE,
+    )
+    CampoTexto(
+        valor = form.recomendaciones,
+        onCambio = { onCambio(form.copy(recomendaciones = it)) },
+        etiqueta = "Recomendaciones para la visita (opcional)",
+        placeholder = "Horarios, qué llevar, qué evitar",
+        minLineas = 2,
+        maxLineas = Int.MAX_VALUE,
+    )
+
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        CampoTexto(
+            form.telefono, { onCambio(form.copy(telefono = it)) }, "Teléfono", Modifier.weight(1f),
+            placeholder = "8112345678", teclado = KeyboardType.Phone,
+        )
+        CampoTexto(
+            form.whatsapp, { onCambio(form.copy(whatsapp = it)) }, "WhatsApp", Modifier.weight(1f),
+            placeholder = "528112345678", teclado = KeyboardType.Phone,
+        )
+    }
+
+    OpcionConCheck("Centro verificado por Familias que Suman", form.verificado) { onCambio(form.copy(verificado = it)) }
 }
