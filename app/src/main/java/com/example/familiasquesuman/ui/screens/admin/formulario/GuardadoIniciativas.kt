@@ -7,11 +7,14 @@ import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.data.agregarActividadMock
 import com.example.familiasquesuman.data.repository.agregarDonacionMock
 import com.example.familiasquesuman.data.repository.donacionesMockData
+import com.example.familiasquesuman.domain.CentroVisiteo
 import com.example.familiasquesuman.domain.Donacion
 import com.example.familiasquesuman.domain.OpcionApoyo
 import com.example.familiasquesuman.domain.Proyecto
 import com.example.familiasquesuman.domain.TipoApoyo
 import com.example.familiasquesuman.domain.TipoDonacion
+import com.example.familiasquesuman.ui.screens.directorio.agregarCentroMock
+import com.example.familiasquesuman.ui.screens.directorio.centrosDeEjemplo
 import com.example.familiasquesuman.ui.screens.proyectos.agregarProyectoMock
 import com.example.familiasquesuman.ui.screens.proyectos.proyectosMockData
 import com.example.familiasquesuman.ui.theme.FondoAzulClaro
@@ -178,11 +181,60 @@ fun guardarDonacion(base: Donacion?, comun: ComunForm, form: DonacionForm, image
     }
 }
 
+/**
+ * Centro de visiteo. Es la ÚNICA función (junto con CentroVisiteo.aFormulario) que conoce los
+ * campos del modelo CentroVisiteo; si el modelo cambia, se ajusta aquí.
+ */
+fun guardarCentro(base: CentroVisiteo?, comun: ComunForm, form: CentroForm, imagenes: List<String>) {
+    // Las filas vacías no se guardan; la posición en la lista es el `orden` de centro_necesidades.
+    val necesidades = form.necesidades.map { it.trim() }.filter { it.isNotEmpty() }
+
+    if (base == null) {
+        agregarCentroMock(
+            CentroVisiteo(
+                id = System.currentTimeMillis().toString(),
+                nombre = comun.titulo.trim(),
+                tipo = form.tipo,
+                descripcionCorta = comun.descripcionCorta.trim(),
+                informacionGeneral = form.informacionGeneral.trim(),
+                necesidades = necesidades,
+                direccion = comun.ubicacion.trim(),
+                logoUrl = imagenes.firstOrNull(),
+                comoAyudar = form.comoAyudar.trim(),
+                recomendaciones = form.recomendaciones.trim(),
+                telefono = form.telefono.trim().ifBlank { null },
+                whatsapp = form.whatsapp.trim().ifBlank { null },
+                verificado = form.verificado,
+                activo = comun.activa,
+            ),
+        )
+    } else {
+        val index = centrosDeEjemplo.indexOfFirst { it.id == base.id }
+        if (index == -1) return
+        centrosDeEjemplo[index] = centrosDeEjemplo[index].copy(
+            nombre = comun.titulo.trim(),
+            tipo = form.tipo,
+            descripcionCorta = comun.descripcionCorta.trim(),
+            informacionGeneral = form.informacionGeneral.trim(),
+            necesidades = necesidades,
+            direccion = comun.ubicacion.trim(),
+            logoUrl = imagenes.firstOrNull(), // si el admin quitó el logo, se respeta
+            comoAyudar = form.comoAyudar.trim(),
+            recomendaciones = form.recomendaciones.trim(),
+            telefono = form.telefono.trim().ifBlank { null },
+            whatsapp = form.whatsapp.trim().ifBlank { null },
+            verificado = form.verificado,
+            activo = comun.activa,
+        )
+    }
+}
+
 fun eliminarIniciativa(tipo: TipoContenidoAdmin, id: String) {
     when (tipo) {
         TipoContenidoAdmin.ACTIVIDAD -> actividadesMockData.removeAll { it.id == id.toIntOrNull() }
         TipoContenidoAdmin.PROYECTO -> proyectosMockData.removeAll { it.id == id }
         TipoContenidoAdmin.DONACION -> donacionesMockData.removeAll { it.id == id }
+        TipoContenidoAdmin.DIRECTORIO -> centrosDeEjemplo.removeAll { it.id.toString() == id }
     }
 }
 

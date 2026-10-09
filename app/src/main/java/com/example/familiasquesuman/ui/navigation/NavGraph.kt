@@ -1,11 +1,8 @@
-
 package com.example.familiasquesuman.ui.navigation
 
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -15,22 +12,23 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.familiasquesuman.ui.screens.informacion.SobreNosotrosScreen
-import com.example.familiasquesuman.ui.screens.informacion.ContactoAyudaScreen
+import com.example.familiasquesuman.ui.screens.actividad.ActividadScreen
+import com.example.familiasquesuman.ui.screens.admin.AdminScreen
+import com.example.familiasquesuman.ui.screens.admin.formulario.AdminFormularioScreen
+import com.example.familiasquesuman.ui.screens.admin.formulario.TipoContenidoAdmin
 import com.example.familiasquesuman.ui.screens.chatbot.ChatbotScreen
-import com.example.familiasquesuman.ui.screens.comun.PantallaProximamente
 import com.example.familiasquesuman.ui.screens.comunidad.ComunidadScreen
+import com.example.familiasquesuman.ui.screens.comunidad.MisPublicacionesScreen
 import com.example.familiasquesuman.ui.screens.comunidad.NuevaPublicacionScreen
+import com.example.familiasquesuman.ui.screens.comunidad.PublicacionDetalleScreen
 import com.example.familiasquesuman.ui.screens.comunidad.ResultadoPublicacionScreen
 import com.example.familiasquesuman.ui.screens.directorio.DirectorioScreen
 import com.example.familiasquesuman.ui.screens.donar.DonacionDetalleScreen
 import com.example.familiasquesuman.ui.screens.donar.DonacionScreen
 import com.example.familiasquesuman.ui.screens.inicio.InicioScreen
+import com.example.familiasquesuman.ui.screens.informacion.ContactoAyudaScreen
+import com.example.familiasquesuman.ui.screens.informacion.SobreNosotrosScreen
 import com.example.familiasquesuman.ui.screens.login.LoginScreen
-import com.example.familiasquesuman.ui.screens.actividad.ActividadScreen
-import com.example.familiasquesuman.ui.screens.admin.AdminScreen
-import com.example.familiasquesuman.ui.screens.admin.formulario.AdminFormularioScreen
-import com.example.familiasquesuman.ui.screens.admin.formulario.TipoContenidoAdmin
 import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScreen
 import com.example.familiasquesuman.ui.screens.onboarding.OnboardingScreen
 import com.example.familiasquesuman.ui.screens.perfil.PerfilScreen
@@ -38,11 +36,12 @@ import com.example.familiasquesuman.ui.screens.perfil.PerfilViewModel
 import com.example.familiasquesuman.ui.screens.perfil.RegistrarFamiliaScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectoDetalleScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectosScreen
-import com.example.familiasquesuman.ui.screens.comunidad.MisPublicacionesScreen
-import com.example.familiasquesuman.ui.screens.comunidad.PublicacionDetalleScreen
 
 @Composable
-fun NavGraphFamilias(navController: NavHostController = rememberNavController(), mostrarOnboarding: Boolean, marcarOnboardingVisto: () -> Unit
+fun NavGraphFamilias(
+    navController: NavHostController = rememberNavController(),
+    mostrarOnboarding: Boolean,
+    marcarOnboardingVisto: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -111,9 +110,11 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         composable(Rutas.Chatbot.ruta) {
             ChatbotScreen(navController)
         }
-        composable (Rutas.Login.ruta){
+        composable(Rutas.Login.ruta) {
             LoginScreen(navController = navController)
         }
+
+        // Administración
         composable(Rutas.Admin.ruta) {
             AdminScreen(navController = navController)
         }
@@ -123,20 +124,38 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
         composable(Rutas.AdminModeracionActividades.ruta) {
             com.example.familiasquesuman.ui.screens.admin.AdminModeracionActividadesScreen(navController = navController)
         }
-        composable(Rutas.AdminActualizacionDonaciones.ruta) {
-            com.example.familiasquesuman.ui.screens.admin.AdminActualizacionDonacionesScreen(navController = navController)
-        }
-
         composable(Rutas.AdminModeracionProyectos.ruta) {
             com.example.familiasquesuman.ui.screens.admin.AdminModeracionProyectosScreen(navController = navController)
         }
 
-        // CREAR: sin id
-        composable(Rutas.AdminCrearContenido.ruta) {
-            AdminFormularioScreen(navController = navController)
+        composable(Rutas.AdminActualizacionDonaciones.ruta) {
+            com.example.familiasquesuman.ui.screens.admin.AdminActualizacionDonacionesScreen(navController = navController)
+        }
+        composable(Rutas.AdminModeracionDirectorio.ruta) {
+            com.example.familiasquesuman.ui.screens.admin.AdminModeracionDirectorioScreen(navController = navController)
+        }
+        composable(
+            route = Rutas.AsistenciaActividades.ruta,
+            arguments = listOf(navArgument("actividadId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("actividadId") ?: 1
+            com.example.familiasquesuman.ui.screens.admin.AdminAsistenciaActividadesScreen(
+                navController = navController,
+                actividadId = id
+            )
         }
 
-// EDITAR: con tipo e id
+
+        composable(
+            route = "${Rutas.AdminCrearContenido.ruta}?tipo={tipo}",
+            arguments = listOf(navArgument("tipo") { type = NavType.StringType; nullable = true; defaultValue = null })
+        ) { entry ->
+            val tipo = entry.arguments?.getString("tipo")
+                ?.let { TipoContenidoAdmin.desdeRuta(it) } ?: TipoContenidoAdmin.ACTIVIDAD
+            AdminFormularioScreen(navController = navController, tipoInicial = tipo)
+        }
+
+        // EDITAR: con tipo e id
         composable(
             route = Rutas.AdminEditarContenido.ruta,
             arguments = listOf(
@@ -152,8 +171,6 @@ fun NavGraphFamilias(navController: NavHostController = rememberNavController(),
                 id = id
             )
         }
-
-
 
         composable(Rutas.Comunidad.ruta) {
             ComunidadScreen(navController = navController)

@@ -21,9 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.domain.EstadoProyecto
 import com.example.familiasquesuman.domain.Proyecto
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
@@ -66,11 +68,25 @@ fun AdminModeracionProyectosScreen(navController: NavHostController) {
                     .fillMaxSize()
                     .background(CremaFondo),
             ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Proyectos",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AzulMarino,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Revisa y edita los proyectos sociales de la plataforma.",
+                        fontSize = 13.sp,
+                        color = GrisTexto,
+                    )
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .horizontalScroll(rememberScrollState())
-                        .padding(16.dp),
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     val countActivos = proyectosMockData.count { it.estado == EstadoProyecto.ACTIVO && it.activo }
@@ -97,7 +113,7 @@ fun AdminModeracionProyectosScreen(navController: NavHostController) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(proyectosFiltrados) { proyecto ->
                             TarjetaProyectoAdmin(
@@ -117,7 +133,7 @@ fun AdminModeracionProyectosScreen(navController: NavHostController) {
             }
 
             ExtendedFloatingActionButton(
-                onClick = { navController.navigate(Rutas.AdminCrearContenido.ruta) },
+                onClick = { navController.navigate(TipoContenidoAdmin.PROYECTO.rutaCrear()) },
                 containerColor = Ambar,
                 contentColor = AzulMarino,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
@@ -320,5 +336,13 @@ fun TarjetaProyectoAdmin(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AdminModeracionProyectosScreenPreview(){
+    FamiliasQueSumanTheme {
+        AdminModeracionProyectosScreen(rememberNavController())
     }
 }

@@ -49,6 +49,8 @@ import com.example.familiasquesuman.data.repository.donacionesMockData
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.components.SeleccionadorImagenes
+import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.screens.directorio.centrosDeEjemplo
 import com.example.familiasquesuman.ui.screens.proyectos.proyectosMockData
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AzulMarino
@@ -81,6 +83,9 @@ fun AdminFormularioScreen(
     val donacionOriginal = remember(id) {
         if (esEdicion && tipoInicial == TipoContenidoAdmin.DONACION) donacionesMockData.find { it.id == id } else null
     }
+    val centroOriginal = remember(id) {
+        if (esEdicion && tipoInicial == TipoContenidoAdmin.DIRECTORIO) centrosDeEjemplo.find { it.id.toString() == id } else null
+    }
 
     // Estado del formulario. Se reinicia solo si cambia el id (no al cambiar de tipo al crear,
     // para no perder lo que ya escribiste en título/descripción).
@@ -89,12 +94,14 @@ fun AdminFormularioScreen(
             actividadOriginal?.aFormulario()?.first
                 ?: proyectoOriginal?.aFormulario()?.first
                 ?: donacionOriginal?.aFormulario()?.first
+                ?: centroOriginal?.aFormulario()?.first
                 ?: ComunForm(),
         )
     }
     var actividad by remember(id) { mutableStateOf(actividadOriginal?.aFormulario()?.second ?: ActividadForm()) }
     var proyecto by remember(id) { mutableStateOf(proyectoOriginal?.aFormulario()?.second ?: ProyectoForm()) }
     var donacion by remember(id) { mutableStateOf(donacionOriginal?.aFormulario()?.second ?: DonacionForm()) }
+    var centro by remember(id) { mutableStateOf(centroOriginal?.aFormulario()?.second ?: CentroForm()) }
 
     // Las imágenes sí se limpian al cambiar de tipo (cada tipo permite distinto número de fotos).
     val listaImagenes = remember(tipo, id) {
@@ -102,6 +109,7 @@ fun AdminFormularioScreen(
             actividadOriginal?.let { addAll(it.imagenesUrl) }
             proyectoOriginal?.let { p -> if (p.imagenesUrl.isNotEmpty()) addAll(p.imagenesUrl) else p.logoUrl?.let { add(it) } }
             donacionOriginal?.let { d -> if (d.imagenesUrl.isNotEmpty()) addAll(d.imagenesUrl) else add(d.imagenUrl) }
+            centroOriginal?.logoUrl?.let { add(it) }
         }
     }
 
@@ -109,7 +117,7 @@ fun AdminFormularioScreen(
     var mostrarExito by remember { mutableStateOf(false) }
     var mostrarEliminar by remember { mutableStateOf(false) }
 
-    if (esEdicion && actividadOriginal == null && proyectoOriginal == null && donacionOriginal == null) {
+    if (esEdicion && actividadOriginal == null && proyectoOriginal == null && donacionOriginal == null && centroOriginal == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("No se encontró la iniciativa a editar.", color = GrisTexto)
         }
@@ -117,13 +125,14 @@ fun AdminFormularioScreen(
     }
 
     fun guardar() {
-        errorMensaje = validarFormulario(tipo, comun, actividad, proyecto, donacion, listaImagenes)
+        errorMensaje = validarFormulario(tipo, comun, actividad, proyecto, donacion, centro, listaImagenes)
         if (errorMensaje != null) return
 
         when (tipo) {
             TipoContenidoAdmin.ACTIVIDAD -> guardarActividad(actividadOriginal, comun, actividad, listaImagenes.toList())
             TipoContenidoAdmin.PROYECTO -> guardarProyecto(proyectoOriginal, comun, proyecto, listaImagenes.toList())
             TipoContenidoAdmin.DONACION -> guardarDonacion(donacionOriginal, comun, donacion, listaImagenes.toList())
+            TipoContenidoAdmin.DIRECTORIO -> guardarCentro(centroOriginal, comun, centro, listaImagenes.toList())
         }
         mostrarExito = true
     }
@@ -133,6 +142,7 @@ fun AdminFormularioScreen(
         TipoContenidoAdmin.ACTIVIDAD -> "Fotos de la Actividad"
         TipoContenidoAdmin.PROYECTO -> "Logo / Foto del Proyecto"
         TipoContenidoAdmin.DONACION -> "Foto de la Donación"
+        TipoContenidoAdmin.DIRECTORIO -> "Logo del Centro"
     }
 
     PantallaPrincipalConMenu(
@@ -141,7 +151,7 @@ fun AdminFormularioScreen(
         navbar = false,
         chatbot = false,
         backButton = true,
-        onBackClick = { navController.popBackStack() },
+        onBackClick = { navController.navigate(Rutas.Admin.ruta) },
         titulo = if (esEdicion) "Editar ${tipo.titulo}" else "Crear nuevo contenido",
     ) { paddingVal ->
         Column(
@@ -196,7 +206,7 @@ fun AdminFormularioScreen(
                         titulo = tituloFotos,
                     )
 
-                    // Este `when` es el ÚNICO lugar que conoce los tres tipos.
+                    // Este `when` es el ÚNICO lugar que conoce los cuatro tipos.
                     when (tipo) {
                         TipoContenidoAdmin.ACTIVIDAD -> CamposActividad(
                             form = actividad,
@@ -218,6 +228,8 @@ fun AdminFormularioScreen(
                             },
                             onCambio = { donacion = it },
                         )
+
+                        TipoContenidoAdmin.DIRECTORIO -> CamposCentro(form = centro, onCambio = { centro = it })
                     }
 
                     errorMensaje?.let {
@@ -299,7 +311,7 @@ fun AdminFormularioScreen(
             text = {
                 Text(
                     text = "¿Estás seguro de que deseas eliminar este ${tipo.titulo.lowercase()} definitivamente? " +
-                        "Esta acción borrará la publicación por completo y no se podrá deshacer.",
+                            "Esta acción borrará la publicación por completo y no se podrá deshacer.",
                     color = GrisTexto,
                     fontSize = 13.sp,
                 )

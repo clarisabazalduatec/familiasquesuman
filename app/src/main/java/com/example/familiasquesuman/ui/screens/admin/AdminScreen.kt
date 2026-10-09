@@ -11,7 +11,7 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,9 +19,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
@@ -43,7 +46,7 @@ fun AdminScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .background(CremaFondo),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
@@ -103,6 +106,16 @@ fun AdminScreen(navController: NavHostController) {
                     fondoIcono = FondoAzulClaro,
                     colorIcono = TextoAzul,
                     onClick = { navController.navigate(Rutas.AdminActualizacionDonaciones.ruta) }
+                )
+            }
+            item {
+                AdminCardOption(
+                    titulo = "Gestión de directorio",
+                    descripcion = "Administra los centros de visiteo verificados.",
+                    icono = Icons.Default.Place,
+                    fondoIcono = AzulMarino,
+                    colorIcono = Color.White,
+                    onClick = { navController.navigate(Rutas.AdminModeracionDirectorio.ruta) }
                 )
             }
 
@@ -182,5 +195,12 @@ fun AdminCardOption(
                 tint = GrisTexto
             )
         }
+    }
+}
+@Preview(showBackground = true)
+@Composable
+private fun AdminScreenPreview(){
+    FamiliasQueSumanTheme {
+        AdminScreen(rememberNavController())
     }
 }

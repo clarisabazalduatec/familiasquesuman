@@ -46,10 +46,18 @@ fun agregarProyectoMock(proyecto: Proyecto) {
     proyectosMockData.add(0, proyecto)
 }
 
+fun eliminarProyectoMock(id: String) {
+    proyectosMockData.removeAll { it.id == id }
+}
+
 class ProyectoViewModel : ViewModel() {
 
     fun obtenerProyectosPorEstado(estado: EstadoProyecto): List<Proyecto> =
-        proyectosMockData.filter { it.estado == estado }
+        if (estado == EstadoProyecto.ACTIVO) {
+            proyectosMockData.filter { it.estado == EstadoProyecto.ACTIVO && it.activo }
+        } else {
+            proyectosMockData.filter { it.estado == EstadoProyecto.ANTERIOR || !it.activo }
+        }
 
     fun obtenerProyectoPorId(id: String): Proyecto? =
         proyectosMockData.find { it.id == id }

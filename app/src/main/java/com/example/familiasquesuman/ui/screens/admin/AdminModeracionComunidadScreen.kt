@@ -16,9 +16,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.theme.*
@@ -42,11 +44,25 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
                 .padding(paddingVal)
                 .background(CremaFondo)
         ) {
+            Column(modifier = Modifier.padding(16.dp, vertical = 5.dp)) {
+                Text(
+                    text = "Comunidad",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AzulMarino,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Revisa y modera las publicaciones de la comunidad.",
+                    fontSize = 13.sp,
+                    color = GrisTexto,
+                )
+            }
             // Pestañas (Pendientes, Aprobados, Rechazados)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 TabPill("Pendientes (5)", pestañaSeleccionada == 0) { pestañaSeleccionada = 0 }
@@ -56,8 +72,8 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 item {
                     TarjetaModeracionComunidad(
@@ -248,5 +264,14 @@ fun TarjetaModeracionComunidad(
                 }
             }
         }
+    }
+}
+@Preview(showBackground = true)
+@Composable
+private fun AdminModeracionComunidadScreenPreview() {
+    FamiliasQueSumanTheme {
+        AdminModeracionComunidadScreen(
+            navController = rememberNavController()
+        )
     }
 }
