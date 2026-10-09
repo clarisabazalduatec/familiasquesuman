@@ -15,6 +15,11 @@ sealed class Rutas(val ruta: String) {
     }
 
     object Chatbot : Rutas("chatbot")
+    
+    object AsistenciaActividades : Rutas("asistencia_actividades/{actividadId}") {
+        fun crearRuta(actividadId: Int) = "asistencia_actividades/$actividadId"
+    }
+
     object Login : Rutas("login")
     object Comunidad : Rutas("comunidad")
 

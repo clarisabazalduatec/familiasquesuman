@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.HowToReg
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Schedule
@@ -100,6 +101,11 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
                                         Rutas.AdminEditarContenido.crearRuta(TipoContenidoAdmin.ACTIVIDAD, actividad.id.toString()),
                                     )
                                 },
+                                onAsistenciaClick = {
+                                    navController.navigate(
+                                        Rutas.AsistenciaActividades.crearRuta(actividad.id),
+                                    )
+                                },
                             )
                         }
                     }
@@ -124,6 +130,7 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
 fun TarjetaActividadAdmin(
     actividad: ActividadMock,
     onEditarClick: () -> Unit,
+    onAsistenciaClick: () -> Unit,
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -137,45 +144,34 @@ fun TarjetaActividadAdmin(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .background(GrisClaroFondo, RoundedCornerShape(12.dp)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(Icons.Default.Image, contentDescription = null, tint = GrisTexto)
+            Column {
+                Text(
+                    text = if (actividad.activa) "Activa" else "Desactivada",
+                    color = if (actividad.activa) TextoVerde else ColorError,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                )
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .background(GrisClaroFondo, RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(Icons.Default.Image, contentDescription = null, tint = GrisTexto)
+                }
             }
-
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = actividad.titulo,
-                        fontWeight = FontWeight.Bold,
-                        color = AzulMarino,
-                        fontSize = 14.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f),
-                    )
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = if (actividad.activa) FondoVerde else Color(0xFFFFEBEE),
-                    ) {
-                        Text(
-                            text = if (actividad.activa) "Activa" else "Desactivada",
-                            color = if (actividad.activa) TextoVerde else ColorError,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                        )
-                    }
-                }
+                Text(
+                    text = actividad.titulo,
+                    fontWeight = FontWeight.Bold,
+                    color = AzulMarino,
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
                 Spacer(modifier = Modifier.height(4.dp))
 
@@ -206,15 +202,37 @@ fun TarjetaActividadAdmin(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Button(
-                onClick = onEditarClick,
-                colors = ButtonDefaults.buttonColors(containerColor = AzulMarino, contentColor = Color.White),
-                shape = RoundedCornerShape(10.dp),
-                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-            ) {
-                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(14.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Editar", fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Button(
+                    onClick = onEditarClick,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = AzulMarino,
+                        contentColor = Color.White,
+                    ),
+                    shape = RoundedCornerShape(10.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.height(34.dp),
+                ) {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Editar", fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                }
+
+                Button(
+                    onClick = onAsistenciaClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = AzulMarino, contentColor = Color.White),
+                    shape = RoundedCornerShape(10.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.height(34.dp),
+                ) {
+                    Icon(Icons.Default.HowToReg, contentDescription = null, modifier = Modifier.size(14.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text("Asistencia", fontSize = 11.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                }
             }
         }
     }
@@ -225,7 +243,7 @@ fun TarjetaActividadAdmin(
 private fun AdminModeracionActividadesScreenPreview() {
     FamiliasQueSumanTheme {
         AdminModeracionActividadesScreen(
-            navController = rememberNavController()
+            navController = rememberNavController(),
         )
     }
 }
