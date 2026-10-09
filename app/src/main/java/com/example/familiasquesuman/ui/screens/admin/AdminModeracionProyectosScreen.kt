@@ -68,11 +68,25 @@ fun AdminModeracionProyectosScreen(navController: NavHostController) {
                     .fillMaxSize()
                     .background(CremaFondo),
             ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Proyectos",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AzulMarino,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Revisa y edita los proyectos sociales de la plataforma.",
+                        fontSize = 13.sp,
+                        color = GrisTexto,
+                    )
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .horizontalScroll(rememberScrollState())
-                        .padding(16.dp),
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     val countActivos = proyectosMockData.count { it.estado == EstadoProyecto.ACTIVO && it.activo }
@@ -99,7 +113,7 @@ fun AdminModeracionProyectosScreen(navController: NavHostController) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(proyectosFiltrados) { proyecto ->
                             TarjetaProyectoAdmin(

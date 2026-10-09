@@ -44,11 +44,25 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
                 .padding(paddingVal)
                 .background(CremaFondo)
         ) {
+            Column(modifier = Modifier.padding(16.dp, vertical = 5.dp)) {
+                Text(
+                    text = "Comunidad",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = AzulMarino,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Revisa y modera las publicaciones de la comunidad.",
+                    fontSize = 13.sp,
+                    color = GrisTexto,
+                )
+            }
             // Pestañas (Pendientes, Aprobados, Rechazados)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 TabPill("Pendientes (5)", pestañaSeleccionada == 0) { pestañaSeleccionada = 0 }
@@ -58,8 +72,8 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 item {
                     TarjetaModeracionComunidad(

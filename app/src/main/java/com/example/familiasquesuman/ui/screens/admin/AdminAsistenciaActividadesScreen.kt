@@ -113,12 +113,7 @@ fun AdminAsistenciaActividadesScreen(
                     .background(CremaFondo)
             ) {
                 // Header de la Actividad Seleccionada
-                Card(
-                    shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
                             text = "Control de Asistencia",
@@ -127,12 +122,21 @@ fun AdminAsistenciaActividadesScreen(
                             color = AzulMarino
                         )
                         Spacer(modifier = Modifier.height(2.dp))
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding( vertical = 8.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        ){
                         Text(
                             text = "Actividad: ${actividadActual.titulo}",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                         )
+                        }
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = "${actividadActual.fecha} • ${actividadActual.horario} • ${actividadActual.ubicacion}",
@@ -140,9 +144,9 @@ fun AdminAsistenciaActividadesScreen(
                             color = GrisTexto
                         )
                     }
-                }
 
-                Spacer(modifier = Modifier.height(12.dp))
+
+               // Spacer(modifier = Modifier.height(12.dp))
 
                 // Selector de Pestañas (Pase de Lista / Asistentes / Faltantes)
                 Row(

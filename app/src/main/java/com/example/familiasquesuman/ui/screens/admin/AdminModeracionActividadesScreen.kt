@@ -53,16 +53,32 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(paddingVal),
         ) {
+
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(CremaFondo),
             ) {
+
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Actividades",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AzulMarino,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Revisa y edita las actividades activas de la comunidad.",
+                        fontSize = 13.sp,
+                        color = GrisTexto,
+                    )
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .horizontalScroll(rememberScrollState())
-                        .padding(16.dp),
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     TabPill("Activas (${actividadesMockData.count { it.activa }})", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
@@ -91,7 +107,7 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(listaAMostrar) { actividad ->
                             TarjetaActividadAdmin(

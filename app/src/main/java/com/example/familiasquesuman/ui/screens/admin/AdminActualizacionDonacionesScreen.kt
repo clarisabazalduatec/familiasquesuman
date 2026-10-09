@@ -23,9 +23,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.data.repository.donacionesMockData
 import com.example.familiasquesuman.data.repository.registrarAporteDonacion
 import com.example.familiasquesuman.domain.Donacion
@@ -62,11 +64,25 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                     .fillMaxSize()
                     .background(CremaFondo),
             ) {
+                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+                    Text(
+                        text = "Donaciones",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AzulMarino,
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Revisa y edita las campañas y donaciones en especie",
+                        fontSize = 13.sp,
+                        color = GrisTexto,
+                    )
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .horizontalScroll(rememberScrollState())
-                        .padding(16.dp),
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     TabPill("Activas (${donacionesMockData.count { it.activa }})", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
@@ -94,7 +110,7 @@ fun AdminActualizacionDonacionesScreen(navController: NavHostController) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 80.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(donacionesFiltradas) { donacion ->
                             TarjetaDonacionAdmin(
@@ -375,4 +391,12 @@ fun TarjetaDonacionAdmin(
             }
         }
     }
+}
+@Preview(showBackground = true)
+@Composable
+private fun AdminActualizacionDonacionesScreenPreview(){
+    FamiliasQueSumanTheme {
+        AdminActualizacionDonacionesScreen(rememberNavController())
+    }
+
 }
