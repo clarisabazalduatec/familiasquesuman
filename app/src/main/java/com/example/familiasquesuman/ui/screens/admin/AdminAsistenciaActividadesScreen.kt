@@ -53,14 +53,14 @@ data class ParticipanteAsistencia(
 @Composable
 fun AdminAsistenciaActividadesScreen(
     navController: NavHostController,
-    actividadId: Int = 1
+    actividadId: String = "1"
 ) {
     var tabSeleccionada by remember { mutableIntStateOf(0) } // 0 = Pase de Lista, 1 = Asistentes, 2 = Faltantes
     var textoBusqueda by remember { mutableStateOf("") }
     var mostrarExitoDialog by remember { mutableStateOf(value = false) }
 
     val actividadActual = remember(actividadId) {
-        actividadesMockData.find { it.id == actividadId } ?: actividadesMockData.first()
+        actividadesMockData.find { it.id.toString() == actividadId } ?: actividadesMockData.first()
     }
 
     // Lista mutable de personas/familias registradas

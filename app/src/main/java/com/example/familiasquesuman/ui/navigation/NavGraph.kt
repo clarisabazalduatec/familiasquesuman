@@ -136,9 +136,9 @@ fun NavGraphFamilias(
         }
         composable(
             route = Rutas.AsistenciaActividades.ruta,
-            arguments = listOf(navArgument("actividadId") { type = NavType.IntType })
+            arguments = listOf(navArgument("actividadId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("actividadId") ?: 1
+            val id = backStackEntry.arguments?.getString("actividadId") ?: ""
             com.example.familiasquesuman.ui.screens.admin.AdminAsistenciaActividadesScreen(
                 navController = navController,
                 actividadId = id
@@ -206,9 +206,9 @@ fun NavGraphFamilias(
         }
         composable(
             route = Rutas.ActividadDetalle.ruta,
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: 1
+            val id = backStackEntry.arguments?.getString("id") ?: ""
             com.example.familiasquesuman.ui.screens.actividad.ActividadDetalleScreen(
                 navController = navController, 
                 actividadId = id
@@ -216,9 +216,9 @@ fun NavGraphFamilias(
         }
         composable(
             route = Rutas.ActividadParticipar.ruta,
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: 1
+            val id = backStackEntry.arguments?.getString("id") ?: ""
             com.example.familiasquesuman.ui.screens.actividad.ActividadParticiparScreen(
                 navController = navController, 
                 actividadId = id
@@ -226,9 +226,9 @@ fun NavGraphFamilias(
         }
         composable(
             route = Rutas.ActividadSeleccionParticipantes.ruta,
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: 1
+            val id = backStackEntry.arguments?.getString("id") ?: ""
             com.example.familiasquesuman.ui.screens.actividad.ActividadSeleccionParticipantesScreen(
                 navController = navController, 
                 actividadId = id
@@ -236,9 +236,9 @@ fun NavGraphFamilias(
         }
         composable(
             route = Rutas.ActividadConfirmacion.ruta,
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: 1
+            val id = backStackEntry.arguments?.getString("id") ?: ""
             com.example.familiasquesuman.ui.screens.actividad.ActividadConfirmacionScreen(
                 navController = navController, 
                 actividadId = id

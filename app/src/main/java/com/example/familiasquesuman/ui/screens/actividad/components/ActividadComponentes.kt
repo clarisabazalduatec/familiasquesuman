@@ -20,8 +20,35 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.familiasquesuman.data.ActividadMock
+import com.example.familiasquesuman.domain.Actividad
 import com.example.familiasquesuman.ui.theme.*
+
+fun obtenerIconoCategoria(categoria: String): ImageVector {
+    return when (categoria.lowercase()) {
+        "medio ambiente", "medioambiente" -> Icons.Default.Star
+        "educación", "educacion" -> Icons.Default.Info
+        "apoyo social", "apoyosocial" -> Icons.Default.Favorite
+        else -> Icons.Default.Category
+    }
+}
+
+fun obtenerColorCategoria(categoria: String): Color {
+    return when (categoria.lowercase()) {
+        "medio ambiente", "medioambiente" -> FondoVerde
+        "educación", "educacion" -> FondoAzulClaro
+        "apoyo social", "apoyosocial" -> FondoNaranja
+        else -> Color(0xFFF3E5F5)
+    }
+}
+
+fun obtenerTextoColorCategoria(categoria: String): Color {
+    return when (categoria.lowercase()) {
+        "medio ambiente", "medioambiente" -> TextoVerde
+        "educación", "educacion" -> TextoAzul
+        "apoyo social", "apoyosocial" -> TextoNaranja
+        else -> Color(0xFF7B1FA2)
+    }
+}
 
 /**
  * Chip de categoría unificado para tarjetas y pantallas de detalles.
@@ -123,10 +150,14 @@ fun AvataresParticipantes(
  */
 @Composable
 fun TarjetaActividadDia(
-    actividad: ActividadMock,
-    onActividadClick: (Int) -> Unit,
+    actividad: Actividad,
+    onActividadClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val iconoCat = obtenerIconoCategoria(actividad.categoria)
+    val colorFondoCat = obtenerColorCategoria(actividad.categoria)
+    val colorTextoCat = obtenerTextoColorCategoria(actividad.categoria)
+
     Card(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -171,9 +202,9 @@ fun TarjetaActividadDia(
                 ) {
                     CategoriaChip(
                         categoria = actividad.categoria,
-                        icono = actividad.iconoCategoria,
-                        backgroundColor = actividad.colorCategoria,
-                        textColor = actividad.textColorCategoria,
+                        icono = iconoCat,
+                        backgroundColor = colorFondoCat,
+                        textColor = colorTextoCat,
                         mostrarIcono = true
                     )
                     Icon(
@@ -239,7 +270,7 @@ fun TarjetaActividadDia(
                     )
 
                     AvataresParticipantes(
-                        participantesAdicionales = actividad.participantesAdicionales
+                        participantesAdicionales = 0
                     )
                 }
             }

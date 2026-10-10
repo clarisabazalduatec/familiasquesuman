@@ -17,7 +17,7 @@ sealed class Rutas(val ruta: String) {
     object Chatbot : Rutas("chatbot")
     
     object AsistenciaActividades : Rutas("asistencia_actividades/{actividadId}") {
-        fun crearRuta(actividadId: Int) = "asistencia_actividades/$actividadId"
+        fun crearRuta(actividadId: String) = "asistencia_actividades/$actividadId"
     }
 
     object Login : Rutas("login")
@@ -49,19 +49,19 @@ sealed class Rutas(val ruta: String) {
     object RegistrarFamilia : Rutas("registrar_familia")
     
     object ActividadDetalle : Rutas("actividad_detalle/{id}") {
-        fun crearRuta(id: Int) = "actividad_detalle/$id"
+        fun crearRuta(id: String) = "actividad_detalle/$id"
     }
     
     object ActividadParticipar : Rutas("actividad_participar/{id}") {
-        fun crearRuta(id: Int) = "actividad_participar/$id"
+        fun crearRuta(id: String) = "actividad_participar/$id"
     }
 
     object ActividadSeleccionParticipantes : Rutas("actividad_seleccion/{id}") {
-        fun crearRuta(id: Int) = "actividad_seleccion/$id"
+        fun crearRuta(id: String) = "actividad_seleccion/$id"
     }
 
     object ActividadConfirmacion : Rutas("actividad_confirmacion/{id}") {
-        fun crearRuta(id: Int) = "actividad_confirmacion/$id"
+        fun crearRuta(id: String) = "actividad_confirmacion/$id"
     }
 
     object ResultadoPublicacion : Rutas("resultado_publicacion/{fueExitoso}") {
