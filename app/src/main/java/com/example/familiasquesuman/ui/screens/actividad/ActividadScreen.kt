@@ -30,17 +30,45 @@ import com.example.familiasquesuman.ui.theme.GrisBordeClaro
 @Composable
 fun ActividadScreen(navController: NavHostController) {
     var categoriaSeleccionada by remember { mutableStateOf<String?>(null) }
+    var mostrarCalendario by remember {  mutableStateOf(false) }
     val categorias = remember { listOf("Medio Ambiente", "Educación", "Apoyo Social", "Otros") }
-
     val actividadesFiltradas = remember(categoriaSeleccionada, actividadesMockData) {
         actividadesMockData.filter { it.activa }.filter { actividad ->
             categoriaSeleccionada == null || actividad.categoria == categoriaSeleccionada
+        }
+    }
+    val actividadesActivas = remember(actividadesMockData) { actividadesMockData.filter { it.activa } }
+    val actividadesInscritas = remember(actividadesActivas) {
+        buildList {
+            actividadesActivas.getOrNull(0)?.let { actividad ->
+                add(ActividadInscritaCalendario(
+                        actividadId = actividad.id,
+                        fecha = "2026-10-24"
+                    )
+                )
+            }
+            actividadesActivas.getOrNull(2)?.let { actividad ->
+                add(ActividadInscritaCalendario(
+                        actividadId = actividad.id,
+                        fecha = "2026-10-28"
+                    )
+                )
+            }
+            actividadesActivas.getOrNull(1)?.let { actividad ->
+                add(ActividadInscritaCalendario(
+                        actividadId = actividad.id,
+                        fecha = "2026-10-25"
+                    )
+                )
+            }
         }
     }
 
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
+        backButton = mostrarCalendario,
+        onBackClick = { mostrarCalendario = false }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -49,55 +77,65 @@ fun ActividadScreen(navController: NavHostController) {
                 .padding(paddingValues),
             contentPadding = PaddingValues(bottom = 80.dp),
         ) {
-            item {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                ) {
-                    Text(
-                        text = "Actividades en Familia",
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
+            if (!mostrarCalendario) {
+                item { Column(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 16.dp,
+                                vertical = 8.dp
+                            )
+                    ) {
+                        Text(text = "Actividades en Familia",
+                            style = MaterialTheme.typography.headlineLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(text = "Actividades en familia para ayudar durante el año.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                item { FiltrosChips(
+                        opciones = categorias,
+                        seleccionado = categoriaSeleccionada,
+                        etiquetaPara = { it },
+                        onSeleccionado = { categoriaSeleccionada = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Actividades en familia para ayudar durante el año.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                }
+                item { HorizontalDivider(
+                        color = GrisBordeClaro,
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+                item { HeaderDiaActividades(onVerAgendaClick = { mostrarCalendario = true })
+                }
+                items(actividadesFiltradas) { actividad ->
+                    TarjetaActividadDia(
+                        actividad = actividad,
+                        onActividadClick = { id ->
+                            navController.navigate(Rutas.ActividadDetalle.crearRuta(id))
+                        }
+                    )
+                }
+                item { BannerSincronizarCalendario() }
+            } else {
+                item { CalendarioActividades(
+                        todasLasActividades = actividadesMockData,
+                        inscripciones = actividadesInscritas,
+                        onActividadClick = { id -> navController.navigate(Rutas.ActividadDetalle.crearRuta(id))
+                        },
+                        onVolver = { mostrarCalendario = false
+                        }
                     )
                 }
             }
-            item {
-                FiltrosChips(
-                    opciones = categorias,
-                    seleccionado = categoriaSeleccionada,
-                    etiquetaPara = { it },
-                    onSeleccionado = { categoriaSeleccionada = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState())
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                )
-            }
-            item {
-                HorizontalDivider(
-                    color = GrisBordeClaro,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 4.dp),
-                )
-            }
-            item { HeaderDiaActividades() }
-            items(actividadesFiltradas) { actividad ->
-                TarjetaActividadDia(
-                    actividad = actividad,
-                    onActividadClick = { id ->
-                        navController.navigate(Rutas.ActividadDetalle.crearRuta(id))
-                    },
-                )
-            }
-            item { BannerSincronizarCalendario() }
         }
     }
 }
