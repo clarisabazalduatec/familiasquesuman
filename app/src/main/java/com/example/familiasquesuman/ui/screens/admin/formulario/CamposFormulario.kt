@@ -326,19 +326,27 @@ fun CamposDonacion(
     onNuevaCategoria: (String) -> Unit,
     onCambio: (DonacionForm) -> Unit,
 ) {
-    val esCampana = form.tipo == TipoDonacion.CAMPANA
-
     EtiquetaSeccion("Tipo de Donación")
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         FilterChip(
-            selected = esCampana,
-            onClick = { onCambio(form.copy(tipo = TipoDonacion.CAMPANA)) },
+            selected = form.tipoDonacionAdmin == TipoDonacionAdmin.MONETARIA,
+            onClick = { onCambio(form.copy(tipoDonacionAdmin = TipoDonacionAdmin.MONETARIA)) },
             label = { Text("Campaña Monetaria") },
         )
         FilterChip(
-            selected = !esCampana,
-            onClick = { onCambio(form.copy(tipo = TipoDonacion.ESPECIE)) },
-            label = { Text("Artículo / En Especie") },
+            selected = form.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE,
+            onClick = { onCambio(form.copy(tipoDonacionAdmin = TipoDonacionAdmin.ESPECIE)) },
+            label = { Text("En Especie") },
+        )
+        FilterChip(
+            selected = form.tipoDonacionAdmin == TipoDonacionAdmin.TIEMPO,
+            onClick = { onCambio(form.copy(tipoDonacionAdmin = TipoDonacionAdmin.TIEMPO)) },
+            label = { Text("Tiempo") },
         )
     }
 
@@ -350,7 +358,6 @@ fun CamposDonacion(
         titulo = "Categoría de la Donación",
     )
 
-    // Antes un solo campo llenaba "categoría" y "fundación" a la vez; ahora son dos datos distintos.
     CampoTexto(
         valor = form.fundacion,
         onCambio = { onCambio(form.copy(fundacion = it)) },
@@ -358,23 +365,117 @@ fun CamposDonacion(
         placeholder = "Ej. Comedor San José",
     )
 
-    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        if (esEdicion) {
+    // CAMPOS DINÁMICOS SEGÚN EL TIPO DE DONACIÓN
+    when (form.tipoDonacionAdmin) {
+        TipoDonacionAdmin.MONETARIA -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 4.dp)
+            ) {
+                Switch(
+                    checked = form.tieneMeta,
+                    onCheckedChange = { onCambio(form.copy(tieneMeta = it)) }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Establecer Meta Económica", color = GrisTexto, fontSize = 14.sp)
+            }
+
+            if (form.tieneMeta) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (esEdicion) {
+                        CampoTexto(
+                            form.recaudado,
+                            { onCambio(form.copy(recaudado = it.filter(Char::isDigit))) },
+                            "Recaudado ($)",
+                            Modifier.weight(1f),
+                            teclado = KeyboardType.Number,
+                        )
+                    }
+                    CampoTexto(
+                        form.meta,
+                        { onCambio(form.copy(meta = it.filter(Char::isDigit))) },
+                        "Meta ($)",
+                        Modifier.weight(1f),
+                        teclado = KeyboardType.Number,
+                    )
+                }
+            }
+
             CampoTexto(
-                form.recaudado,
-                { onCambio(form.copy(recaudado = it.filter(Char::isDigit))) },
-                if (esCampana) "Recaudado ($)" else "Entregados (Cant.)",
-                Modifier.weight(1f),
-                teclado = KeyboardType.Number,
+                valor = form.montosSugeridos,
+                onCambio = { onCambio(form.copy(montosSugeridos = it)) },
+                etiqueta = "Cantidades Sugeridas (opcional)",
+                placeholder = "Ej. 100, 200, 500",
             )
         }
-        CampoTexto(
-            form.meta,
-            { onCambio(form.copy(meta = it.filter(Char::isDigit))) },
-            if (esCampana) "Meta ($)" else "Meta (Cant.)",
-            Modifier.weight(1f),
-            teclado = KeyboardType.Number,
-        )
+
+        TipoDonacionAdmin.ESPECIE -> {
+            CampoTexto(
+                valor = form.articulosNecesarios,
+                onCambio = { onCambio(form.copy(articulosNecesarios = it)) },
+                etiqueta = "Lista de Artículos e Insumos",
+                placeholder = "Ej. Cobijas, Atún, Agua embotellada",
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = 4.dp)
+            ) {
+                Switch(
+                    checked = form.tieneMeta,
+                    onCheckedChange = { onCambio(form.copy(tieneMeta = it)) }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Establecer Meta de Artículos", color = GrisTexto, fontSize = 14.sp)
+            }
+
+            if (form.tieneMeta) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    if (esEdicion) {
+                        CampoTexto(
+                            form.recaudado,
+                            { onCambio(form.copy(recaudado = it.filter(Char::isDigit))) },
+                            "Entregados (Cant.)",
+                            Modifier.weight(1f),
+                            teclado = KeyboardType.Number,
+                        )
+                    }
+                    CampoTexto(
+                        form.meta,
+                        { onCambio(form.copy(meta = it.filter(Char::isDigit))) },
+                        "Meta (Cant.)",
+                        Modifier.weight(1f),
+                        teclado = KeyboardType.Number,
+                    )
+                }
+            }
+
+            CampoTexto(
+                valor = form.condiciones,
+                onCambio = { onCambio(form.copy(condiciones = it)) },
+                etiqueta = "Condiciones de entrega (opcional)",
+                placeholder = "Ej. Nuevo o en buen estado",
+            )
+        }
+
+        TipoDonacionAdmin.TIEMPO -> {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                CampoTexto(
+                    valor = form.fechaLimite,
+                    onCambio = { onCambio(form.copy(fechaLimite = it)) },
+                    etiqueta = "Fecha Límite / Evento",
+                    modifier = Modifier.weight(1f),
+                    placeholder = "Ej. 25 de Octubre",
+                )
+                CampoTexto(
+                    valor = form.horario,
+                    onCambio = { onCambio(form.copy(horario = it)) },
+                    etiqueta = "Horario (opcional)",
+                    modifier = Modifier.weight(1f),
+                    placeholder = "Ej. 9:00 AM - 1:00 PM",
+                )
+            }
+        }
     }
 
     CampoTexto(
@@ -385,17 +486,13 @@ fun CamposDonacion(
         maxLineas = Int.MAX_VALUE,
     )
 
-    if (esCampana) {
-        CampoTexto(
-            form.whatsapp, { onCambio(form.copy(whatsapp = it)) }, "WhatsApp para donar",
-            placeholder = "528112345678", teclado = KeyboardType.Phone,
-        )
-    } else {
-        CampoTexto(
-            form.condiciones, { onCambio(form.copy(condiciones = it)) }, "Condiciones de entrega (opcional)",
-            placeholder = "Ej. Nuevo o en buen estado",
-        )
-    }
+    CampoTexto(
+        valor = form.whatsapp,
+        onCambio = { onCambio(form.copy(whatsapp = it)) },
+        etiqueta = "WhatsApp para dudas / donar",
+        placeholder = "528112345678",
+        teclado = KeyboardType.Phone,
+    )
 }
 
 @Composable
