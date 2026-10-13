@@ -17,12 +17,9 @@ import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.LightbulbCircle
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,13 +28,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.familiasquesuman.ui.components.OpcionMenuPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.components.TarjetaActividadDestacada
 import com.example.familiasquesuman.ui.components.TarjetaComunidad
 import com.example.familiasquesuman.ui.navigation.Rutas
-import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 
@@ -101,6 +96,22 @@ private fun EstadisticaImpacto(
 fun InicioScreen(
     navController: NavHostController
 ) {
+    val navegarASeccionPrincipal: (String) -> Unit = { ruta ->
+        if (navController.currentDestination?.route != ruta) {
+            try {
+                navController.navigate(ruta) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            } catch (_: Exception) {
+                navController.navigate(ruta)
+            }
+        }
+    }
+
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.INICIO
@@ -156,7 +167,7 @@ fun InicioScreen(
                             "Directorio de Visiteo" -> Rutas.Directorio.ruta
                             else -> Rutas.Inicio.ruta
                         }
-                        navController.navigate(ruta)
+                        navegarASeccionPrincipal(ruta)
                     }
                 )
             }
@@ -165,22 +176,22 @@ fun InicioScreen(
             item {
                 TarjetaComunidad(
                     onVerComunidad = {
-                        navController.navigate(Rutas.Comunidad.ruta)
+                        navegarASeccionPrincipal(Rutas.Comunidad.ruta)
                     },
                     onChatbot = {
-                        navController.navigate(Rutas.Chatbot.ruta)
+                        navegarASeccionPrincipal(Rutas.Chatbot.ruta)
                     }
                 )
             }
 
-            //chatbot
+            // Chatbot
             item {
                 TarjetaActividadDestacada(
                     titulo = "Chatbot",
                     descripcion = "Habla con nuestro chatbot",
                     icono = Icons.Default.ChatBubble,
                     onClick = {
-                        navController.navigate(Rutas.Chatbot.ruta)
+                        navegarASeccionPrincipal(Rutas.Chatbot.ruta)
                     }
                 )
             }
