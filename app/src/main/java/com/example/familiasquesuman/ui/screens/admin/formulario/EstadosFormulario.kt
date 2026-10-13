@@ -42,8 +42,15 @@ data class ProyectoForm(
     val aceptaAportacion: Boolean = false,
 )
 
+enum class TipoDonacionAdmin(val titulo: String) {
+    MONETARIA("Campaña Monetaria"),
+    ESPECIE("En Especie"),
+    TIEMPO("Tiempo")
+}
+
 data class DonacionForm(
     val tipo: TipoDonacion = TipoDonacion.CAMPANA,
+    val tipoDonacionAdmin: TipoDonacionAdmin = TipoDonacionAdmin.MONETARIA,
     val categoria: String = "",
     val fundacion: String = "",
     val recaudado: String = "0",
@@ -51,12 +58,21 @@ data class DonacionForm(
     val descripcionLarga: String = "",
     val whatsapp: String = "",
     val condiciones: String = "",
+    // Campos dinámicos
+    val tieneMeta: Boolean = false,
+    val montosSugeridos: String = "", // Para Monetaria (ej. "100, 200, 500")
+    val articulosNecesarios: String = "", // Para Especie
+    val fechaLimite: String = "", // Para Tiempo
+    val horario: String = "", // Para Tiempo
 )
 
 /**
- * Centro de visiteo. Campos de la tabla centros_visiteo; nombre, descripción corta, dirección y
- * "activo" viajan en ComunForm (titulo, descripcionCorta, ubicacion, activa).
- * `necesidades` = filas de centro_necesidades; el orden de la lista es la columna `orden`.
+- Centro de visiteo. Campos de la tabla centros_visiteo; nombre, descripción corta, dirección y
+
+- "activo" viajan en ComunForm (titulo, descripcionCorta, ubicacion, activa).
+
+- `necesidades` = filas de centro_necesidades; el orden de la lista es la columna `orden`.
+
  */
 data class CentroForm(
     val tipo: TipoCentro = TipoCentro.ASILO,
@@ -98,13 +114,16 @@ fun Proyecto.aFormulario(): Pair<ComunForm, ProyectoForm> =
 fun Donacion.aFormulario(): Pair<ComunForm, DonacionForm> =
     ComunForm(titulo, descripcionCorta, ubicacion.orEmpty(), activa) to DonacionForm(
         tipo = tipo,
+        tipoDonacionAdmin = if (tipo == TipoDonacion.ESPECIE) TipoDonacionAdmin.ESPECIE else TipoDonacionAdmin.MONETARIA,
         categoria = categoria.orEmpty(),
         fundacion = fundacion,
         recaudado = recaudado.toInt().toString(),
         meta = meta.toInt().toString(),
+        tieneMeta = (meta.toString().toFloatOrNull() ?: 0f) > 0f,
         descripcionLarga = descripcionLarga,
         whatsapp = telefonoWhatsapp.orEmpty(),
         condiciones = condiciones.orEmpty(),
+        articulosNecesarios = condiciones.orEmpty(),
     )
 
 fun CentroVisiteo.aFormulario(): Pair<ComunForm, CentroForm> =
@@ -163,11 +182,15 @@ fun validarFormulario(
             donacion.fundacion.isBlank() -> "Indica la fundación u organización."
             donacion.categoria.isBlank() -> "Elige o crea una categoría."
             imagenes.isEmpty() -> "Agrega una imagen para la donación."
-            (donacion.meta.toFloatOrNull() ?: 0f) <= 0f -> "La meta debe ser mayor a 0."
-            (donacion.recaudado.toFloatOrNull() ?: -1f) < 0f -> "El monto recaudado no es válido."
-            donacion.tipo == TipoDonacion.ESPECIE && comun.ubicacion.isBlank() -> "Indica el centro de acopio."
-            donacion.tipo == TipoDonacion.CAMPANA && donacion.whatsapp.isBlank() -> "Indica el WhatsApp para donar."
             !telefonoValido(donacion.whatsapp) -> MSG_TELEFONO
+
+            // Validaciones dinámicas por tipo
+            donacion.tipoDonacionAdmin == TipoDonacionAdmin.MONETARIA && donacion.tieneMeta && (donacion.meta.toFloatOrNull() ?: 0f) <= 0f -> "La meta económica debe ser mayor a 0."
+            donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && donacion.articulosNecesarios.isBlank() -> "Indica los artículos requeridos."
+            donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && donacion.tieneMeta && (donacion.meta.toFloatOrNull() ?: 0f) <= 0f -> "La meta de artículos debe ser mayor a 0."
+            donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && comun.ubicacion.isBlank() -> "Indica el centro de acopio o ubicación."
+            donacion.tipoDonacionAdmin == TipoDonacionAdmin.TIEMPO && donacion.fechaLimite.isBlank() -> "Indica la fecha del evento o límite."
+            donacion.tipoDonacionAdmin == TipoDonacionAdmin.TIEMPO && comun.ubicacion.isBlank() -> "Indica la ubicación donde se requiere el apoyo."
             else -> null
         }
 
