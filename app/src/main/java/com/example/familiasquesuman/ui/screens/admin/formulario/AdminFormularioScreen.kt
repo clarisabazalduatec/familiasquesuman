@@ -87,8 +87,7 @@ fun AdminFormularioScreen(
         if (esEdicion && tipoInicial == TipoContenidoAdmin.DIRECTORIO) centrosDeEjemplo.find { it.id.toString() == id } else null
     }
 
-    // Estado del formulario. Se reinicia solo si cambia el id (no al cambiar de tipo al crear,
-    // para no perder lo que ya escribiste en título/descripción).
+    // Estado del formulario.
     var comun by remember(id) {
         mutableStateOf(
             actividadOriginal?.aFormulario()?.first
@@ -103,7 +102,7 @@ fun AdminFormularioScreen(
     var donacion by remember(id) { mutableStateOf(donacionOriginal?.aFormulario()?.second ?: DonacionForm()) }
     var centro by remember(id) { mutableStateOf(centroOriginal?.aFormulario()?.second ?: CentroForm()) }
 
-    // Las imágenes sí se limpian al cambiar de tipo (cada tipo permite distinto número de fotos).
+    // Lista de imágenes.
     val listaImagenes = remember(tipo, id) {
         mutableStateListOf<String>().apply {
             actividadOriginal?.let { addAll(it.imagenesUrl) }
@@ -197,7 +196,8 @@ fun AdminFormularioScreen(
                         tipo = tipo,
                         form = comun,
                         onCambio = { comun = it },
-                        ayudaUbicacion = if (tipo == TipoContenidoAdmin.DONACION) "Obligatoria en donaciones en especie (centro de acopio)." else null,
+                        ayudaUbicacion = if (tipo == TipoContenidoAdmin.DONACION && donacion.tipoDonacionAdmin != TipoDonacionAdmin.MONETARIA)
+                            "Obligatoria en donaciones en especie y voluntariado." else null,
                     )
 
                     SeleccionadorImagenes(
@@ -206,7 +206,6 @@ fun AdminFormularioScreen(
                         titulo = tituloFotos,
                     )
 
-                    // Este `when` es el ÚNICO lugar que conoce los cuatro tipos.
                     when (tipo) {
                         TipoContenidoAdmin.ACTIVIDAD -> CamposActividad(
                             form = actividad,
