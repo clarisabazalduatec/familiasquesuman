@@ -25,11 +25,14 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,10 +41,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.familiasquesuman.domain.EstadoProyecto
 import com.example.familiasquesuman.data.CategoriasMock
 import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.data.agregarCategoria
@@ -51,7 +57,6 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.components.SeleccionadorImagenes
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.directorio.centrosDeEjemplo
-import com.example.familiasquesuman.ui.screens.proyectos.proyectosMockData
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.ColorError
@@ -72,14 +77,21 @@ fun AdminFormularioScreen(
 ) {
     val esEdicion = id != null
     var tipo by remember(tipoInicial) { mutableStateOf(tipoInicial) }
+    val context = LocalContext.current
+    var mostrarExitoProyecto by remember { mutableStateOf(false) }
+
+    // Proyectos: se leen y guardan en el backend (los demás tipos siguen con mocks por ahora).
+    val vmProyecto: AdminProyectoViewModel = viewModel()
+    val estadoProyecto by vmProyecto.uiState.collectAsState()
+    val esEdicionProyecto = esEdicion && tipoInicial == TipoContenidoAdmin.PROYECTO
+    LaunchedEffect(id) { if (esEdicionProyecto && id != null) vmProyecto.cargar(id) }
+    LaunchedEffect(estadoProyecto.guardado) { if (estadoProyecto.guardado != null) mostrarExitoProyecto = true }
 
     // Elemento original (solo al editar). Se busca una vez por id.
     val actividadOriginal = remember(id) {
         if (esEdicion && tipoInicial == TipoContenidoAdmin.ACTIVIDAD) actividadesMockData.find { it.id == id?.toIntOrNull() } else null
     }
-    val proyectoOriginal = remember(id) {
-        if (esEdicion && tipoInicial == TipoContenidoAdmin.PROYECTO) proyectosMockData.find { it.id == id } else null
-    }
+    val proyectoOriginal = if (esEdicionProyecto) estadoProyecto.proyecto else null
     val donacionOriginal = remember(id) {
         if (esEdicion && tipoInicial == TipoContenidoAdmin.DONACION) donacionesMockData.find { it.id == id } else null
     }
@@ -88,7 +100,7 @@ fun AdminFormularioScreen(
     }
 
     // Estado del formulario.
-    var comun by remember(id) {
+    var comun by remember(id, proyectoOriginal) {
         mutableStateOf(
             actividadOriginal?.aFormulario()?.first
                 ?: proyectoOriginal?.aFormulario()?.first
@@ -98,12 +110,12 @@ fun AdminFormularioScreen(
         )
     }
     var actividad by remember(id) { mutableStateOf(actividadOriginal?.aFormulario()?.second ?: ActividadForm()) }
-    var proyecto by remember(id) { mutableStateOf(proyectoOriginal?.aFormulario()?.second ?: ProyectoForm()) }
+    var proyecto by remember(id, proyectoOriginal) { mutableStateOf(proyectoOriginal?.aFormulario()?.second ?: ProyectoForm()) }
     var donacion by remember(id) { mutableStateOf(donacionOriginal?.aFormulario()?.second ?: DonacionForm()) }
     var centro by remember(id) { mutableStateOf(centroOriginal?.aFormulario()?.second ?: CentroForm()) }
 
     // Lista de imágenes.
-    val listaImagenes = remember(tipo, id) {
+    val listaImagenes = remember(tipo, id, proyectoOriginal) {
         mutableStateListOf<String>().apply {
             actividadOriginal?.let { addAll(it.imagenesUrl) }
             proyectoOriginal?.let { p -> if (p.imagenesUrl.isNotEmpty()) addAll(p.imagenesUrl) else p.logoUrl?.let { add(it) } }
@@ -116,6 +128,21 @@ fun AdminFormularioScreen(
     var mostrarExito by remember { mutableStateOf(false) }
     var mostrarEliminar by remember { mutableStateOf(false) }
 
+    if (esEdicionProyecto && proyectoOriginal == null) {
+        Box(modifier = Modifier.fillMaxSize().background(CremaFondo), contentAlignment = Alignment.Center) {
+            val error = estadoProyecto.errorCarga
+            if (error != null) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(error, color = GrisTexto)
+                    TextButton(onClick = { id?.let { vmProyecto.cargar(it) } }) { Text("Reintentar", color = AzulMarino) }
+                }
+            } else {
+                CircularProgressIndicator(color = Ambar)
+            }
+        }
+        return
+    }
+
     if (esEdicion && actividadOriginal == null && proyectoOriginal == null && donacionOriginal == null && centroOriginal == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("No se encontró la iniciativa a editar.", color = GrisTexto)
@@ -127,14 +154,28 @@ fun AdminFormularioScreen(
         errorMensaje = validarFormulario(tipo, comun, actividad, proyecto, donacion, centro, listaImagenes)
         if (errorMensaje != null) return
 
+        if (tipo == TipoContenidoAdmin.PROYECTO) {
+            // Async: el diálogo de éxito se abre cuando el backend confirma (estadoProyecto.guardado).
+            vmProyecto.guardar(id, comun, proyecto, listaImagenes.toList(), context.contentResolver)
+            return
+        }
+
         when (tipo) {
             TipoContenidoAdmin.ACTIVIDAD -> guardarActividad(actividadOriginal, comun, actividad, listaImagenes.toList())
-            TipoContenidoAdmin.PROYECTO -> guardarProyecto(proyectoOriginal, comun, proyecto, listaImagenes.toList())
+            TipoContenidoAdmin.PROYECTO -> Unit
             TipoContenidoAdmin.DONACION -> guardarDonacion(donacionOriginal, comun, donacion, listaImagenes.toList())
             TipoContenidoAdmin.DIRECTORIO -> guardarCentro(centroOriginal, comun, centro, listaImagenes.toList())
         }
         mostrarExito = true
     }
+
+    LaunchedEffect(estadoProyecto.error) {
+        estadoProyecto.error?.let {
+            errorMensaje = it
+            vmProyecto.errorMostrado()
+        }
+    }
+    val guardandoProyecto = tipo == TipoContenidoAdmin.PROYECTO && estadoProyecto.guardando
 
     val maxFotos = if (tipo == TipoContenidoAdmin.ACTIVIDAD) 5 else 1
     val tituloFotos = when (tipo) {
@@ -190,7 +231,10 @@ fun AdminFormularioScreen(
             ) {
                 Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
 
-                    InterruptorActiva(activa = comun.activa, onCambio = { comun = comun.copy(activa = it) })
+                    // En proyectos el activo/desactivado es el "Estado del Proyecto" (ver CamposProyecto).
+                    if (tipo != TipoContenidoAdmin.PROYECTO) {
+                        InterruptorActiva(activa = comun.activa, onCambio = { comun = comun.copy(activa = it) })
+                    }
 
                     CamposComunes(
                         tipo = tipo,
@@ -239,21 +283,28 @@ fun AdminFormularioScreen(
 
                     Button(
                         onClick = { guardar() },
+                        enabled = !guardandoProyecto,
                         colors = ButtonDefaults.buttonColors(containerColor = Ambar, contentColor = AzulMarino),
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                     ) {
-                        Icon(
-                            imageVector = if (esEdicion) Icons.Default.Save else Icons.Default.AddCircle,
-                            contentDescription = null,
-                            tint = AzulMarino,
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = if (esEdicion) "Guardar Cambios" else "Publicar ${tipo.titulo}",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                        )
+                        if (guardandoProyecto) {
+                            CircularProgressIndicator(color = AzulMarino, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Guardando...", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        } else {
+                            Icon(
+                                imageVector = if (esEdicion) Icons.Default.Save else Icons.Default.AddCircle,
+                                contentDescription = null,
+                                tint = AzulMarino,
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (esEdicion) "Guardar Cambios" else "Publicar ${tipo.titulo}",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                            )
+                        }
                     }
 
                     if (esEdicion) {
@@ -274,15 +325,19 @@ fun AdminFormularioScreen(
         }
     }
 
-    if (mostrarExito) {
+    if (mostrarExito || mostrarExitoProyecto) {
         val textoExito = when {
+            tipo == TipoContenidoAdmin.PROYECTO && proyecto.estado == EstadoProyecto.ACTIVO ->
+                "El proyecto se guardó y aparece en \"Proyectos activos\"."
+            tipo == TipoContenidoAdmin.PROYECTO ->
+                "El proyecto se guardó como desactivado y aparece en \"Proyectos anteriores\"."
             esEdicion && comun.activa -> "La tarjeta ha sido actualizada y está activa en la aplicación."
             esEdicion -> "La tarjeta ha sido desactivada y se ha ocultado para los usuarios."
             comun.activa -> "La tarjeta de ${tipo.titulo.lowercase()} ha sido agregada y ya está visible para los usuarios."
             else -> "La tarjeta se guardó como desactivada: los usuarios no la verán hasta que la actives."
         }
         AlertDialog(
-            onDismissRequest = { mostrarExito = false; navController.popBackStack() },
+            onDismissRequest = { mostrarExito = false; mostrarExitoProyecto = false; navController.popBackStack() },
             icon = { Icon(Icons.Default.CheckCircle, contentDescription = null, tint = VerdeExito, modifier = Modifier.size(48.dp)) },
             title = {
                 Text(
@@ -294,7 +349,7 @@ fun AdminFormularioScreen(
             text = { Text(text = textoExito, color = GrisTexto) },
             confirmButton = {
                 Button(
-                    onClick = { mostrarExito = false; navController.popBackStack() },
+                    onClick = { mostrarExito = false; mostrarExitoProyecto = false; navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(containerColor = AzulMarino, contentColor = Color.White),
                     shape = RoundedCornerShape(12.dp),
                 ) { Text("Aceptar", fontWeight = FontWeight.Bold) }
@@ -319,8 +374,12 @@ fun AdminFormularioScreen(
                 Button(
                     onClick = {
                         mostrarEliminar = false
-                        id?.let { eliminarIniciativa(tipo, it) }
-                        navController.popBackStack()
+                        if (tipo == TipoContenidoAdmin.PROYECTO) {
+                            id?.let { vmProyecto.borrar(it) { navController.popBackStack() } }
+                        } else {
+                            id?.let { eliminarIniciativa(tipo, it) }
+                            navController.popBackStack()
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = ColorError, contentColor = Color.White),
                     shape = RoundedCornerShape(12.dp),

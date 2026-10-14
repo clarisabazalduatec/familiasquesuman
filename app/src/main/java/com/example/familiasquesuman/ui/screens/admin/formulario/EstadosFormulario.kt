@@ -31,15 +31,24 @@ data class ActividadForm(
     val acercaDe: String = "",
 )
 
+
+data class OpcionApoyoForm(
+    val titulo: String = "",
+    val descripcion: String = "",
+)
+
+
+/** ======= PROYECTO =======*/
 data class ProyectoForm(
     val estado: EstadoProyecto = EstadoProyecto.ACTIVO,
     val participantes: String = "",
     val acercaDe: String = "",
     val descripcionLarga: String = "",
+    val comoAyudar: String = "",
+    val instagram: String = "",
     val whatsapp: String = "",
     val telefono: String = "",
-    val aceptaVoluntarios: Boolean = true,
-    val aceptaAportacion: Boolean = false,
+    val opciones: List<OpcionApoyoForm> = emptyList(),
 )
 
 enum class TipoDonacionAdmin(val titulo: String) {
@@ -105,10 +114,11 @@ fun Proyecto.aFormulario(): Pair<ComunForm, ProyectoForm> =
         participantes = participantes,
         acercaDe = acercaDe,
         descripcionLarga = descripcionLarga,
+        comoAyudar = comoAyudar.orEmpty(),
+        instagram = instagramUrl.orEmpty(),
         whatsapp = telefonoWhatsapp.orEmpty(),
         telefono = telefonoLlamada.orEmpty(),
-        aceptaVoluntarios = opcionesApoyo.any { it.tipo == TipoApoyo.TIEMPO_TALENTO },
-        aceptaAportacion = opcionesApoyo.any { it.tipo == TipoApoyo.APORTACION_ECONOMICA },
+        opciones = opcionesApoyo.map { OpcionApoyoForm(titulo = it.titulo, descripcion = it.descripcion) },
     )
 
 fun Donacion.aFormulario(): Pair<ComunForm, DonacionForm> =
@@ -175,6 +185,10 @@ fun validarFormulario(
             comun.ubicacion.isBlank() -> "Indica la ubicación."
             proyecto.participantes.isBlank() -> "Indica los participantes o beneficiarios."
             !telefonoValido(proyecto.whatsapp) || !telefonoValido(proyecto.telefono) -> MSG_TELEFONO
+            proyecto.opciones.any { it.titulo.isBlank() && it.descripcion.isNotBlank() } ->
+                "Cada forma de apoyo necesita un título."
+            proyecto.instagram.isNotBlank() && !proyecto.instagram.trim().startsWith("http") ->
+                "El Instagram debe ser un enlace completo (https://instagram.com/...)."
             else -> null
         }
 
