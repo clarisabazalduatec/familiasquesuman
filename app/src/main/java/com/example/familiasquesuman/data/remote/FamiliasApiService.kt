@@ -20,6 +20,8 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import com.example.familiasquesuman.data.remote.dto.ProyectoDto
+import retrofit2.http.Query
 
 /** El token lo agrega AuthInterceptor (en RetrofitInstance); no se pasa a mano. */
 interface FamiliasApiService {
@@ -73,6 +75,12 @@ interface FamiliasApiService {
     @POST("invitaciones/{id}/rechazar")
     suspend fun rechazarInvitacion(@Path("id") id: String)
 
+    // ---------- Proyectos ----------
+    @GET("proyectos")
+    suspend fun listarProyectos(@Query("limit") limit: Int = 100): List<ProyectoDto>
+
+    @GET("proyectos/{id}")
+    suspend fun detalleProyecto(@Path("id") id: String): ProyectoDto
     // ---------- Chat ----------
     @POST("chat")
     suspend fun enviarMensajeChat(@Body entrada: ChatMensajeEntradaDto): ChatMensajeRespuestaDto

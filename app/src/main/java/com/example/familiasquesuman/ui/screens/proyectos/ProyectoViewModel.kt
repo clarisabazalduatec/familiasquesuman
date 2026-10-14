@@ -2,7 +2,14 @@ package com.example.familiasquesuman.ui.screens.proyectos
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.familiasquesuman.data.repository.ProyectoRepository
 import com.example.familiasquesuman.domain.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 val proyectosMockData = mutableStateListOf(
     Proyecto(
@@ -50,15 +57,44 @@ fun eliminarProyectoMock(id: String) {
     proyectosMockData.removeAll { it.id == id }
 }
 
-class ProyectoViewModel : ViewModel() {
+data class ProyectosUiState(
+    val cargando: Boolean = true,
+    val proyectos: List<Proyecto> = emptyList(),
+    val error: String? = null
+)
 
-    fun obtenerProyectosPorEstado(estado: EstadoProyecto): List<Proyecto> =
-        if (estado == EstadoProyecto.ACTIVO) {
-            proyectosMockData.filter { it.estado == EstadoProyecto.ACTIVO && it.activo }
-        } else {
-            proyectosMockData.filter { it.estado == EstadoProyecto.ANTERIOR || !it.activo }
+data class ProyectoDetalleUiState(
+    val cargando: Boolean = true,
+    val proyecto: Proyecto? = null,
+    val error: String? = null
+)
+
+class ProyectoViewModel(
+    private val repo: ProyectoRepository = ProyectoRepository()
+) : ViewModel() {
+
+    private val _lista = MutableStateFlow(ProyectosUiState())
+    val lista: StateFlow<ProyectosUiState> = _lista.asStateFlow()
+
+    private val _detalle = MutableStateFlow(ProyectoDetalleUiState())
+    val detalle: StateFlow<ProyectoDetalleUiState> = _detalle.asStateFlow()
+
+    /** Se llama cada vez que se abre la pantalla: si ya hay datos, se quedan visibles mientras recarga. */
+    fun cargarLista() {
+        _lista.update { it.copy(cargando = true, error = null) }
+        viewModelScope.launch {
+            repo.listar()
+                .onSuccess { proyectos -> _lista.value = ProyectosUiState(cargando = false, proyectos = proyectos) }
+                .onFailure { e -> _lista.update { it.copy(cargando = false, error = e.message) } }
         }
+    }
 
-    fun obtenerProyectoPorId(id: String): Proyecto? =
-        proyectosMockData.find { it.id == id }
+    fun cargarDetalle(id: String) {
+        _detalle.update { it.copy(cargando = true, error = null) }
+        viewModelScope.launch {
+            repo.detalle(id)
+                .onSuccess { p -> _detalle.value = ProyectoDetalleUiState(cargando = false, proyecto = p) }
+                .onFailure { e -> _detalle.update { it.copy(cargando = false, error = e.message) } }
+        }
+    }
 }
