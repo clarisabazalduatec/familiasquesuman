@@ -26,7 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.data.actividadesMockData
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
-import com.example.familiasquesuman.ui.model.SesionDemoState
+import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.actividad.components.CategoriaChip
@@ -263,7 +263,7 @@ fun ActividadDetalleScreen(navController: NavHostController, actividadId: Int) {
                     ) {
                         Button(
                             onClick = {
-                                if (SesionDemoState.tipoSesion == TipoSesion.INVITADO) {
+                                if (SesionManager.tipoSesion == TipoSesion.INVITADO) {
                                     navController.navigate(Rutas.Login.ruta) {
                                         launchSingleTop = true
                                     }

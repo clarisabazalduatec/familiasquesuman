@@ -21,6 +21,8 @@ sealed class Rutas(val ruta: String) {
     }
 
     object Login : Rutas("login")
+    object Registro : Rutas("registro")
+
     object Comunidad : Rutas("comunidad")
 
     object SobreNosotros : Rutas("sobre_nosotros")

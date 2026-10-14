@@ -28,7 +28,7 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.theme.*
 import kotlinx.coroutines.delay
 import androidx.compose.runtime.LaunchedEffect
-import com.example.familiasquesuman.ui.model.SesionDemoState
+import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.ui.navigation.Rutas
 
@@ -38,7 +38,7 @@ fun NuevaPublicacionScreen(
     navController: NavHostController,
     esOficial: Boolean = false
 ) {
-    val sesionIniciada = SesionDemoState.tipoSesion != TipoSesion.INVITADO
+    val sesionIniciada = SesionManager.tipoSesion != TipoSesion.INVITADO
     if (!sesionIniciada) { LaunchedEffect(Unit) {
             navController.navigate(Rutas.Login.ruta)
             {

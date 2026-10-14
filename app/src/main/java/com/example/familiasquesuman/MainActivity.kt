@@ -27,10 +27,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.example.familiasquesuman.data.local.OnboardingPreferences
 import com.example.familiasquesuman.ui.navigation.NavGraphFamilias
+import androidx.lifecycle.lifecycleScope
+import com.example.familiasquesuman.data.SesionManager
+import com.example.familiasquesuman.data.repository.AuthRepository
+import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        SesionManager.init(this)
+        lifecycleScope.launch { AuthRepository().validarSesionGuardada() }
         val preferencias = OnboardingPreferences(this)
         val onboardingCompletado =
             preferencias.yaCompletoOnboarding()

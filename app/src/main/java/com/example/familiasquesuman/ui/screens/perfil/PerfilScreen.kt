@@ -48,7 +48,8 @@ fun PerfilScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item { SaludoConUbicacion(
-                    nombreUsuario = "Mariana",
+                    nombreUsuario = com.example.familiasquesuman.data.SesionManager.usuario?.nombre
+                    ?.substringBefore(" ") ?: "familia",
                     ciudad = "Monterrey, NL"
                 )
             }

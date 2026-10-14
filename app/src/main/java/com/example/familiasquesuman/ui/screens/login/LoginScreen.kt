@@ -60,6 +60,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -98,10 +99,18 @@ fun LoginScreen(
     }
 
     var recordarme by remember {
-        mutableStateOf(false)
+        mutableStateOf(true)
     }
 
     val uiState by loginViewModel.uiState.collectAsState()
+    LaunchedEffect(uiState) {
+        if (uiState is LoginUiState.Exito) {
+            navController.navigate(Rutas.Inicio.ruta) {
+                popUpTo(navController.graph.id) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
 
 
     Scaffold(
@@ -496,10 +505,10 @@ fun LoginScreen(
 
             Button(
                 onClick = {
-
                     loginViewModel.iniciarSesion(
                         email,
-                        password
+                        password,
+                        recordarme
                     )
                 },
 
@@ -530,21 +539,11 @@ fun LoginScreen(
             ) {
 
                 if (
-                    uiState is
-                            LoginUiState.Cargando
+                    uiState is LoginUiState.Cargando
                 ) {
 
-                    CircularProgressIndicator(
-                        modifier =
-                            Modifier.size(20.dp),
-
-                        color =
-                            Blanco,
-
-                        strokeWidth =
-                            2.dp
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Blanco, strokeWidth = 2.dp
                     )
-
                 } else {
 
                     Text(
@@ -575,7 +574,9 @@ fun LoginScreen(
 
             OutlinedButton(
                 onClick = {
-                    /* navegar a pantalla de registro, luego */
+                    navController.navigate(Rutas.Registro.ruta) {
+                        launchSingleTop = true
+                    }
                 },
 
                 shape =
@@ -676,18 +677,9 @@ fun LoginScreen(
                 shape =
                     RoundedCornerShape(8.dp),
 
-                colors =
-                    ButtonDefaults
-                        .outlinedButtonColors(
-                            containerColor =
-                                Blanco,
-                            contentColor =
-                                AzulMarino
-                        ),
+                colors = ButtonDefaults.outlinedButtonColors(containerColor = Blanco, contentColor = AzulMarino),
 
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
+                modifier = Modifier.fillMaxWidth().height(52.dp)
             ) {
 
                 // G visual sin necesitar otro drawable
@@ -700,18 +692,14 @@ fun LoginScreen(
 
 
                 Spacer(
-                    modifier =
-                        Modifier.width(12.dp)
+                    modifier = Modifier.width(12.dp)
                 )
 
 
                 Text(
                     text = "Google",
                     color = AzulMarino,
-                    style =
-                        MaterialTheme
-                            .typography
-                            .titleMedium
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
 
@@ -726,33 +714,20 @@ fun LoginScreen(
             // =================================================
 
             Row(
-                modifier =
-                    Modifier.fillMaxWidth(),
-
-                verticalAlignment =
-                    Alignment.CenterVertically,
-
-                horizontalArrangement =
-                    Arrangement.Center
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
             ) {
 
                 Icon(
-                    imageVector =
-                        Icons.Outlined.Shield,
-
+                    imageVector = Icons.Outlined.Shield,
                     contentDescription = null,
-
-                    modifier =
-                        Modifier.size(30.dp),
-
-                    tint =
-                        AzulMarino
+                    modifier = Modifier.size(30.dp),
+                    tint = AzulMarino
                 )
 
-
                 Spacer(
-                    modifier =
-                        Modifier.width(10.dp)
+                    modifier = Modifier.width(10.dp)
                 )
 
 
@@ -760,24 +735,13 @@ fun LoginScreen(
                     text =
                         "Tu información está protegida y solo\n" +
                                 "se usa para gestionar tu participación.",
-
-                    style =
-                        MaterialTheme
-                            .typography
-                            .labelSmall,
-
-                    color =
-                        AzulMarino,
-
-                    lineHeight =
-                        15.sp
+                    style = MaterialTheme.typography.labelSmall,
+                    color = AzulMarino,
+                    lineHeight = 15.sp
                 )
             }
-
-
             Spacer(
-                modifier =
-                    Modifier.height(24.dp)
+                modifier = Modifier.height(24.dp)
             )
         }
     }

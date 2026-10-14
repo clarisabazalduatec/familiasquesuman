@@ -113,6 +113,9 @@ fun NavGraphFamilias(
         composable(Rutas.Login.ruta) {
             LoginScreen(navController = navController)
         }
+        composable(Rutas.Registro.ruta) {
+            com.example.familiasquesuman.ui.screens.login.RegistroScreen(navController = navController)
+        }
 
         // Administración
         composable(Rutas.Admin.ruta) {

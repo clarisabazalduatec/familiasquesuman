@@ -33,7 +33,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.familiasquesuman.R
-import com.example.familiasquesuman.ui.model.SesionDemoState
+import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.AzulMarino
@@ -58,7 +58,7 @@ fun PantallaPrincipalConMenu(
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val tipoSesion = SesionDemoState.tipoSesion
+    val tipoSesion = SesionManager.tipoSesion
 
     val navigateTo: (String) -> Unit = { route ->
         scope.launch { drawerState.close() }
@@ -83,9 +83,8 @@ fun PantallaPrincipalConMenu(
 
             MenuLateral(
                 tipoSesion = tipoSesion,
-                nombreUsuario = "Usuario Generico",
+                nombreUsuario = SesionManager.usuario?.nombre ?: "",
                 onChatbotClick = { navigateTo(Rutas.Chatbot.ruta) },
-                onTipoSesionChange = { nuevoTipo -> SesionDemoState.tipoSesion = nuevoTipo },
                 onInicioClick = { navigateTo(Rutas.Inicio.ruta) },
                 onActividadesClick = { navigateTo(Rutas.Actividades.ruta) },
                 onProyectosClick = { navigateTo(Rutas.Proyectos.ruta) },
@@ -96,13 +95,10 @@ fun PantallaPrincipalConMenu(
                 onContactoClick = { navigateTo(Rutas.ContactoAyuda.ruta) },
                 onPerfilClick = { navigateTo(Rutas.Perfil.ruta) },
                 onAdminClick = { navigateTo(Rutas.Admin.ruta) },
-                onIniciarSesionClick = {
-                    SesionDemoState.tipoSesion = TipoSesion.USUARIO
-                    navigateTo(Rutas.Login.ruta)
-                },
-                onCrearCuentaClick = { navigateTo(Rutas.Login.ruta) },
+                onIniciarSesionClick = { navigateTo(Rutas.Login.ruta) },
+                onCrearCuentaClick = { navigateTo(Rutas.Registro.ruta) },
                 onCerrarSesionClick = {
-                    SesionDemoState.tipoSesion = TipoSesion.INVITADO
+                    SesionManager.cerrarSesion()
                     navigateTo(Rutas.Inicio.ruta)
                 },
                 onBackClick = { scope.launch { drawerState.close() } }
