@@ -654,6 +654,14 @@ fun CamposCentro(form: CentroForm, onCambio: (CentroForm) -> Unit) {
             placeholder = "528112345678", teclado = KeyboardType.Phone,
         )
     }
-
+    CampoTexto(
+        valor = form.mapaUrl,
+        onCambio = { onCambio(form.copy(mapaUrl = it)) },
+        etiqueta = "Link de cómo llegar (opcional)",
+        placeholder = "https://maps.app.goo.gl/...",
+        ayuda = "En Google Maps: busca el lugar → Compartir → Copiar vínculo. " +
+                "Si lo dejas vacío, \"Cómo llegar\" busca la dirección.",
+        teclado = KeyboardType.Uri,
+    )
     OpcionConCheck("Centro verificado por Familias que Suman", form.verificado) { onCambio(form.copy(verificado = it)) }
 }

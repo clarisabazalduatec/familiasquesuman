@@ -56,7 +56,6 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.components.SeleccionadorImagenes
 import com.example.familiasquesuman.ui.navigation.Rutas
-import com.example.familiasquesuman.ui.screens.directorio.centrosDeEjemplo
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.ColorError
@@ -78,15 +77,21 @@ fun AdminFormularioScreen(
     val esEdicion = id != null
     var tipo by remember(tipoInicial) { mutableStateOf(tipoInicial) }
     val context = LocalContext.current
-    var mostrarExitoProyecto by remember { mutableStateOf(false) }
+    var mostrarExitoBackend by remember { mutableStateOf(false) }
 
     // Proyectos: se leen y guardan en el backend (los demás tipos siguen con mocks por ahora).
     val vmProyecto: AdminProyectoViewModel = viewModel()
     val estadoProyecto by vmProyecto.uiState.collectAsState()
     val esEdicionProyecto = esEdicion && tipoInicial == TipoContenidoAdmin.PROYECTO
     LaunchedEffect(id) { if (esEdicionProyecto && id != null) vmProyecto.cargar(id) }
-    LaunchedEffect(estadoProyecto.guardado) { if (estadoProyecto.guardado != null) mostrarExitoProyecto = true }
+    LaunchedEffect(estadoProyecto.guardado) { if (estadoProyecto.guardado != null) mostrarExitoBackend = true }
 
+    // Directorio: igual que proyectos, contra el backend.
+    val vmCentro: AdminCentroViewModel = viewModel()
+    val estadoCentro by vmCentro.uiState.collectAsState()
+    val esEdicionCentro = esEdicion && tipoInicial == TipoContenidoAdmin.DIRECTORIO
+    LaunchedEffect(id) { if (esEdicionCentro && id != null) vmCentro.cargar(id) }
+    LaunchedEffect(estadoCentro.guardado) { if (estadoCentro.guardado != null) mostrarExitoBackend = true }
     // Elemento original (solo al editar). Se busca una vez por id.
     val actividadOriginal = remember(id) {
         if (esEdicion && tipoInicial == TipoContenidoAdmin.ACTIVIDAD) actividadesMockData.find { it.id == id?.toIntOrNull() } else null
@@ -95,12 +100,10 @@ fun AdminFormularioScreen(
     val donacionOriginal = remember(id) {
         if (esEdicion && tipoInicial == TipoContenidoAdmin.DONACION) donacionesMockData.find { it.id == id } else null
     }
-    val centroOriginal = remember(id) {
-        if (esEdicion && tipoInicial == TipoContenidoAdmin.DIRECTORIO) centrosDeEjemplo.find { it.id.toString() == id } else null
-    }
+    val centroOriginal = if (esEdicionCentro) estadoCentro.centro else null
 
     // Estado del formulario.
-    var comun by remember(id, proyectoOriginal) {
+    var comun by remember(id, proyectoOriginal,centroOriginal) {
         mutableStateOf(
             actividadOriginal?.aFormulario()?.first
                 ?: proyectoOriginal?.aFormulario()?.first
@@ -112,10 +115,10 @@ fun AdminFormularioScreen(
     var actividad by remember(id) { mutableStateOf(actividadOriginal?.aFormulario()?.second ?: ActividadForm()) }
     var proyecto by remember(id, proyectoOriginal) { mutableStateOf(proyectoOriginal?.aFormulario()?.second ?: ProyectoForm()) }
     var donacion by remember(id) { mutableStateOf(donacionOriginal?.aFormulario()?.second ?: DonacionForm()) }
-    var centro by remember(id) { mutableStateOf(centroOriginal?.aFormulario()?.second ?: CentroForm()) }
+    var centro by remember(id,centroOriginal) { mutableStateOf(centroOriginal?.aFormulario()?.second ?: CentroForm()) }
 
     // Lista de imágenes.
-    val listaImagenes = remember(tipo, id, proyectoOriginal) {
+    val listaImagenes = remember(tipo, id, proyectoOriginal,centroOriginal) {
         mutableStateListOf<String>().apply {
             actividadOriginal?.let { addAll(it.imagenesUrl) }
             proyectoOriginal?.let { p -> if (p.imagenesUrl.isNotEmpty()) addAll(p.imagenesUrl) else p.logoUrl?.let { add(it) } }
@@ -128,13 +131,16 @@ fun AdminFormularioScreen(
     var mostrarExito by remember { mutableStateOf(false) }
     var mostrarEliminar by remember { mutableStateOf(false) }
 
-    if (esEdicionProyecto && proyectoOriginal == null) {
+    // Editando algo del backend que todavía no llega: cargando o error.
+    if ((esEdicionProyecto && proyectoOriginal == null) || (esEdicionCentro && centroOriginal == null)) {
         Box(modifier = Modifier.fillMaxSize().background(CremaFondo), contentAlignment = Alignment.Center) {
-            val error = estadoProyecto.errorCarga
+            val error = if (esEdicionProyecto) estadoProyecto.errorCarga else estadoCentro.errorCarga
             if (error != null) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(error, color = GrisTexto)
-                    TextButton(onClick = { id?.let { vmProyecto.cargar(it) } }) { Text("Reintentar", color = AzulMarino) }
+                    TextButton(onClick = {
+                        id?.let { if (esEdicionProyecto) vmProyecto.cargar(it) else vmCentro.cargar(it) }
+                    }) { Text("Reintentar", color = AzulMarino) }
                 }
             } else {
                 CircularProgressIndicator(color = Ambar)
@@ -159,12 +165,16 @@ fun AdminFormularioScreen(
             vmProyecto.guardar(id, comun, proyecto, listaImagenes.toList(), context.contentResolver)
             return
         }
+        if (tipo == TipoContenidoAdmin.DIRECTORIO) {
+            vmCentro.guardar(id, comun, centro, listaImagenes.toList(), context.contentResolver)
+            return
+        }
 
         when (tipo) {
             TipoContenidoAdmin.ACTIVIDAD -> guardarActividad(actividadOriginal, comun, actividad, listaImagenes.toList())
             TipoContenidoAdmin.PROYECTO -> Unit
             TipoContenidoAdmin.DONACION -> guardarDonacion(donacionOriginal, comun, donacion, listaImagenes.toList())
-            TipoContenidoAdmin.DIRECTORIO -> guardarCentro(centroOriginal, comun, centro, listaImagenes.toList())
+            TipoContenidoAdmin.DIRECTORIO -> Unit
         }
         mostrarExito = true
     }
@@ -175,7 +185,14 @@ fun AdminFormularioScreen(
             vmProyecto.errorMostrado()
         }
     }
-    val guardandoProyecto = tipo == TipoContenidoAdmin.PROYECTO && estadoProyecto.guardando
+    LaunchedEffect(estadoCentro.error) {
+        estadoCentro.error?.let {
+            errorMensaje = it
+            vmCentro.errorMostrado()
+        }
+    }
+    val guardandoBackend = (tipo == TipoContenidoAdmin.PROYECTO && estadoProyecto.guardando) ||
+            (tipo == TipoContenidoAdmin.DIRECTORIO && estadoCentro.guardando)
 
     val maxFotos = if (tipo == TipoContenidoAdmin.ACTIVIDAD) 5 else 1
     val tituloFotos = when (tipo) {
@@ -283,12 +300,12 @@ fun AdminFormularioScreen(
 
                     Button(
                         onClick = { guardar() },
-                        enabled = !guardandoProyecto,
+                        enabled = !guardandoBackend,
                         colors = ButtonDefaults.buttonColors(containerColor = Ambar, contentColor = AzulMarino),
                         shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                     ) {
-                        if (guardandoProyecto) {
+                        if (guardandoBackend) {
                             CircularProgressIndicator(color = AzulMarino, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Guardando...", fontWeight = FontWeight.Bold, fontSize = 15.sp)
@@ -325,7 +342,7 @@ fun AdminFormularioScreen(
         }
     }
 
-    if (mostrarExito || mostrarExitoProyecto) {
+    if (mostrarExito || mostrarExitoBackend) {
         val textoExito = when {
             tipo == TipoContenidoAdmin.PROYECTO && proyecto.estado == EstadoProyecto.ACTIVO ->
                 "El proyecto se guardó y aparece en \"Proyectos activos\"."
@@ -337,7 +354,7 @@ fun AdminFormularioScreen(
             else -> "La tarjeta se guardó como desactivada: los usuarios no la verán hasta que la actives."
         }
         AlertDialog(
-            onDismissRequest = { mostrarExito = false; mostrarExitoProyecto = false; navController.popBackStack() },
+            onDismissRequest = { mostrarExito = false; mostrarExitoBackend = false; navController.popBackStack() },
             icon = { Icon(Icons.Default.CheckCircle, contentDescription = null, tint = VerdeExito, modifier = Modifier.size(48.dp)) },
             title = {
                 Text(
@@ -349,7 +366,7 @@ fun AdminFormularioScreen(
             text = { Text(text = textoExito, color = GrisTexto) },
             confirmButton = {
                 Button(
-                    onClick = { mostrarExito = false; mostrarExitoProyecto = false; navController.popBackStack() },
+                    onClick = { mostrarExito = false; mostrarExitoBackend = false; navController.popBackStack() },
                     colors = ButtonDefaults.buttonColors(containerColor = AzulMarino, contentColor = Color.White),
                     shape = RoundedCornerShape(12.dp),
                 ) { Text("Aceptar", fontWeight = FontWeight.Bold) }
@@ -376,6 +393,8 @@ fun AdminFormularioScreen(
                         mostrarEliminar = false
                         if (tipo == TipoContenidoAdmin.PROYECTO) {
                             id?.let { vmProyecto.borrar(it) { navController.popBackStack() } }
+                        } else if (tipo == TipoContenidoAdmin.DIRECTORIO) {
+                            id?.let { vmCentro.borrar(it) { navController.popBackStack() } }
                         } else {
                             id?.let { eliminarIniciativa(tipo, it) }
                             navController.popBackStack()
