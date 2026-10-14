@@ -33,7 +33,6 @@ import com.example.familiasquesuman.ui.screens.notificaciones.NotificacionesScre
 import com.example.familiasquesuman.ui.screens.onboarding.OnboardingScreen
 import com.example.familiasquesuman.ui.screens.perfil.PerfilScreen
 import com.example.familiasquesuman.ui.screens.perfil.PerfilViewModel
-import com.example.familiasquesuman.ui.screens.perfil.RegistrarFamiliaScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectoDetalleScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectosScreen
 
@@ -113,6 +112,9 @@ fun NavGraphFamilias(
         composable(Rutas.Login.ruta) {
             LoginScreen(navController = navController)
         }
+        composable(Rutas.Registro.ruta) {
+            com.example.familiasquesuman.ui.screens.login.RegistroScreen(navController = navController)
+        }
 
         // Administración
         composable(Rutas.Admin.ruta) {
@@ -182,17 +184,7 @@ fun NavGraphFamilias(
             val viewModel: PerfilViewModel = viewModel(backStackEntry)
             PerfilScreen(navController = navController, viewModel = viewModel)
         }
-        composable(Rutas.RegistrarFamilia.ruta) {
-            val parentEntry = remember(navController.currentBackStackEntry) {
-                try {
-                    navController.getBackStackEntry(Rutas.Perfil.ruta)
-                } catch (_: Exception) {
-                    null
-                }
-            }
-            val viewModel: PerfilViewModel = if (parentEntry != null) viewModel(parentEntry) else viewModel()
-            RegistrarFamiliaScreen(navController = navController, viewModel = viewModel)
-        }
+
         composable(Rutas.SobreNosotros.ruta) {
             SobreNosotrosScreen(
                 navController = navController

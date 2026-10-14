@@ -21,11 +21,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
-import com.example.familiasquesuman.ui.model.SesionDemoState
 import com.example.familiasquesuman.ui.model.TipoSesion
 
 @Composable
@@ -35,7 +35,7 @@ fun PublicacionDetalleScreen(
 ) {
 
     val publicacion = buscarPublicacion(publicacionId)
-    val sesionIniciada = SesionDemoState.tipoSesion != TipoSesion.INVITADO
+    val sesionIniciada = SesionManager.tipoSesion != TipoSesion.INVITADO
 
     PantallaPrincipalConMenu(
         navController = navController,

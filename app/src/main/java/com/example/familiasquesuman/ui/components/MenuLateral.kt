@@ -82,7 +82,6 @@ import com.example.familiasquesuman.ui.theme.GrisTexto
 fun MenuLateral(
     // ESTADO DE SESIÓN
     tipoSesion: TipoSesion,
-    onTipoSesionChange: (TipoSesion) -> Unit,
     nombreUsuario: String = "María Gzz",
     @DrawableRes
     fotoPerfilRes: Int? = null,
@@ -131,8 +130,6 @@ fun MenuLateral(
             HeaderUsuario(
                 nombreUsuario = if (sesionIniciada) nombreUsuario else "Bienvenido",
                 fotoPerfilRes = fotoPerfilRes,
-                tipoSesion = tipoSesion,
-                onTipoSesionChange = { onTipoSesionChange(it) },
                 onPerfilClick = { if (sesionIniciada) onPerfilClick() },
                 onCerrarDrawer = onBackClick
             )
@@ -382,14 +379,10 @@ private fun HeaderUsuario(
     nombreUsuario: String,
     @DrawableRes
     fotoPerfilRes: Int?,
-    tipoSesion: TipoSesion,
-    onTipoSesionChange: (TipoSesion) -> Unit,
     onPerfilClick: () -> Unit,
     onCerrarDrawer: () -> Unit
 ) {
-    var mostrarSelector by remember {
-        mutableStateOf(false)
-    }
+
 
 
     Box(modifier = Modifier.fillMaxWidth()) {
@@ -430,48 +423,7 @@ private fun HeaderUsuario(
 
             Spacer(modifier = Modifier.width(16.dp))
 
-            Box(modifier = Modifier
-                .weight(1f)) {
-
-                IconButton( onClick = { mostrarSelector = true }) {
-                        Icon(
-                            imageVector = Icons.Outlined.ChevronRight,
-                            contentDescription = "Cambiar vista de sesión",
-                            tint = AzulMarino,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-
-                DropdownMenu(
-                    expanded = mostrarSelector,
-                    onDismissRequest = {
-                        mostrarSelector = false
-                    }
-                ) {
-                    OpcionTipoSesion(
-                        texto = "Sin iniciar sesión",
-                        seleccionado =
-                            tipoSesion == TipoSesion.INVITADO,
-                        onClick = { onTipoSesionChange(TipoSesion.INVITADO)
-                            mostrarSelector = false
-                        }
-                    )
-                    OpcionTipoSesion(
-                        texto = "Usuario",
-                        seleccionado = tipoSesion == TipoSesion.USUARIO,
-                        onClick = { onTipoSesionChange(TipoSesion.USUARIO)
-                            mostrarSelector = false
-                        }
-                    )
-                    OpcionTipoSesion(
-                        texto = "Administrador",
-                        seleccionado = tipoSesion == TipoSesion.ADMIN,
-                        onClick = { onTipoSesionChange(TipoSesion.ADMIN)
-                            mostrarSelector = false
-                        }
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.weight(1f))
             IconButton(
                 onClick = onCerrarDrawer,
             ) {
@@ -520,29 +472,6 @@ private fun AvatarUsuario(
     }
 }
 
-@Composable
-private fun OpcionTipoSesion(
-    texto: String,
-    seleccionado: Boolean,
-    onClick: () -> Unit
-) {
-    DropdownMenuItem(
-        text = {
-            Text(
-                text = texto,
-                style = MaterialTheme.typography.bodyMedium,
-                color = AzulMarino
-            )
-        },
-        leadingIcon = {
-            RadioButton(
-                selected = seleccionado,
-                onClick = null
-            )
-        },
-        onClick = onClick
-    )
-}
 
 @Composable
 private fun ItemMenuLateral(

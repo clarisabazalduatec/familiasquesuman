@@ -131,7 +131,8 @@ fun InicioScreen(
         ) {
             item {
                 SaludoConUbicacion(
-                    nombreUsuario = "Mariana",
+                    nombreUsuario = com.example.familiasquesuman.data.SesionManager.usuario?.nombre
+                        ?.substringBefore(" ") ?: "familia",
                     ciudad = "Monterrey, NL"
                 )
             }
