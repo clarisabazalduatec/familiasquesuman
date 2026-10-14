@@ -268,54 +268,134 @@ fun CamposActividad(
 
 @Composable
 fun CamposProyecto(form: ProyectoForm, onCambio: (ProyectoForm) -> Unit) {
+    // En proyectos, "desactivar" = pasarlo a Proyectos anteriores (sigue visible ahí).
     EtiquetaSeccion("Estado del Proyecto")
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         FilterChip(
             selected = form.estado == EstadoProyecto.ACTIVO,
             onClick = { onCambio(form.copy(estado = EstadoProyecto.ACTIVO)) },
-            label = { Text("Proyecto Activo") },
+            label = { Text("Activo") },
         )
         FilterChip(
             selected = form.estado == EstadoProyecto.ANTERIOR,
             onClick = { onCambio(form.copy(estado = EstadoProyecto.ANTERIOR)) },
-            label = { Text("Proyecto Anterior") },
+            label = { Text("Desactivado") },
         )
     }
+    Text(
+        text = if (form.estado == EstadoProyecto.ACTIVO) "Se muestra en \"Proyectos activos\"."
+        else "Se muestra en \"Proyectos anteriores\".",
+        fontSize = 11.sp,
+        color = GrisTexto,
+    )
 
     CampoTexto(
         valor = form.participantes,
         onCambio = { onCambio(form.copy(participantes = it)) },
-        etiqueta = "Participantes / Beneficiarios",
-        placeholder = "Ej. 25 Mujeres, 100 Niños",
+        etiqueta = "Personas beneficiadas",
+        placeholder = "Ej. 25 Mujeres, 1500 Bebés y mamás",
     )
     CampoTexto(
         valor = form.acercaDe,
         onCambio = { onCambio(form.copy(acercaDe = it)) },
-        etiqueta = "Acerca del Proyecto",
-        maxLineas = 2,
+        etiqueta = "Acerca del proyecto (opcional)",
+        minLineas = 2,
+        maxLineas = Int.MAX_VALUE,
     )
     CampoTexto(
         valor = form.descripcionLarga,
         onCambio = { onCambio(form.copy(descripcionLarga = it)) },
-        etiqueta = "Descripción detallada / Misión",
+        etiqueta = "Descripción (opcional)",
         minLineas = 3,
         maxLineas = Int.MAX_VALUE,
     )
+    CampoTexto(
+        valor = form.comoAyudar,
+        onCambio = { onCambio(form.copy(comoAyudar = it)) },
+        etiqueta = "¿Cómo ayudar? (opcional)",
+        ayuda = "Se muestra en un recuadro aparte en el detalle.",
+        minLineas = 2,
+        maxLineas = Int.MAX_VALUE,
+    )
 
-    EtiquetaSeccion("Formas de apoyo que se muestran en el proyecto")
-    OpcionConCheck("Tiempo y voluntariado", form.aceptaVoluntarios) { onCambio(form.copy(aceptaVoluntarios = it)) }
-    OpcionConCheck("Aportación económica", form.aceptaAportacion) { onCambio(form.copy(aceptaAportacion = it)) }
+    // ---------- Formas de apoyo (lista libre) ----------
+    EtiquetaSeccion("Formas de apoyo (opcional)")
+    Text(
+        text = "Al tocarlas, abren WhatsApp con un mensaje que menciona la opción elegida.",
+        fontSize = 11.sp,
+        color = GrisTexto,
+    )
+    form.opciones.forEachIndexed { indice, opcion ->
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            border = BorderStroke(1.dp, GrisBorde),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(modifier = Modifier.padding(start = 12.dp, end = 4.dp, top = 8.dp, bottom = 12.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Opción ${indice + 1}",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = AzulMarino,
+                        modifier = Modifier.weight(1f),
+                    )
+                    IconButton(onClick = {
+                        onCambio(form.copy(opciones = form.opciones.filterIndexed { i, _ -> i != indice }))
+                    }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Quitar opción ${indice + 1}", tint = ColorError)
+                    }
+                }
+                CampoTexto(
+                    valor = opcion.titulo,
+                    onCambio = { nuevo ->
+                        onCambio(form.copy(opciones = form.opciones.mapIndexed { i, o -> if (i == indice) o.copy(titulo = nuevo) else o }))
+                    },
+                    etiqueta = "Título",
+                    modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+                    placeholder = "Ej. Cocinando desde casa",
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                CampoTexto(
+                    valor = opcion.descripcion,
+                    onCambio = { nuevo ->
+                        onCambio(form.copy(opciones = form.opciones.mapIndexed { i, o -> if (i == indice) o.copy(descripcion = nuevo) else o }))
+                    },
+                    etiqueta = "Descripción",
+                    modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+                    minLineas = 2,
+                    maxLineas = Int.MAX_VALUE,
+                )
+            }
+        }
+    }
+    if (form.opciones.size < 10) {
+        TextButton(onClick = { onCambio(form.copy(opciones = form.opciones + OpcionApoyoForm())) }) {
+            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text("Agregar forma de apoyo", fontWeight = FontWeight.Bold)
+        }
+    }
 
+    // ---------- Contacto y redes ----------
+    EtiquetaSeccion("Contacto")
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         CampoTexto(
-            form.whatsapp, { onCambio(form.copy(whatsapp = it)) }, "WhatsApp de contacto", Modifier.weight(1f),
-            placeholder = "528112345678", teclado = KeyboardType.Phone,
+            form.whatsapp, { onCambio(form.copy(whatsapp = it)) }, "WhatsApp", Modifier.weight(1f),
+            placeholder = "5218112345678", teclado = KeyboardType.Phone,
         )
         CampoTexto(
-            form.telefono, { onCambio(form.copy(telefono = it)) }, "Teléfono de llamada", Modifier.weight(1f),
+            form.telefono, { onCambio(form.copy(telefono = it)) }, "Teléfono", Modifier.weight(1f),
             placeholder = "8112345678", teclado = KeyboardType.Phone,
         )
     }
+    CampoTexto(
+        valor = form.instagram,
+        onCambio = { onCambio(form.copy(instagram = it)) },
+        etiqueta = "Instagram (opcional)",
+        placeholder = "https://instagram.com/...",
+        teclado = KeyboardType.Uri,
+    )
 }
 
 @Composable

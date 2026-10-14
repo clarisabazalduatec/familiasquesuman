@@ -20,6 +20,14 @@ import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
+import com.example.familiasquesuman.data.remote.dto.ProyectoDto
+import retrofit2.http.Query
+import com.example.familiasquesuman.data.remote.dto.ImagenSubidaDto
+import com.example.familiasquesuman.data.remote.dto.ProyectoGuardarDto
+import okhttp3.MultipartBody
+import retrofit2.http.Multipart
+import retrofit2.http.PUT
+import retrofit2.http.Part
 
 /** El token lo agrega AuthInterceptor (en RetrofitInstance); no se pasa a mano. */
 interface FamiliasApiService {
@@ -72,6 +80,28 @@ interface FamiliasApiService {
 
     @POST("invitaciones/{id}/rechazar")
     suspend fun rechazarInvitacion(@Path("id") id: String)
+
+    // ---------- Proyectos ----------
+    @GET("proyectos")
+    suspend fun listarProyectos(@Query("limit") limit: Int = 100): List<ProyectoDto>
+
+    @GET("proyectos/{id}")
+    suspend fun detalleProyecto(@Path("id") id: String): ProyectoDto
+
+    // ---------- Admin: proyectos ----------
+    @POST("proyectos")
+    suspend fun crearProyecto(@Body datos: ProyectoGuardarDto): ProyectoDto
+
+    @PUT("proyectos/{id}")
+    suspend fun editarProyecto(@Path("id") id: String, @Body datos: ProyectoGuardarDto): ProyectoDto
+
+    @DELETE("proyectos/{id}")
+    suspend fun borrarProyecto(@Path("id") id: String)
+
+    // ---------- Admin: imágenes ----------
+    @Multipart
+    @POST("imagenes")
+    suspend fun subirImagen(@Part archivo: MultipartBody.Part): ImagenSubidaDto
 
     // ---------- Chat ----------
     @POST("chat")

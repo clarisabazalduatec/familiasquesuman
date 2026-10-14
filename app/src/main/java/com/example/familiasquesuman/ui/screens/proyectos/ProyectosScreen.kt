@@ -32,8 +32,13 @@ fun ProyectosScreen(
     var pestanaActiva by remember { mutableStateOf(EstadoProyecto.ACTIVO) }
     var textoBusqueda by remember { mutableStateOf("") }
 
-    val proyectosFiltrados = remember(pestanaActiva, textoBusqueda) {
-        viewModel.obtenerProyectosPorEstado(pestanaActiva).filter { it.activo }.filter {
+    val uiState by viewModel.lista.collectAsState()
+
+    // Recarga cada vez que se abre la pantalla (por si el admin agregó o editó algo).
+    LaunchedEffect(Unit) { viewModel.cargarLista() }
+
+    val proyectosFiltrados = remember(uiState.proyectos, pestanaActiva, textoBusqueda) {
+        uiState.proyectos.filter { it.estado == pestanaActiva }.filter {
             textoBusqueda.isBlank() ||
                     it.nombre.contains(textoBusqueda, ignoreCase = true) ||
                     it.descripcionCorta.contains(textoBusqueda, ignoreCase = true)
@@ -107,7 +112,24 @@ fun ProyectosScreen(
                 )
             }
 
-            if (proyectosFiltrados.isEmpty()) {
+            if (uiState.cargando && uiState.proyectos.isEmpty()) {
+                item {
+                    Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+            } else if (uiState.error != null && uiState.proyectos.isEmpty()) {
+                item {
+                    Column(Modifier.fillMaxWidth().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = uiState.error ?: "",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center
+                        )
+                        TextButton(onClick = { viewModel.cargarLista() }) { Text("Reintentar") }
+                    }
+                }
+            } else if (proyectosFiltrados.isEmpty()) {
                 item { EstadoVacioProyectos() }
             } else {
                 items(proyectosFiltrados) { proyecto ->

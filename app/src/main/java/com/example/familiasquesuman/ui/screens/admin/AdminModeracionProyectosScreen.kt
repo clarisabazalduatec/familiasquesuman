@@ -33,21 +33,37 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.admin.formulario.TipoContenidoAdmin
 import com.example.familiasquesuman.ui.screens.admin.formulario.eliminarIniciativa
-import com.example.familiasquesuman.ui.screens.proyectos.proyectosMockData
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.familiasquesuman.ui.screens.admin.formulario.AdminProyectoViewModel
+import com.example.familiasquesuman.ui.screens.proyectos.ProyectoViewModel
 import com.example.familiasquesuman.ui.theme.*
 
 @Composable
-fun AdminModeracionProyectosScreen(navController: NavHostController) {
+fun AdminModeracionProyectosScreen(
+    navController: NavHostController,
+    listaViewModel: ProyectoViewModel = viewModel(),
+    adminViewModel: AdminProyectoViewModel = viewModel(),
+) {
     var pestanaSeleccionada by remember { mutableIntStateOf(0) }
     var proyectoAEliminar by remember { mutableStateOf<Proyecto?>(null) }
 
-    val proyectosFiltrados = remember(pestanaSeleccionada, proyectosMockData.size) {
-        if (pestanaSeleccionada == 0) {
-            proyectosMockData.filter { it.estado == EstadoProyecto.ACTIVO && it.activo }
-        } else {
-            proyectosMockData.filter { it.estado == EstadoProyecto.ANTERIOR || !it.activo }
+    val lista by listaViewModel.lista.collectAsState()
+    val admin by adminViewModel.uiState.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    // Recarga cada vez que se abre (por ejemplo, al regresar del formulario).
+    LaunchedEffect(Unit) { listaViewModel.cargarLista() }
+    LaunchedEffect(admin.error) {
+        admin.error?.let {
+            android.widget.Toast.makeText(context, it, android.widget.Toast.LENGTH_SHORT).show()
+            adminViewModel.errorMostrado()
         }
     }
+
+    // Activo -> pestaña 1; desactivado (ANTERIOR) -> pestaña 2.
+    val activos = lista.proyectos.filter { it.estado == EstadoProyecto.ACTIVO }
+    val anteriores = lista.proyectos.filter { it.estado == EstadoProyecto.ANTERIOR }
+    val proyectosFiltrados = if (pestanaSeleccionada == 0) activos else anteriores
 
     PantallaPrincipalConMenu(
         navController = navController,
@@ -89,14 +105,31 @@ fun AdminModeracionProyectosScreen(navController: NavHostController) {
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    val countActivos = proyectosMockData.count { it.estado == EstadoProyecto.ACTIVO && it.activo }
-                    val countAnteriores = proyectosMockData.count { it.estado == EstadoProyecto.ANTERIOR || !it.activo }
-
-                    TabPill("Proyectos Activos ($countActivos)", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
-                    TabPill("Proyectos Anteriores ($countAnteriores)", pestanaSeleccionada == 1) { pestanaSeleccionada = 1 }
+                    TabPill("Proyectos Activos (${activos.size})", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
+                    TabPill("Desactivados / Anteriores (${anteriores.size})", pestanaSeleccionada == 1) { pestanaSeleccionada = 1 }
                 }
 
-                if (proyectosFiltrados.isEmpty()) {
+                if (lista.cargando && lista.proyectos.isEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator(color = Ambar)
+                    }
+                } else if (lista.error != null && lista.proyectos.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(text = lista.error ?: "", color = GrisTexto, fontSize = 14.sp)
+                        TextButton(onClick = { listaViewModel.cargarLista() }) { Text("Reintentar", color = AzulMarino) }
+                    }
+                } else if (proyectosFiltrados.isEmpty()) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -176,8 +209,8 @@ fun AdminModeracionProyectosScreen(navController: NavHostController) {
             confirmButton = {
                 Button(
                     onClick = {
-                        eliminarIniciativa(TipoContenidoAdmin.PROYECTO, proy.id)
                         proyectoAEliminar = null
+                        adminViewModel.borrar(proy.id) { listaViewModel.cargarLista() }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = ColorError, contentColor = Color.White),
                     shape = RoundedCornerShape(12.dp),

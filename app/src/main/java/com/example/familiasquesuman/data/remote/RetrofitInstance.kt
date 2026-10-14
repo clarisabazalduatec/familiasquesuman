@@ -42,6 +42,23 @@ object RetrofitInstance {
         .addInterceptor(AuthInterceptor())
         .addInterceptor(loggingInterceptor)
         .build()
+    private val SERVIDOR = BASE_URL.trimEnd('/')
+
+    /**
+     * Las imágenes subidas se guardan en el backend como ruta relativa ("/media/abc.jpg").
+     * Para mostrarlas hay que anteponer el servidor. Las URLs completas (https://...) y las
+     * fotos locales del teléfono (content://...) se dejan igual.
+     */
+    fun urlCompleta(url: String?): String? = when {
+        url.isNullOrBlank() -> null
+        url.startsWith("/") -> SERVIDOR + url
+        else -> url
+    }
+
+    /** Lo contrario: antes de mandar una URL al backend, se le quita el servidor si es nuestra. */
+    fun urlParaGuardar(url: String): String =
+        if (url.startsWith("$SERVIDOR/media/")) url.removePrefix(SERVIDOR) else url
+
 
     val api: FamiliasApiService by lazy {
         Retrofit.Builder()

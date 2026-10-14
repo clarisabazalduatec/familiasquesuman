@@ -15,8 +15,6 @@ import com.example.familiasquesuman.domain.TipoApoyo
 import com.example.familiasquesuman.domain.TipoDonacion
 import com.example.familiasquesuman.ui.screens.directorio.agregarCentroMock
 import com.example.familiasquesuman.ui.screens.directorio.centrosDeEjemplo
-import com.example.familiasquesuman.ui.screens.proyectos.agregarProyectoMock
-import com.example.familiasquesuman.ui.screens.proyectos.proyectosMockData
 import com.example.familiasquesuman.ui.theme.FondoAzulClaro
 import com.example.familiasquesuman.ui.theme.TextoAzul
 
@@ -81,51 +79,7 @@ fun guardarActividad(base: ActividadMock?, comun: ComunForm, form: ActividadForm
     }
 }
 
-fun guardarProyecto(base: Proyecto?, comun: ComunForm, form: ProyectoForm, imagenes: List<String>) {
-    val descripcion = comun.descripcionCorta.trim()
-    val acercaDe = form.acercaDe.trim().ifBlank { descripcion }
-    val descripcionLarga = form.descripcionLarga.trim().ifBlank { acercaDe }
 
-    if (base == null) {
-        agregarProyectoMock(
-            Proyecto(
-                id = System.currentTimeMillis().toString(),
-                nombre = comun.titulo.trim(),
-                logoUrl = imagenes.firstOrNull(),
-                estado = form.estado,
-                ubicacion = comun.ubicacion.trim(),
-                participantes = form.participantes.trim(),
-                descripcionCorta = descripcion,
-                acercaDe = acercaDe,
-                descripcionLarga = descripcionLarga,
-                opcionesApoyo = construirOpcionesApoyo(form, emptyList()),
-                telefonoWhatsapp = form.whatsapp.trim().ifBlank { null },
-                telefonoLlamada = form.telefono.trim().ifBlank { null },
-                imagenesUrl = imagenes,
-                activo = comun.activa,
-            ),
-        )
-    } else {
-        val index = proyectosMockData.indexOfFirst { it.id == base.id }
-        if (index == -1) return
-        val viejo = proyectosMockData[index]
-        proyectosMockData[index] = viejo.copy(
-            nombre = comun.titulo.trim(),
-            logoUrl = imagenes.firstOrNull(), // si el admin quitó la imagen, se respeta
-            estado = form.estado,
-            ubicacion = comun.ubicacion.trim(),
-            participantes = form.participantes.trim(),
-            descripcionCorta = descripcion,
-            acercaDe = acercaDe,
-            descripcionLarga = descripcionLarga,
-            opcionesApoyo = construirOpcionesApoyo(form, viejo.opcionesApoyo),
-            telefonoWhatsapp = form.whatsapp.trim().ifBlank { null },
-            telefonoLlamada = form.telefono.trim().ifBlank { null },
-            imagenesUrl = imagenes,
-            activo = comun.activa,
-        )
-    }
-}
 
 fun guardarDonacion(base: Donacion?, comun: ComunForm, form: DonacionForm, imagenes: List<String>) {
     val esCampana = form.tipo == TipoDonacion.CAMPANA
@@ -232,7 +186,7 @@ fun guardarCentro(base: CentroVisiteo?, comun: ComunForm, form: CentroForm, imag
 fun eliminarIniciativa(tipo: TipoContenidoAdmin, id: String) {
     when (tipo) {
         TipoContenidoAdmin.ACTIVIDAD -> actividadesMockData.removeAll { it.id == id.toIntOrNull() }
-        TipoContenidoAdmin.PROYECTO -> proyectosMockData.removeAll { it.id == id }
+        TipoContenidoAdmin.PROYECTO -> Unit
         TipoContenidoAdmin.DONACION -> donacionesMockData.removeAll { it.id == id }
         TipoContenidoAdmin.DIRECTORIO -> centrosDeEjemplo.removeAll { it.id.toString() == id }
     }
@@ -242,28 +196,3 @@ fun eliminarIniciativa(tipo: TipoContenidoAdmin, id: String) {
 private fun textoProgresoDonacion(tipo: TipoDonacion, cantidad: Float): String =
     if (tipo == TipoDonacion.CAMPANA) "\$${cantidad.toInt()} recaudados" else "${cantidad.toInt()} entregadas"
 
-/** Solo se crean las opciones que el admin marcó; conserva las ya escritas al editar. */
-private fun construirOpcionesApoyo(form: ProyectoForm, existentes: List<OpcionApoyo>): List<OpcionApoyo> = buildList {
-    if (form.aceptaVoluntarios) {
-        add(
-            existentes.firstOrNull { it.tipo == TipoApoyo.TIEMPO_TALENTO }
-                ?: OpcionApoyo(
-                    tipo = TipoApoyo.TIEMPO_TALENTO,
-                    titulo = "Aportación de tiempo y voluntariado",
-                    descripcion = "Súmate como voluntario activo en este proyecto.",
-                ),
-        )
-    }
-    if (form.aceptaAportacion) {
-        add(
-            existentes.firstOrNull { it.tipo == TipoApoyo.APORTACION_ECONOMICA }
-                ?: OpcionApoyo(
-                    tipo = TipoApoyo.APORTACION_ECONOMICA,
-                    titulo = "Aportación económica",
-                    descripcion = "Apoya con donativos para materiales y suministros.",
-                ),
-        )
-    }
-    // Cualquier otro tipo de apoyo que ya existiera se conserva tal cual.
-    addAll(existentes.filter { it.tipo != TipoApoyo.TIEMPO_TALENTO && it.tipo != TipoApoyo.APORTACION_ECONOMICA })
-}
