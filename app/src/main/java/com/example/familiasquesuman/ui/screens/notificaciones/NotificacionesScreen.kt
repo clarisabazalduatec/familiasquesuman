@@ -20,6 +20,14 @@ import com.example.familiasquesuman.ui.components.EstadoVacio
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
+import android.widget.Toast
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.familiasquesuman.ui.screens.perfil.InvitacionesRecibidasCard
+import com.example.familiasquesuman.ui.screens.perfil.PerfilViewModel
 
 private val notificacionesHoy = listOf(
     Notificacion("1", TipoNotificacion.PARTICIPACION, "Mateo en Reforestación...", "Tu hermano participará en la jornada \"Reforestación en Parque Central\".", "10:30 AM", leida = false),
@@ -37,9 +45,23 @@ private val notificacionesEstaSemana = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificacionesScreen(navController: NavHostController) {
-    val hayNotificaciones = notificacionesHoy.isNotEmpty() || notificacionesAyer.isNotEmpty() || notificacionesEstaSemana.isNotEmpty()
+fun NotificacionesScreen(
+    navController: NavHostController,
+    perfilViewModel: PerfilViewModel = viewModel()
+) {
+    // Invitaciones a familia reales (las demás notificaciones siguen siendo de ejemplo).
+    val perfil by perfilViewModel.uiState.collectAsState()
+    val invitaciones = perfil.invitacionesRecibidas
+    val context = LocalContext.current
+    LaunchedEffect(Unit) { perfilViewModel.cargar() }
+    LaunchedEffect(perfil.mensaje) {
+        perfil.mensaje?.let {
+            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+            perfilViewModel.mensajeMostrado()
+        }
+    }
 
+    val hayNotificaciones = invitaciones.isNotEmpty() || notificacionesHoy.isNotEmpty() || notificacionesAyer.isNotEmpty() || notificacionesEstaSemana.isNotEmpty()
     Scaffold(
         containerColor = CremaFondo,
         topBar = {
@@ -85,6 +107,16 @@ fun NotificacionesScreen(navController: NavHostController) {
                     .padding(paddingInterno)
                     .fillMaxSize(),
             ) {
+                if (invitaciones.isNotEmpty()) {
+                    item {
+                        InvitacionesRecibidasCard(
+                            invitaciones = invitaciones,
+                            guardando = perfil.guardando,
+                            onAceptar = { perfilViewModel.aceptarInvitacion(it) },
+                            onRechazar = { perfilViewModel.rechazarInvitacion(it) }
+                        )
+                    }
+                }
                 if (notificacionesHoy.isNotEmpty()) {
                     item { EncabezadoSeccion("HOY") }
                     items(notificacionesHoy) { NotificacionItem(it) }
