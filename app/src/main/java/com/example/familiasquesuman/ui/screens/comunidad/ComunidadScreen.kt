@@ -42,6 +42,7 @@ fun ComunidadScreen(
 
     var seccionSeleccionada by rememberSaveable { mutableStateOf(SeccionComunidad.OFICIAL) }
     val sesionIniciada = SesionManager.tipoSesion != TipoSesion.INVITADO
+    var mostrarFormularioOficial by rememberSaveable {   mutableStateOf(false)}
 
     PantallaPrincipalConMenu(
         navController = navController,
@@ -49,46 +50,41 @@ fun ComunidadScreen(
         navbar = false,
         backButton = true,
         onBackClick = { navController.popBackStack() }
-    ) { paddingInterno -> LazyColumn(
-            modifier = Modifier
-                .padding(paddingInterno)
+    ) { paddingInterno ->
+        Box(modifier = Modifier
                 .fillMaxSize()
-                .background(CremaFondo),
-            contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
-                top = 10.dp,
-                bottom = 24.dp
-            ),
+                .background(CremaFondo)
+        ){
+            LazyColumn(
+                modifier = Modifier
+                    .padding(paddingInterno)
+                    .fillMaxSize()
+                    .background(CremaFondo),
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 10.dp,
+                    bottom = 24.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                item { Spacer(Modifier.height(14.dp))
+                    SelectorComunidad(
+                        seleccionada = seccionSeleccionada,
+                        onSeleccionar = {
+                            seccionSeleccionada = it
+                        }
+                    )
+                }
 
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-
-            item { Spacer(Modifier.height(14.dp))
-                SelectorComunidad(
-                    seleccionada = seccionSeleccionada,
-                    onSeleccionar = {
-                        seccionSeleccionada = it
-                    }
-                )
-            }
-
-            if (seccionSeleccionada == SeccionComunidad.OFICIAL) {
-                if (esAdministrador) {
-                    item { CajaCrearPublicacion(
-                            texto = "Crear anuncio oficial",
-                            textoSecundario = "Publicar como administrador",
-                            onClick = { navController.navigate(Rutas.NuevaPublicacionOficial.ruta)
+                if (seccionSeleccionada == SeccionComunidad.OFICIAL) {
+                    items(publicacionesOficialesMock, key = { it.id }) { publicacion ->
+                        TarjetaPublicacion(
+                            publicacion = publicacion,
+                            onClick = {  navController.navigate( Rutas.DetallePublicacion.crearRuta(publicacion.id))
                             }
                         )
                     }
-                }
-
-                items(publicacionesOficialesMock, key = { it.id })
-                { publicacion -> TarjetaPublicacion(publicacion = publicacion,
-                        onClick = { navController.navigate(Rutas.DetallePublicacion.crearRuta(publicacion.id)) }
-                    )
-                }
 
             } else {
                 item { AvisoRevision() }
@@ -126,12 +122,36 @@ fun ComunidadScreen(
 
                 items(publicacionesComunidadMock, key = { it.id }) { publicacion ->
                     TarjetaPublicacion(publicacion = publicacion,
-                        onClick = { navController.navigate(Rutas.DetallePublicacion.crearRuta(publicacion.id))
+                        onClick = { navController.navigate(Rutas.DetallePublicacion.crearRuta(publicacion.id)
+                            )
                         }
                     )
                 }
             }
         }
+
+    if ( SesionManager.esAdmin &&  seccionSeleccionada == SeccionComunidad.OFICIAL) {
+        FloatingActionButton(
+            onClick = { mostrarFormularioOficial = true },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(paddingInterno)
+                .padding(end = 20.dp, bottom = 20.dp),
+            containerColor = Ambar,
+            contentColor = AzulMarino,
+            shape = CircleShape
+        ) {
+            Icon(imageVector = Icons.Outlined.Add,
+                contentDescription = "Crear aviso oficial",
+                modifier = Modifier.size(30.dp)
+                    )
+                }
+            }
+        }
+    }
+
+    if (mostrarFormularioOficial && SesionManager.esAdmin) {
+        CrearAvisoOficialSheet( onCerrar = {  mostrarFormularioOficial = false  })
     }
 }
 
