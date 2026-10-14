@@ -70,7 +70,9 @@ fun DonacionDetalleScreen(
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.DONAR
+        pantallaActual = PantallaPrincipal.DONAR,
+        backButton = true
+
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -87,19 +89,6 @@ fun DonacionDetalleScreen(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxWidth().height(200.dp)
                 )
-                IconButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .size(40.dp)
-                        .background(MaterialTheme.colorScheme.surface, CircleShape)
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver",
-                        tint = AzulMarino
-                    )
-                }
             }
 
             Column(
