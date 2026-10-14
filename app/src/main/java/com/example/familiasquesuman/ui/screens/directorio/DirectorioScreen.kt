@@ -1,5 +1,5 @@
 package com.example.familiasquesuman.ui.screens.directorio
-
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,41 +26,22 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 
-val centrosDeEjemplo = mutableStateListOf(
-    CentroVisiteo(
-        id = "1",
-        tipo = TipoCentro.ASILO,
-        nombre = "Morada del Anciano Desvalido Cadereyta",
-        descripcionCorta = "Asilo de ancianos donde se atienden 24 horas a 46 adultos mayores.",
-        informacionGeneral = "Atención a adultos mayores en abandono, soledad y falta de apoyo familiar. Se les proporciona una vida digna. Se les ofrece refugio, alimentación, atención integral y compañía.",
-        necesidades = listOf(
-            "Alimentos como: azúcar, leche, aceite, té, gelatina, mole en lata, saladitas, servilletas, ensure, jugos y frutas",
-            "Limpieza: trapeadores, cubetas, botes de basura, guantes, cloro, fabuloso, pino, jabón líquido, shampoo, desengrasantes, bolsas de basura",
-        ),
-        direccion = "Blvd Jose Maria Gonzalez #1000, Cadereyta",
-        activo = true
-    ),
-)
 
-fun agregarCentroMock(centro: CentroVisiteo) {
-    centrosDeEjemplo.add(0, centro)
-}
-
-fun eliminarCentroMock(id: String) {
-    centrosDeEjemplo.removeAll { it.id == id }
-}
-
-fun obtenerCentroPorId(id: String): CentroVisiteo? {
-    return centrosDeEjemplo.find { it.id == id } ?: centrosDeEjemplo.firstOrNull()
-}
 
 @Composable
-fun DirectorioScreen(navController: NavHostController) {
+fun DirectorioScreen(
+    navController: NavHostController,
+    viewModel: DirectorioViewModel = viewModel(),
+) {
+    val uiState by viewModel.lista.collectAsState()
     var textoBusqueda by remember { mutableStateOf("") }
     var tipoSeleccionado by remember { mutableStateOf<TipoCentro?>(null) }
 
-    val centrosFiltrados = remember(textoBusqueda, tipoSeleccionado, centrosDeEjemplo.size) {
-        centrosDeEjemplo.filter { centro ->
+    // Se recarga cada vez que se abre la pantalla (por si el admin agregó o editó centros).
+    LaunchedEffect(Unit) { viewModel.cargarLista() }
+
+    val centrosFiltrados = remember(textoBusqueda, tipoSeleccionado, uiState.centros) {
+        uiState.centros.filter { centro ->
             val coincideTipo = (tipoSeleccionado == null) || (centro.tipo == tipoSeleccionado)
             val coincideBusqueda = textoBusqueda.isBlank() ||
                     centro.nombre.contains(textoBusqueda, ignoreCase = true) ||
@@ -68,7 +49,6 @@ fun DirectorioScreen(navController: NavHostController) {
             coincideTipo && coincideBusqueda
         }
     }
-
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.DIRECTORIO,
@@ -111,7 +91,24 @@ fun DirectorioScreen(navController: NavHostController) {
                     onSeleccionado = { tipoSeleccionado = it },
                 )
             }
-            if (centrosFiltrados.isEmpty()) {
+            if (uiState.cargando && uiState.centros.isEmpty()) {
+                item {
+                    Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+            } else if (uiState.error != null && uiState.centros.isEmpty()) {
+                item {
+                    Column(Modifier.fillMaxWidth().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = uiState.error ?: "",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            textAlign = TextAlign.Center,
+                        )
+                        TextButton(onClick = { viewModel.cargarLista() }) { Text("Reintentar") }
+                    }
+                }
+            } else if (centrosFiltrados.isEmpty()) {
                 item { EstadoVacioDirectorio() }
             } else {
                 items(centrosFiltrados) { centro ->

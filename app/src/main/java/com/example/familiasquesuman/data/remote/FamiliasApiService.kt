@@ -31,6 +31,8 @@ import retrofit2.http.Multipart
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Header
+import com.example.familiasquesuman.data.remote.dto.CentroDto
+import com.example.familiasquesuman.data.remote.dto.CentroGuardarDto
 
 /** El token lo agrega AuthInterceptor (en RetrofitInstance); no se pasa a mano. */
 interface FamiliasApiService {
@@ -105,6 +107,29 @@ interface FamiliasApiService {
     @Multipart
     @POST("imagenes")
     suspend fun subirImagen(@Part archivo: MultipartBody.Part): ImagenSubidaDto
+
+    // ---------- Directorio de visiteo ----------
+    @GET("centros")
+    suspend fun listarCentros(@Query("limit") limit: Int = 100): List<CentroDto>
+
+    @GET("centros/{id}")
+    suspend fun detalleCentro(@Path("id") id: String): CentroDto
+
+    // ---------- Admin: directorio ----------
+    @GET("centros/admin")
+    suspend fun listarCentrosAdmin(): List<CentroDto>
+
+    @GET("centros/admin/{id}")
+    suspend fun detalleCentroAdmin(@Path("id") id: String): CentroDto
+
+    @POST("centros")
+    suspend fun crearCentro(@Body datos: CentroGuardarDto): CentroDto
+
+    @PUT("centros/{id}")
+    suspend fun editarCentro(@Path("id") id: String, @Body datos: CentroGuardarDto): CentroDto
+
+    @DELETE("centros/{id}")
+    suspend fun borrarCentro(@Path("id") id: String)
 
     // ---------- Chat ----------
     @POST("chat")

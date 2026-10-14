@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -37,13 +38,21 @@ import com.example.familiasquesuman.domain.TipoCentro
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.screens.admin.formulario.AdminCentroViewModel
 import com.example.familiasquesuman.ui.screens.admin.formulario.TipoContenidoAdmin
-import com.example.familiasquesuman.ui.screens.directorio.centrosDeEjemplo
-import com.example.familiasquesuman.ui.screens.directorio.eliminarCentroMock
 import com.example.familiasquesuman.ui.theme.*
 
 @Composable
-fun AdminModeracionDirectorioScreen(navController: NavHostController) {
+fun AdminModeracionDirectorioScreen(
+    navController: NavHostController,
+    viewModel: AdminCentroViewModel = viewModel(),
+) {
+    val estado by viewModel.uiState.collectAsState()
+    val centros = estado.centros
+
+    // Se recarga cada vez que se abre (al volver del formulario aparecen los cambios).
+    LaunchedEffect(Unit) { viewModel.cargarLista() }
+
     var pestanaSeleccionada by remember { mutableIntStateOf(0) } // 0 = Todos, 1 = Asilos, 2 = Casas Hogar, 3 = Comedores
     var centroAEliminar by remember { mutableStateOf<CentroVisiteo?>(null) }
 
@@ -54,17 +63,13 @@ fun AdminModeracionDirectorioScreen(navController: NavHostController) {
         else -> null
     }
 
-    val centrosFiltrados = remember(pestanaSeleccionada, centrosDeEjemplo.size) {
-        if (tipoFiltro == null) {
-            centrosDeEjemplo
-        } else {
-            centrosDeEjemplo.filter { it.tipo == tipoFiltro }
-        }
+    val centrosFiltrados = remember(pestanaSeleccionada, centros) {
+        if (tipoFiltro == null) centros else centros.filter { it.tipo == tipoFiltro }
     }
 
-    val countAsilos = centrosDeEjemplo.count { it.tipo == TipoCentro.ASILO }
-    val countCasasHogar = centrosDeEjemplo.count { it.tipo == TipoCentro.CASA_HOGAR }
-    val countComedores = centrosDeEjemplo.count { it.tipo == TipoCentro.COMEDOR }
+    val countAsilos = centros.count { it.tipo == TipoCentro.ASILO }
+    val countCasasHogar = centros.count { it.tipo == TipoCentro.CASA_HOGAR }
+    val countComedores = centros.count { it.tipo == TipoCentro.COMEDOR }
 
     PantallaPrincipalConMenu(
         navController = navController,
@@ -109,7 +114,7 @@ fun AdminModeracionDirectorioScreen(navController: NavHostController) {
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    TabPill("Todos (${centrosDeEjemplo.size})", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
+                    TabPill("Todos (${centros.size})", pestanaSeleccionada == 0) { pestanaSeleccionada = 0 }
                     TabPill("Asilos ($countAsilos)", pestanaSeleccionada == 1) { pestanaSeleccionada = 1 }
                     TabPill("Casas Hogar ($countCasasHogar)", pestanaSeleccionada == 2) { pestanaSeleccionada = 2 }
                     TabPill("Comedores ($countComedores)", pestanaSeleccionada == 3) { pestanaSeleccionada = 3 }
@@ -117,7 +122,31 @@ fun AdminModeracionDirectorioScreen(navController: NavHostController) {
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                if (centrosFiltrados.isEmpty()) {
+                // Error al borrar (el de cargar se muestra abajo en lugar de la lista)
+                estado.error?.let {
+                    Text(
+                        text = it,
+                        color = ColorError,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                }
+
+                if (estado.cargandoLista && centros.isEmpty()) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = Ambar)
+                    }
+                } else if (estado.errorLista != null && centros.isEmpty()) {
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(24.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(text = estado.errorLista ?: "", color = GrisTexto, fontSize = 14.sp)
+                        TextButton(onClick = { viewModel.cargarLista() }) { Text("Reintentar", color = AzulMarino) }
+                    }
+                } else if (centrosFiltrados.isEmpty()) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -141,7 +170,7 @@ fun AdminModeracionDirectorioScreen(navController: NavHostController) {
                                 centro = centro,
                                 onEditarClick = {
                                     navController.navigate(
-                                        Rutas.AdminEditarContenido.crearRuta(TipoContenidoAdmin.DIRECTORIO.claveRuta, centro.id.toString()),
+                                        Rutas.AdminEditarContenido.crearRuta(TipoContenidoAdmin.DIRECTORIO.claveRuta, centro.id),
                                     )
                                 },
                                 onEliminarClick = { centroAEliminar = centro },
@@ -196,7 +225,7 @@ fun AdminModeracionDirectorioScreen(navController: NavHostController) {
             confirmButton = {
                 Button(
                     onClick = {
-                        eliminarCentroMock(c.id)
+                        viewModel.borrar(c.id)
                         centroAEliminar = null
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = ColorError, contentColor = Color.White),

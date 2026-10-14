@@ -91,7 +91,9 @@ data class CentroForm(
     val recomendaciones: String = "",
     val telefono: String = "",
     val whatsapp: String = "",
+    val mapaUrl: String = "",      // link de "Cómo llegar" (Google Maps, etc.)
     val verificado: Boolean = true,
+
 )
 
 // ---------------------------------------------------------------------------
@@ -145,6 +147,7 @@ fun CentroVisiteo.aFormulario(): Pair<ComunForm, CentroForm> =
         recomendaciones = recomendaciones.orEmpty(),
         telefono = telefono.orEmpty(),
         whatsapp = whatsapp.orEmpty(),
+        mapaUrl = mapaUrl.orEmpty(),
         verificado = verificado,
     )
 
@@ -213,6 +216,8 @@ fun validarFormulario(
             centro.informacionGeneral.isBlank() -> "Agrega la información general del centro."
             centro.comoAyudar.isBlank() -> "Explica cómo se puede ayudar al centro."
             !telefonoValido(centro.telefono) || !telefonoValido(centro.whatsapp) -> MSG_TELEFONO
+            centro.mapaUrl.isNotBlank() && !centro.mapaUrl.trim().startsWith("http") ->
+                "El link de cómo llegar debe ser un enlace completo (https://maps.app.goo.gl/...)."
             else -> null
         }
     }

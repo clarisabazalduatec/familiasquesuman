@@ -9,16 +9,17 @@ enum class TipoCentro(val etiqueta: String) {
 data class CentroVisiteo(
     val id: String,
     val tipo: TipoCentro,
-    val nombre: String,
-    val activo : Boolean,
+    val nombre: String,                 // título
+    val activo: Boolean,
     val descripcionCorta: String,
-    val informacionGeneral: String,
+    val informacionGeneral: String,     // descripción larga
     val necesidades: List<String>,
-    val direccion: String,
+    val direccion: String,              // texto que se muestra bajo el título
+    val mapaUrl: String? = null,        // link de "Cómo llegar" (Google Maps, etc.)
     val logoUrl: String? = null,
-    val comoAyudar: String? = "Donación en especie. Visita a los ancianos para convivir y platicar.",
-    val recomendaciones: String? = "Hablar con anticipación para ver que actividades se recomiendan y en que horario.",
-    val telefono: String? = "8282844311",
-    val whatsapp: String? = "528282844311",
+    val comoAyudar: String? = null,
+    val recomendaciones: String? = null,
+    val telefono: String? = null,
+    val whatsapp: String? = null,
     val verificado: Boolean = true
 )
