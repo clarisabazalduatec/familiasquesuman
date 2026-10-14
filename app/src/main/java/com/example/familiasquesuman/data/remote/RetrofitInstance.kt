@@ -56,9 +56,14 @@ object RetrofitInstance {
         else -> url
     }
 
+
     /** Lo contrario: antes de mandar una URL al backend, se le quita el servidor si es nuestra. */
     fun urlParaGuardar(url: String): String =
-        if (url.startsWith("$SERVIDOR/media/")) url.removePrefix(SERVIDOR) else url
+        if (url.startsWith("$SERVIDOR/media/") || url.startsWith("$SERVIDOR/imagenes/")) {
+            url.removePrefix(SERVIDOR)
+        } else {
+            url
+        }
 
 
     val api: FamiliasApiService by lazy {

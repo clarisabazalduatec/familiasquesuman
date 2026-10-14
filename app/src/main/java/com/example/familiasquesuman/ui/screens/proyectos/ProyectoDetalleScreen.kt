@@ -82,6 +82,7 @@ fun ProyectoDetalleScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.PROYECTOS,
+        backButton = true
     ) { paddingInterno ->
         val proyecto = estado.proyecto
         when {
@@ -107,7 +108,7 @@ fun ProyectoDetalleScreen(
                     textAlign = TextAlign.Center
                 )
                 TextButton(onClick = { viewModel.cargarDetalle(proyectoId) }) { Text("Reintentar") }
-                TextButton(onClick = { navController.popBackStack() }) { Text("Volver") }
+                //TextButton(onClick = { navController.popBackStack() }) { Text("Volver") }
             }
         }
     }
@@ -127,24 +128,7 @@ private fun ContenidoDetalle(
             .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        // Botón Volver
-        TextButton(
-            onClick = onVolver,
-            modifier = Modifier.padding(bottom = 8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Volver",
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "Volver",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-        }
+
 
         // ---------- Tarjeta encabezado ----------
         Card(
