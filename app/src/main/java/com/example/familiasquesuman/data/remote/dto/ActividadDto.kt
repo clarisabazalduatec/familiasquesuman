@@ -1,5 +1,6 @@
 package com.example.familiasquesuman.data.remote.dto
 
+import com.example.familiasquesuman.data.remote.RetrofitInstance
 import com.example.familiasquesuman.domain.Actividad
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
@@ -107,6 +108,6 @@ fun ActividadDto.toDomain(): Actividad {
         acercaDe = acercaDeTexto,
         lugaresDisponibles = plazasDisponibles ?: 0,
         lugaresTotales = cupoTotal ?: 0,
-        imagenes = imagenes ?: emptyList()
+        imagenes = imagenes.orEmpty().mapNotNull { RetrofitInstance.urlCompleta(it) }
     )
 }

@@ -1,5 +1,6 @@
 package com.example.familiasquesuman.data.remote
 
+import com.example.familiasquesuman.BuildConfig
 import com.example.familiasquesuman.data.SesionManager
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -11,7 +12,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 object RetrofitInstance {
 
     // Emulador: 10.0.2.2 apunta al localhost de tu computadora.
-    private const val BASE_URL = "https://tomorrow-mumbai-faced-parameters.trycloudflare.com/"
+    private val BASE_URL = BuildConfig.API_BASE_URL
 
     /** Agrega el token a todas las peticiones; si el backend responde 401, cierra la sesión. */
     private class AuthInterceptor : Interceptor {
