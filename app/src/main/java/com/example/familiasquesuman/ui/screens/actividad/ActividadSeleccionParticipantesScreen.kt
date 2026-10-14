@@ -36,7 +36,7 @@ import com.example.familiasquesuman.ui.theme.TextoGrisActividad
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActividadSeleccionParticipantesScreen(navController: NavHostController, actividadId: Int) {
+fun ActividadSeleccionParticipantesScreen(navController: NavHostController, actividadId: String) {
     var seleccionado by remember { mutableStateOf(true) }
 
     PantallaPrincipalConMenu(
@@ -180,7 +180,7 @@ private fun ActividadSeleccionParticipantesScreenPreview() {
     FamiliasQueSumanTheme {
         ActividadSeleccionParticipantesScreen(
             navController = rememberNavController(),
-            actividadId = 1
+            actividadId = "1"
         )
     }
 }

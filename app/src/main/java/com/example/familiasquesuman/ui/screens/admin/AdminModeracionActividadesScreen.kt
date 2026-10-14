@@ -119,7 +119,7 @@ fun AdminModeracionActividadesScreen(navController: NavHostController) {
                                 },
                                 onAsistenciaClick = {
                                     navController.navigate(
-                                        Rutas.AsistenciaActividades.crearRuta(actividad.id),
+                                        Rutas.AsistenciaActividades.crearRuta(actividad.id.toString()),
                                     )
                                 },
                             )

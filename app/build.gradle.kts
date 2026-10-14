@@ -60,4 +60,11 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation("io.coil-kt:coil-compose:2.5.0")
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    // Compose UI Test trae Espresso 3.5.0, que truena en Android reciente: busca
+    // InputManager.getInstance(), que ya no existe. La 3.7.0 pide el InputManager al sistema.
+    androidTestImplementation(libs.androidx.test.espresso.core)
+    // Compose necesita una Activity vacía donde dibujar la pantalla que se prueba.
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

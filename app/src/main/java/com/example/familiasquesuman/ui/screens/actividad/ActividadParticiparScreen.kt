@@ -30,7 +30,7 @@ import com.example.familiasquesuman.ui.theme.FondoClaro
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActividadParticiparScreen(navController: NavHostController, actividadId: Int) {
+fun ActividadParticiparScreen(navController: NavHostController, actividadId: String) {
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
@@ -155,7 +155,7 @@ private fun ActividadParticiparScreenPreview() {
     FamiliasQueSumanTheme {
         ActividadParticiparScreen(
             navController = rememberNavController(),
-            actividadId = 1
+            actividadId = "1"
         )
     }
 }
