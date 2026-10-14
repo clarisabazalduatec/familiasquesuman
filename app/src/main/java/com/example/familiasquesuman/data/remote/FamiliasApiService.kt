@@ -30,6 +30,7 @@ import okhttp3.MultipartBody
 import retrofit2.http.Multipart
 import retrofit2.http.PUT
 import retrofit2.http.Part
+import retrofit2.http.Header
 
 /** El token lo agrega AuthInterceptor (en RetrofitInstance); no se pasa a mano. */
 interface FamiliasApiService {
@@ -107,10 +108,7 @@ interface FamiliasApiService {
 
     // ---------- Chat ----------
     @POST("chat")
-    suspend fun enviarMensajeChat(
-        @Header("Authorization") token: String?,
-        @Body entrada: ChatMensajeEntradaDto
-    ): ChatMensajeRespuestaDto
+    suspend fun enviarMensajeChat(@Body entrada: ChatMensajeEntradaDto): ChatMensajeRespuestaDto
 
     @GET("actividades")
     suspend fun getActividades(): List<ActividadDto>

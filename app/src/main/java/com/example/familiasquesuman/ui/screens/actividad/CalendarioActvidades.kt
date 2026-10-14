@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.familiasquesuman.data.ActividadMock
+import com.example.familiasquesuman.data.toDomain
 import com.example.familiasquesuman.ui.screens.actividad.components.LeyendaFiltros
 import com.example.familiasquesuman.ui.screens.actividad.components.TarjetaActividadDia
 import com.example.familiasquesuman.ui.theme.*
@@ -34,8 +34,8 @@ data class ActividadInscritaCalendario(val actividadId: Int, val fecha: String)
 fun CalendarioActividades(
     todasLasActividades: List<ActividadMock>,
     inscripciones: List<ActividadInscritaCalendario>,
-    onActividadClick: (Int) -> Unit,
-    onVolver: () -> Unit
+    onActividadClick: (String) -> Unit,
+    onVolver: () -> Unit = {}
 ) {
     val locale = Locale("es", "MX")
     val formatoBase = remember { SimpleDateFormat("yyyy-MM-dd", locale) }
@@ -237,10 +237,11 @@ fun CalendarioActividades(
 
             } else {
                 actividadesSeleccionadas.forEach { actividad ->
-                        TarjetaActividadDia(actividad = actividad,
-                            onActividadClick = onActividadClick
-                        )
-                    }
+                    TarjetaActividadDia(
+                        actividad = actividad.toDomain(),
+                        onActividadClick = onActividadClick
+                    )
+                }
             }
         }
         Spacer(modifier = Modifier.height(30.dp)

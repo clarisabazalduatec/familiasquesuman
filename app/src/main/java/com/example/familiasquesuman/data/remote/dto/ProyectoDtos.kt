@@ -7,12 +7,6 @@ import com.example.familiasquesuman.domain.Proyecto
 import com.example.familiasquesuman.domain.TipoApoyo
 import com.google.gson.annotations.SerializedName
 
-data class CiudadDto(
-    val id: Int,
-    val nombre: String,
-    val estado: String
-)
-
 data class OpcionApoyoDto(
     val tipo: String,
     val titulo: String,

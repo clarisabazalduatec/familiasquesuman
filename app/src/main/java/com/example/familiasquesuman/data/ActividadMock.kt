@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.familiasquesuman.domain.Actividad
 import com.example.familiasquesuman.ui.theme.FondoAzulClaro
 import com.example.familiasquesuman.ui.theme.FondoNaranja
 import com.example.familiasquesuman.ui.theme.FondoVerde
@@ -35,6 +36,22 @@ data class ActividadMock(
     val participantesAdicionales: Int,
     val imagenesUrl: List<String> = emptyList(),
     val activa: Boolean = true
+)
+
+fun ActividadMock.toDomain(): Actividad = Actividad(
+    id = id.toString(),
+    titulo = titulo,
+    descripcion = descripcion,
+    categoria = categoria,
+    fecha = fecha,
+    horario = horario,
+    ubicacion = ubicacion,
+    organizador = organizador,
+    organizadorVerificado = organizadorVerificado,
+    acercaDe = acercaDe,
+    lugaresDisponibles = lugaresDisponibles,
+    lugaresTotales = lugaresTotales,
+    imagenes = imagenesUrl
 )
 
 val actividadesMockData = mutableStateListOf(

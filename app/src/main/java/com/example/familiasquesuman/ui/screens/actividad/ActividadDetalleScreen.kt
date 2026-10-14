@@ -302,7 +302,7 @@ fun ActividadDetalleScreen(
                             ) {
                                 Button(
                                     onClick = {
-                                        if (SesionDemoState.tipoSesion == TipoSesion.INVITADO) {
+                                        if (SesionManager.tipoSesion == TipoSesion.INVITADO) {
                                             navController.navigate(Rutas.Login.ruta) {
                                                 launchSingleTop = true
                                             }
