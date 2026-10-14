@@ -24,5 +24,7 @@ data class Proyecto(
     val telefonoWhatsapp: String? = null,
     val telefonoLlamada: String? = null,
     val imagenesUrl: List<String> = emptyList(),
-    val activo: Boolean = true
+    val activo: Boolean = true,
+    val comoAyudar: String? = null,   // recuadro "¿Cómo ayudar?" (opcional)
+    val instagramUrl: String? = null  // "Síguenos en" (opcional)
 )

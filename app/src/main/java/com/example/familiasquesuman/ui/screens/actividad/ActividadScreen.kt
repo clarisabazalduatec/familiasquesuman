@@ -42,6 +42,8 @@ fun ActividadScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
+        backButton = mostrarCalendario,
+        onBackClick = { mostrarCalendario = false }
     ) { paddingValues ->
         Box(
             modifier = Modifier

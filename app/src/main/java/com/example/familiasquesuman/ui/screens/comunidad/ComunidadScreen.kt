@@ -30,7 +30,7 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
-import com.example.familiasquesuman.ui.model.SesionDemoState
+import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.model.TipoSesion
 private enum class SeccionComunidad { OFICIAL, COMUNIDAD }
 
@@ -41,7 +41,7 @@ fun ComunidadScreen(
 ) {
 
     var seccionSeleccionada by rememberSaveable { mutableStateOf(SeccionComunidad.OFICIAL) }
-    val sesionIniciada = SesionDemoState.tipoSesion != TipoSesion.INVITADO
+    val sesionIniciada = SesionManager.tipoSesion != TipoSesion.INVITADO
 
     PantallaPrincipalConMenu(
         navController = navController,
