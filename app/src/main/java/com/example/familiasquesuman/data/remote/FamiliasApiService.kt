@@ -33,6 +33,9 @@ import retrofit2.http.Part
 import retrofit2.http.Header
 import com.example.familiasquesuman.data.remote.dto.CentroDto
 import com.example.familiasquesuman.data.remote.dto.CentroGuardarDto
+import com.example.familiasquesuman.data.remote.dto.PublicacionDto
+import com.example.familiasquesuman.data.remote.dto.ComentarioDto
+import com.example.familiasquesuman.data.remote.dto.CrearComentarioRequest
 
 /** El token lo agrega AuthInterceptor (en RetrofitInstance); no se pasa a mano. */
 interface FamiliasApiService {
@@ -143,4 +146,19 @@ interface FamiliasApiService {
 
     @GET("categorias")
     suspend fun getCategorias(@Query("ambito") ambito: String? = "ACTIVIDAD"): List<CategoriaDto>
+
+
+    // ---- COMUNIDAD -----
+    @GET("comunidad") suspend fun listarPublicacionesComunidad(@Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<PublicacionDto>
+    @GET("comunidad/{id}") suspend fun detallePublicacionComunidad(@Path("id") id: String): PublicacionDto
+    @GET("comunidad/avisos") suspend fun listarAvisosOficiales(@Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<PublicacionDto>
+
+        // ---------- LIKES ----------
+    @POST("comunidad/{id}/like")  suspend fun darLikePublicacion(@Path("id") id: String)
+    @DELETE("comunidad/{id}/like") suspend fun quitarLikePublicacion(@Path("id") id: String)
+        // ---------- COMENTARIOS ----------
+    @GET("comunidad/{id}/comentarios") suspend fun obtenerComentariosPublicacion(@Path("id") id: String, @Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<ComentarioDto>
+    @POST("comunidad/{id}/comentarios") suspend fun publicarComentario(@Path("id") id: String, @Body comentario: CrearComentarioRequest): ComentarioDto
+
+
 }
