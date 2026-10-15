@@ -3,6 +3,7 @@ package com.example.familiasquesuman.data.repository
 import com.example.familiasquesuman.data.remote.RetrofitInstance
 import com.example.familiasquesuman.data.remote.dto.ChatMensajeEntradaDto
 import com.example.familiasquesuman.data.remote.dto.ChatTurnoDto
+import com.example.familiasquesuman.domain.EnlaceChat
 import com.example.familiasquesuman.domain.MensajeChat
 
 class ChatRepository {
@@ -16,7 +17,10 @@ class ChatRepository {
             Result.success(
                 MensajeChat(
                     contenido = respuestaDto.respuesta,
-                    esDelUsuario = false
+                    esDelUsuario = false,
+                    enlaces = respuestaDto.enlaces.orEmpty().map {
+                        EnlaceChat(tipo = it.tipo, id = it.id, titulo = it.titulo)
+                    }
                 )
             )
         } catch (e: Exception) {

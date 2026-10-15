@@ -8,4 +8,10 @@ data class ChatMensajeEntradaDto(
     val historial: List<ChatTurnoDto> = emptyList()
 )
 
-data class ChatMensajeRespuestaDto(val respuesta: String)
+/** tipo = "actividad", "proyecto", "donacion" o "centro". */
+data class ChatEnlaceDto(val tipo: String, val id: String, val titulo: String)
+
+data class ChatMensajeRespuestaDto(
+    val respuesta: String,
+    val enlaces: List<ChatEnlaceDto>? = null
+)

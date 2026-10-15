@@ -14,7 +14,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -42,6 +41,7 @@ import com.example.familiasquesuman.domain.OpcionApoyo
 import com.example.familiasquesuman.domain.Proyecto
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
@@ -79,16 +79,27 @@ fun ProyectoDetalleScreen(
     val estado by viewModel.detalle.collectAsState()
     LaunchedEffect(proyectoId) { viewModel.cargarDetalle(proyectoId) }
 
+    val irAProyectos = {
+        if (navController.currentDestination?.route != Rutas.Proyectos.ruta) {
+            navController.navigate(Rutas.Proyectos.ruta) {
+                popUpTo(Rutas.Proyectos.ruta) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
+    }
+
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.PROYECTOS,
-        backButton = true
+        backButton = true,
+        onBackClick = irAProyectos
     ) { paddingInterno ->
         val proyecto = estado.proyecto
         when {
             proyecto != null -> ContenidoDetalle(
                 proyecto = proyecto,
-                onVolver = { navController.popBackStack() },
                 modifier = Modifier.padding(paddingInterno)
             )
 
@@ -108,7 +119,7 @@ fun ProyectoDetalleScreen(
                     textAlign = TextAlign.Center
                 )
                 TextButton(onClick = { viewModel.cargarDetalle(proyectoId) }) { Text("Reintentar") }
-                //TextButton(onClick = { navController.popBackStack() }) { Text("Volver") }
+                TextButton(onClick = irAProyectos) { Text("Volver a Proyectos") }
             }
         }
     }
@@ -117,7 +128,6 @@ fun ProyectoDetalleScreen(
 @Composable
 private fun ContenidoDetalle(
     proyecto: Proyecto,
-    onVolver: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
