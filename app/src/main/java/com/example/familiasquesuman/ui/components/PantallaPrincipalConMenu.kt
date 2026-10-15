@@ -2,11 +2,9 @@ package com.example.familiasquesuman.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -15,13 +13,11 @@ import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -64,15 +60,35 @@ fun PantallaPrincipalConMenu(
         scope.launch { drawerState.close() }
         if (navController.currentDestination?.route != route) {
             try {
-                navController.navigate(route) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
+                when (route) {
+                    Rutas.Inicio.ruta -> {
+                        navController.navigate(Rutas.Inicio.ruta) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     }
-                    launchSingleTop = true
-                    restoreState = true
+                    Rutas.Chatbot.ruta -> {
+                        navController.navigate(route) {
+                            popUpTo(Rutas.Chatbot.ruta) {
+                                inclusive = false
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                    else -> {
+                        navController.navigate(route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 }
             } catch (_: Exception) {
-                // Previene bloqueos por toques rápidos durante animaciones
+                navController.navigate(route)
             }
         }
     }
@@ -158,7 +174,22 @@ fun PantallaPrincipalConMenu(
             },
             floatingActionButton = {if (chatbot) {
                 FloatingActionButton(
-                    onClick = { navController.navigate(Rutas.Chatbot.ruta) { launchSingleTop = true } },
+                    onClick = {
+                        if (navController.currentDestination?.route != Rutas.Chatbot.ruta) {
+                            try {
+                                navController.navigate(Rutas.Chatbot.ruta) {
+                                    popUpTo(Rutas.Chatbot.ruta) {
+                                        inclusive = false
+                                    }
+                                    launchSingleTop = true
+                                }
+                            } catch (_: Exception) {
+                                navController.navigate(Rutas.Chatbot.ruta) {
+                                    launchSingleTop = true
+                                }
+                            }
+                        }
+                    },
                     containerColor = AzulMarino,
                     contentColor = Color.White,
                     modifier = Modifier.size(68.dp)
@@ -188,12 +219,32 @@ fun PantallaPrincipalConMenu(
                                 }
                             if (navController.currentDestination?.route != ruta) {
                                 try {
-                                    navController.navigate(ruta) {
-                                        popUpTo(navController.graph.startDestinationId) {
-                                            saveState = true
+                                    when (ruta) {
+                                        Rutas.Inicio.ruta -> {
+                                            navController.navigate(Rutas.Inicio.ruta) {
+                                                popUpTo(navController.graph.startDestinationId) {
+                                                    inclusive = true
+                                                }
+                                                launchSingleTop = true
+                                            }
                                         }
-                                        launchSingleTop = true
-                                        restoreState = true
+                                        Rutas.Chatbot.ruta -> {
+                                            navController.navigate(ruta) {
+                                                popUpTo(Rutas.Chatbot.ruta) {
+                                                    inclusive = false
+                                                }
+                                                launchSingleTop = true
+                                            }
+                                        }
+                                        else -> {
+                                            navController.navigate(ruta) {
+                                                popUpTo(navController.graph.startDestinationId) {
+                                                    saveState = true
+                                                }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
+                                        }
                                     }
                                 } catch (_: Exception) {
                                     // Previene bloqueos por toques rápidos durante animaciones

@@ -1,5 +1,5 @@
 package com.example.familiasquesuman.ui.screens.chatbot
-
+import com.example.familiasquesuman.domain.EnlaceChat
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -54,8 +54,15 @@ fun ChatbotScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.weight(1f).fillMaxWidth()
                 ) {
+                    // reverseLayout: el primer item es el de hasta abajo
+                    if (estaEnviando) {
+                        item(key = "pensando") { BurbujaPensando() }
+                    }
                     items(mensajes.reversed()) { mensaje ->
-                        BurbujaMensaje(mensaje = mensaje)
+                        BurbujaMensaje(
+                            mensaje = mensaje,
+                            onEnlaceClick = { enlace -> navController.navigate(rutaDeEnlace(enlace)) },
+                        )
                     }
                 }
 
@@ -73,6 +80,16 @@ fun ChatbotScreen(
         }
     }
 
+/** A qué pantalla lleva cada botón que pone el asistente bajo su respuesta. */
+private fun rutaDeEnlace(enlace: EnlaceChat): String = when (enlace.tipo) {
+    "actividad" -> Rutas.ActividadDetalle.crearRuta(enlace.id)
+    "proyecto" -> Rutas.ProyectoDetalle.crearRuta(enlace.id)
+    "centro" -> Rutas.DirectorioDetalle.crearRuta(enlace.id)
+    // Donaciones todavía usa datos de prueba en la app: se abre la sección.
+    // Cuando se conecte al backend, cambiar por "detalle_donacion/${enlace.id}".
+    "donacion" -> Rutas.Donar.ruta
+    else -> Rutas.Inicio.ruta
+}
 
 @Preview(showBackground = true)
 @Composable
