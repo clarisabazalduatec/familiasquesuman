@@ -1,6 +1,8 @@
 package com.example.familiasquesuman.data.remote
 
 import com.example.familiasquesuman.data.remote.dto.ActividadDto
+import com.example.familiasquesuman.data.remote.dto.ActividadGuardarDto
+import com.example.familiasquesuman.data.remote.dto.CategoriaCrearDto
 import com.example.familiasquesuman.data.remote.dto.CategoriaDto
 import com.example.familiasquesuman.data.remote.dto.ChatMensajeEntradaDto
 import com.example.familiasquesuman.data.remote.dto.ChatMensajeRespuestaDto
@@ -161,4 +163,22 @@ interface FamiliasApiService {
     @POST("comunidad/{id}/comentarios") suspend fun publicarComentario(@Path("id") id: String, @Body comentario: CrearComentarioRequest): ComentarioDto
 
 
+    // ---------- Admin: actividades ----------
+    @GET("actividades/admin")
+    suspend fun listarActividadesAdmin(@Query("limit") limit: Int = 100): List<ActividadDto>
+
+    @GET("actividades/admin/{id}")
+    suspend fun detalleActividadAdmin(@Path("id") id: String): ActividadDto
+
+    @POST("actividades")
+    suspend fun crearActividad(@Body datos: ActividadGuardarDto): ActividadDto
+
+    @PUT("actividades/{id}")
+    suspend fun editarActividad(@Path("id") id: String, @Body datos: ActividadGuardarDto): ActividadDto
+
+    @DELETE("actividades/{id}")
+    suspend fun borrarActividad(@Path("id") id: String)
+
+    @POST("categorias")
+    suspend fun crearCategoria(@Body datos: CategoriaCrearDto): CategoriaDto
 }

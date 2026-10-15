@@ -22,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.familiasquesuman.data.remote.dto.CategoriaDto
 
 /**
  * Chips de categorías (en varias líneas si no caben) + un chip "Nueva" para crear otra.
@@ -51,6 +52,51 @@ fun SelectorCategoria(
                     selected = categoria == seleccionada,
                     onClick = { onSeleccionar(categoria) },
                     label = { Text(categoria) },
+                )
+            }
+            AssistChip(
+                onClick = { mostrarDialogo = true },
+                label = { Text("Nueva") },
+                leadingIcon = { Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp)) },
+            )
+        }
+    }
+
+    if (mostrarDialogo) {
+        DialogoNuevaCategoria(
+            onConfirmar = {
+                onNuevaCategoria(it)
+                mostrarDialogo = false
+            },
+            onCancelar = { mostrarDialogo = false },
+        )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun SelectorCategoriaDto(
+    categorias: List<CategoriaDto>,
+    seleccionadaId: Int?,
+    onSeleccionar: (CategoriaDto) -> Unit,
+    onNuevaCategoria: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    titulo: String = "Categoría",
+) {
+    var mostrarDialogo by remember { mutableStateOf(false) }
+
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            text = titulo,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            categorias.forEach { categoria ->
+                FilterChip(
+                    selected = categoria.id == seleccionadaId,
+                    onClick = { onSeleccionar(categoria) },
+                    label = { Text(categoria.nombre) },
                 )
             }
             AssistChip(

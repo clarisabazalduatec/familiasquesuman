@@ -38,6 +38,10 @@ fun ActividadScreen(
 ) {
     var mostrarCalendario by remember { mutableStateOf(value = false) }
 
+    LaunchedEffect(Unit) {
+        viewModel.cargarActividades()
+    }
+
     val uiState by viewModel.uiState.collectAsState()
     val categoriaSeleccionada by viewModel.categoriaSeleccionada.collectAsState()
     val categorias by viewModel.categorias.collectAsState()
