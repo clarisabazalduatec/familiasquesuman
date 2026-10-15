@@ -12,11 +12,14 @@ data class ComentarioUi(
     val autor: String,
     val tiempo: String,
     val comentario: String,
-    val likes: Int = 0
+    val likes: Int = 0,
+    val numeroComentarios: Int = 0,
+    val meGusta: Boolean = false,
 )
 
 
 data class PublicacionComunidadUi(
+
     val id: String,
     val tipo: TipoPublicacion,
     val autor: String,
@@ -27,8 +30,10 @@ data class PublicacionComunidadUi(
 
     @DrawableRes
     val imagenRes: Int? = null,
+    val imagenUrl: String? = null,
     val numeroLikes: Int = 0,
     val numeroComentarios: Int = 0,
+    val meGusta: Boolean = false,
     val fechaEvento: String? = null,
     val horarioEvento: String? = null,
     val ubicacion: String? = null,
