@@ -1,5 +1,7 @@
 package com.example.familiasquesuman.domain
 
+import java.util.Date
+
 data class Actividad(
     val id: String,
     val titulo: String,
@@ -13,5 +15,9 @@ data class Actividad(
     val acercaDe: String,
     val lugaresDisponibles: Int,
     val lugaresTotales: Int,
-    val imagenes: List<String> = emptyList()
+    val imagenes: List<String> = emptyList(),
+    val iniciaEn: Date? = null,
+    val terminaEn: Date? = null,
+    val activa: Boolean = true,
+    val categoriaId: Int? = null
 )
