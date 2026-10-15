@@ -1,5 +1,10 @@
 package com.example.familiasquesuman.data.remote
 
+import com.example.familiasquesuman.data.remote.dto.AsistenciaGuardarDto
+import com.example.familiasquesuman.data.remote.dto.InscripcionAdminDto
+import com.example.familiasquesuman.data.remote.dto.InscripcionDto
+import com.example.familiasquesuman.data.remote.dto.InscripcionGuardarDto
+import com.example.familiasquesuman.data.remote.dto.MiInscripcionDto
 import com.example.familiasquesuman.data.remote.dto.ActividadDto
 import com.example.familiasquesuman.data.remote.dto.ActividadGuardarDto
 import com.example.familiasquesuman.data.remote.dto.CategoriaCrearDto
@@ -181,4 +186,31 @@ interface FamiliasApiService {
 
     @POST("categorias")
     suspend fun crearCategoria(@Body datos: CategoriaCrearDto): CategoriaDto
+
+    // ---------- Inscripciones ----------
+    // Familia:
+    @POST("actividades/{id}/inscripcion")
+    suspend fun inscribirActividad(@Path("id") id: String, @Body datos: InscripcionGuardarDto): InscripcionDto
+
+    @PUT("actividades/{id}/inscripcion")
+    suspend fun modificarInscripcionActividad(@Path("id") id: String, @Body datos: InscripcionGuardarDto): InscripcionDto
+
+    @GET("actividades/{id}/inscripcion")
+    suspend fun miInscripcionActividad(@Path("id") id: String): InscripcionDto
+
+    @DELETE("actividades/{id}/inscripcion")
+    suspend fun cancelarInscripcionActividad(@Path("id") id: String)
+
+    @GET("familias/mia/inscripciones")
+    suspend fun misInscripcionesFamilia(): List<MiInscripcionDto>
+
+    // Admin:
+    @GET("actividades/{id}/inscripciones")
+    suspend fun listarInscripcionesAdmin(@Path("id") id: String): List<InscripcionAdminDto>
+
+    @PUT("actividades/{id}/asistencia")
+    suspend fun guardarAsistenciaAdmin(@Path("id") id: String, @Body datos: AsistenciaGuardarDto): List<InscripcionAdminDto>
+
+    @DELETE("actividades/{id}/inscripciones/{inscripcionId}")
+    suspend fun borrarInscripcionAdmin(@Path("id") id: String, @Path("inscripcionId") inscripcionId: Any)
 }

@@ -39,13 +39,16 @@ import com.example.familiasquesuman.ui.theme.*
 fun ActividadConfirmacionScreen(
     navController: NavHostController,
     actividadId: String,
-    viewModel: ActividadViewModel = viewModel()
+    viewModel: ActividadViewModel = viewModel(),
+    inscripcionViewModel: InscripcionViewModel = viewModel()
 ) {
     LaunchedEffect(actividadId) {
         viewModel.cargarDetalle(actividadId)
+        inscripcionViewModel.cargar(actividadId)
     }
 
     val detalleState by viewModel.detalleUiState.collectAsState()
+    val inscripcionState by inscripcionViewModel.uiState.collectAsState()
 
     val regresarAlDetalle = {
         val rutaDetalle = Rutas.ActividadDetalle.crearRuta(actividadId)
@@ -67,7 +70,7 @@ fun ActividadConfirmacionScreen(
         navbar = false,
         chatbot = false,
         backButton = true,
-        onBackClick = regresarAlDetalle
+        onBackClick = { regresarAlDetalle() }
     ) { paddingValues ->
         when (val state = detalleState) {
             is ActividadDetalleUiState.Cargando -> {
@@ -102,6 +105,8 @@ fun ActividadConfirmacionScreen(
             }
             is ActividadDetalleUiState.Exito -> {
                 val actividad = state.actividad
+                val inscripcion = inscripcionState.inscripcionActual
+                val participantes = inscripcion?.participantes ?: emptyList()
                 val scrollState = rememberScrollState()
 
                 Column(
@@ -213,17 +218,26 @@ fun ActividadConfirmacionScreen(
                                 Column {
                                     Text("Participantes", color = TextoGrisActividad, fontSize = 12.sp)
                                     Spacer(modifier = Modifier.height(8.dp))
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(24.dp)
-                                                .background(Color.LightGray, CircleShape),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(Icons.Default.Person, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                                    if (participantes.isEmpty()) {
+                                        Text("Cargando integrantes...", color = AzulOscuro, fontSize = 14.sp)
+                                    } else {
+                                        participantes.forEach { p ->
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                modifier = Modifier.padding(vertical = 4.dp)
+                                            ) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(24.dp)
+                                                        .background(Color.LightGray, CircleShape),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Icon(Icons.Default.Person, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                                                }
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(p.nombre ?: "", color = AzulOscuro, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                                            }
                                         }
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Text("Tú", color = AzulOscuro, fontSize = 14.sp)
                                     }
                                 }
                             }
@@ -246,7 +260,13 @@ fun ActividadConfirmacionScreen(
                         ) {
                             Icon(Icons.Default.Groups, contentDescription = null, tint = AmarilloOscuro)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("1 asistente confirmado", color = AzulOscuro, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            val cantidad = participantes.size
+                            Text(
+                                text = if (cantidad == 1) "1 asistente confirmado" else "$cantidad asistentes confirmados",
+                                color = AzulOscuro,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
                         }
                     }
 
@@ -254,7 +274,7 @@ fun ActividadConfirmacionScreen(
 
                     Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                         Button(
-                            onClick = { /*TODO*/ },
+                            onClick = { /* Calendario */ },
                             colors = ButtonDefaults.buttonColors(containerColor = AmarilloOscuro),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
