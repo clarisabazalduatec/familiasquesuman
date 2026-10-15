@@ -8,6 +8,7 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
 
@@ -39,7 +40,12 @@ object RetrofitInstance {
         level = HttpLoggingInterceptor.Level.BODY
     }
 
+    // El chatbot puede tardar más de 10 s (consulta la base y llama a Gemini dos veces),
+    // así que se espera hasta 60 s la respuesta.
     private val okHttpClient = OkHttpClient.Builder()
+        .connectTimeout(15, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
         .addInterceptor(AuthInterceptor())
         .addInterceptor(loggingInterceptor)
         .build()
