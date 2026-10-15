@@ -16,7 +16,7 @@ class ChatViewModel(
     private val _mensajes = MutableStateFlow(
         listOf(
             MensajeChat(
-                contenido = "¡Hola! Soy tu asistente. Estoy aquí para ayudarte a encontrar proyectos, organizar tu voluntariado o resolver dudas.",
+                contenido = "Asistente de Familias que Suman. Consulta actividades, proyectos, donaciones y centros del directorio, o resuelve dudas sobre la app.",
                 esDelUsuario = false
             )
         )
