@@ -129,7 +129,7 @@ fun PerfilScreen(
                 item { MisInsigniasCard() }
             }
             if (seccionSeleccionada == SeccionPerfil.ACTIVIDADES) {
-                item {  MisActividadesPerfil() }
+                item { MisActividadesPerfil(navController = navController) }
             }
             }
         }
