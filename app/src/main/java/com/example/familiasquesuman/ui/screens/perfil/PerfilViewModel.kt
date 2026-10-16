@@ -135,6 +135,7 @@ class PerfilViewModel(
         _uiState.update { it.copy(subiendoFoto = true, dialogo = null) }
         viewModelScope.launch {
             val resultado = accion()
+            if (resultado.isSuccess) recargarEnSilencio()
             _uiState.update {
                 it.copy(
                     subiendoFoto = false,

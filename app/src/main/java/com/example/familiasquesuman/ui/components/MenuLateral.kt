@@ -76,7 +76,7 @@ import com.example.familiasquesuman.ui.theme.Blanco
 import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.GrisBorde
 import com.example.familiasquesuman.ui.theme.GrisTexto
-
+import com.example.familiasquesuman.data.SesionManager
 
 @Composable
 fun MenuLateral(
@@ -444,14 +444,14 @@ private fun AvatarUsuario(
     @DrawableRes
     fotoPerfilRes: Int?
 ) {
-    Box(
-        modifier = Modifier
-            .size(58.dp)
-            .clip(CircleShape)
-            .background(AmbarClaro),
-        contentAlignment = Alignment.Center
-    ) {
-        if (fotoPerfilRes != null) {
+    if (fotoPerfilRes != null) {
+        Box(
+            modifier = Modifier
+                .size(58.dp)
+                .clip(CircleShape)
+                .background(AmbarClaro),
+            contentAlignment = Alignment.Center
+        ) {
             Image(
                 painter = painterResource(
                     id = fotoPerfilRes
@@ -460,15 +460,15 @@ private fun AvatarUsuario(
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-
-        } else {
-            Icon(
-                imageVector = Icons.Outlined.Person,
-                contentDescription = null,
-                tint = AzulMarino,
-                modifier = Modifier.size(34.dp)
-            )
         }
+    } else {
+        // Foto de la sesión (o iniciales). Invitado: sin nombre -> ícono de persona.
+        val usuario = if (SesionManager.estaAutenticado) SesionManager.usuario else null
+        FotoPerfil(
+            fotoUrl = usuario?.fotoUrl,
+            nombre = usuario?.nombre,
+            tamano = 58.dp
+        )
     }
 }
 
