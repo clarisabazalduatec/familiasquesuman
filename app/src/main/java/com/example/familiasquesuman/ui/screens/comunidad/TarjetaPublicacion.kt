@@ -20,7 +20,7 @@ import com.example.familiasquesuman.ui.theme.*
 import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.data.repository.ComunidadRepository
 import kotlinx.coroutines.launch
-
+import com.example.familiasquesuman.ui.components.FotoPerfil
 @Composable
 fun TarjetaPublicacion(publicacion: PublicacionComunidadUi, onClick: () -> Unit, modifier: Modifier = Modifier, onRequiereLogin: () -> Unit = {}) {
     if (publicacion.tipo == TipoPublicacion.OFICIAL) {
@@ -130,17 +130,11 @@ private fun TarjetaPublicacionComunidad(publicacion: PublicacionComunidadUi, onC
                 ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Surface(modifier = Modifier.size(42.dp),
-                    shape = CircleShape,
-                    color = AmbarClaro
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(imageVector = Icons.Outlined.Person,
-                            contentDescription = null,
-                            tint = AzulMarino
-                        )
-                    }
-                }
+                FotoPerfil(
+                    fotoUrl = publicacion.autorFotoUrl,
+                    nombre = publicacion.autor,
+                    tamano = 42.dp
+                )
                 Spacer(Modifier.width(9.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = publicacion.autor,

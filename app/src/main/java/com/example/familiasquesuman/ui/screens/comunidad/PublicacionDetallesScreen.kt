@@ -29,7 +29,7 @@ import com.example.familiasquesuman.ui.theme.*
 import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.data.repository.ComunidadRepository
 import kotlinx.coroutines.launch
-
+import com.example.familiasquesuman.ui.components.FotoPerfil
 @Composable
 fun PublicacionDetalleScreen(navController: NavHostController, publicacionId: String){
     val repository = remember { ComunidadRepository() }
@@ -317,18 +317,11 @@ private fun DetalleComunidad(
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
-                    Surface(modifier = Modifier.size(42.dp),
-                        shape = CircleShape,
-                        color = AmbarClaro
-                    ) {
-                        Box(contentAlignment = Alignment.Center
-                        ) {
-                            Icon(imageVector = Icons.Outlined.Person,
-                                contentDescription = null,
-                                tint = AzulMarino
-                            )
-                        }
-                    }
+                    FotoPerfil(
+                        fotoUrl = publicacion.autorFotoUrl,
+                        nombre = publicacion.autor,
+                        tamano = 42.dp
+                    )
                     Spacer(modifier = Modifier.width(10.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(text = publicacion.autor,
@@ -485,17 +478,11 @@ private fun DetalleComunidad(
         items(items = comentarios) { item ->
             Row(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp)
             ) {
-                Surface(modifier = Modifier.size(38.dp),
-                    shape = CircleShape,
-                    color = AmbarClaro
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(imageVector = Icons.Outlined.Person,
-                            contentDescription = null,
-                            tint = AzulMarino
-                        )
-                    }
-                }
+                FotoPerfil(
+                    fotoUrl = item.autorFotoUrl,
+                    nombre = item.autor,
+                    tamano = 38.dp
+                )
                 Spacer(modifier = Modifier.width(10.dp))
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
