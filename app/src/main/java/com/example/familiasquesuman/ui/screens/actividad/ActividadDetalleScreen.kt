@@ -71,7 +71,16 @@ fun ActividadDetalleScreen(
     val detalleState by viewModel.detalleUiState.collectAsState()
     val inscripcionState by inscripcionViewModel.uiState.collectAsState()
     var mostrarDialogoCancelar by remember { mutableStateOf(false) }
-
+    val irAActividades = {
+        if (navController.currentDestination?.route != Rutas.Actividades.ruta) {
+            navController.navigate(Rutas.Actividades.ruta) {
+                popUpTo(Rutas.Actividades.ruta) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
+    }
     LaunchedEffect(inscripcionState.listo) {
         if (inscripcionState.listo) {
             viewModel.cargarDetalle(actividadId)
@@ -83,7 +92,8 @@ fun ActividadDetalleScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
-        backButton = true
+        backButton = true,
+        onBackClick = irAActividades
     ) { paddingValues ->
         when (val state = detalleState) {
             is ActividadDetalleUiState.Cargando -> {

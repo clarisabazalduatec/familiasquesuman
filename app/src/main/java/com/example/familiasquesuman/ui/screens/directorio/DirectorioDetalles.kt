@@ -81,12 +81,22 @@ fun DirectorioDetalleScreen(
 ) {
     val estado by viewModel.detalle.collectAsState()
     LaunchedEffect(centroId) { viewModel.cargarDetalle(centroId) }
+    val iraDirectorio = {
+        if (navController.currentDestination?.route != Rutas.Directorio.ruta) {
+            navController.navigate(Rutas.Directorio.ruta) {
+                popUpTo(Rutas.Directorio.ruta) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
+    }
 
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.DIRECTORIO,
         backButton = true,
-        onBackClick = { navController.popBackStack() },
+        onBackClick = iraDirectorio,
     ) { paddingInterno ->
         val centro = estado.centro
         when {
