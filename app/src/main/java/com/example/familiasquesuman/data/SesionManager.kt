@@ -17,6 +17,7 @@ import com.example.familiasquesuman.ui.model.TipoSesion
 object SesionManager {
 
     private const val PREFS = "familias_sesion"
+    private const val K_FOTO = "usuario_foto"
     private const val K_TOKEN = "token"
     private const val K_ID = "usuario_id"
     private const val K_NOMBRE = "usuario_nombre"
@@ -60,7 +61,8 @@ object SesionManager {
                 nombre = p.getString(K_NOMBRE, "") ?: "",
                 email = p.getString(K_EMAIL, "") ?: "",
                 ubicacion = p.getString(K_UBICACION, null),
-                rol = p.getString(K_ROL, "USUARIO")
+                rol = p.getString(K_ROL, "USUARIO"),
+                fotoUrl = p.getString(K_FOTO, null)
             )
         }
     }
@@ -103,4 +105,5 @@ object SesionManager {
             .putString(K_EMAIL, u.email)
             .putString(K_UBICACION, u.ubicacion)
             .putString(K_ROL, u.rol)
+            .putString(K_FOTO, u.fotoUrl)
 }

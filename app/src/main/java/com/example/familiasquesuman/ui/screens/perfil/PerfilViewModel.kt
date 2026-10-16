@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.content.ContentResolver
+import android.net.Uri
 
 /**
  * Perfil = datos de mi familia real (backend). Cada acción se guarda al momento
@@ -119,7 +121,28 @@ class PerfilViewModel(
                 }
         }
     }
+    // ---------- foto de perfil ----------
+    // La foto nueva queda en SesionManager.usuario, así que se ve sola en Inicio, Perfil y Comunidad.
 
+    fun cambiarFoto(resolver: ContentResolver, uri: Uri) =
+        accionDeFoto("Foto actualizada") { repo.cambiarMiFoto(resolver, uri) }
+
+    fun quitarFoto() =
+        accionDeFoto("Foto eliminada") { repo.quitarMiFoto() }
+
+    private fun accionDeFoto(avisoExito: String, accion: suspend () -> Result<*>) {
+        if (_uiState.value.subiendoFoto) return
+        _uiState.update { it.copy(subiendoFoto = true, dialogo = null) }
+        viewModelScope.launch {
+            val resultado = accion()
+            _uiState.update {
+                it.copy(
+                    subiendoFoto = false,
+                    mensaje = if (resultado.isSuccess) avisoExito else resultado.exceptionOrNull()?.message
+                )
+            }
+        }
+    }
     // ---------- familia ----------
 
     fun crearFamilia(nombre: String, parentesco: String?) =
