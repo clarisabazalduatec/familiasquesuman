@@ -15,26 +15,38 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.familiasquesuman.domain.Notificacion
-import com.example.familiasquesuman.domain.TipoNotificacion
+import com.example.familiasquesuman.data.remote.dto.NotificacionDto
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
+import com.example.familiasquesuman.ui.theme.Blanco
 
-private fun iconoPara(tipo: TipoNotificacion): ImageVector = when (tipo) {
-    TipoNotificacion.PARTICIPACION -> Icons.Default.Person
-    TipoNotificacion.INSIGNIA -> Icons.Default.Star
-    TipoNotificacion.COMENTARIO -> Icons.AutoMirrored.Filled.Chat
-    TipoNotificacion.DONACION -> Icons.Default.VolunteerActivism
-    TipoNotificacion.TALLER -> Icons.Default.Event
+private fun iconoPara(tipo: String): ImageVector = when (tipo) {
+    "PUBLICACION_APROBADA" -> Icons.Default.CheckCircle
+    "PUBLICACION_RECHAZADA" -> Icons.Default.Cancel
+    "NUEVO_COMENTARIO" -> Icons.AutoMirrored.Filled.Chat
+    "NUEVOS_LIKES" -> Icons.Default.Favorite
+    "INVITACION_FAMILIA" -> Icons.Default.GroupAdd
+    "AVISO_OFICIAL" -> Icons.Default.Campaign
+    "RECORDATORIO_ACTIVIDAD" -> Icons.Default.Event
+    "PUBLICACION_POR_REVISAR" -> Icons.Default.RateReview
+    "ACTIVIDAD_LLENA" -> Icons.Default.EventBusy
+    else -> Icons.Default.Notifications
 }
 
 @Composable
-fun NotificacionItem(notificacion: Notificacion, modifier: Modifier = Modifier) {
+fun NotificacionItem(
+    notificacion: NotificacionDto,
+    tiempo: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
+        onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+            // Las no leídas resaltan un poco
+            containerColor = if (notificacion.leida) Blanco else AmbarClaro.copy(alpha = 0.45f),
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = modifier.fillMaxWidth(),
@@ -69,20 +81,20 @@ fun NotificacionItem(notificacion: Notificacion, modifier: Modifier = Modifier) 
                     Text(
                         text = notificacion.titulo,
                         style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = if (notificacion.leida) FontWeight.SemiBold else FontWeight.Bold,
+                        color = AzulMarino,
                         modifier = Modifier.weight(1f),
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = notificacion.tiempo,
+                        text = tiempo,
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = notificacion.descripcion,
+                    text = notificacion.cuerpo,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

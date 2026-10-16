@@ -1,5 +1,7 @@
 package com.example.familiasquesuman.data.remote
 
+import com.example.familiasquesuman.data.remote.dto.NotificacionDto
+import com.example.familiasquesuman.data.remote.dto.ResumenNotificacionesDto
 import com.example.familiasquesuman.data.remote.dto.AsistenciaGuardarDto
 import com.example.familiasquesuman.data.remote.dto.InscripcionAdminDto
 import com.example.familiasquesuman.data.remote.dto.InscripcionDto
@@ -220,4 +222,22 @@ interface FamiliasApiService {
 
     @DELETE("actividades/{id}/inscripciones/{inscripcionId}")
     suspend fun borrarInscripcionAdmin(@Path("id") id: String, @Path("inscripcionId") inscripcionId: Any)
+
+    // ---------- Notificaciones ----------
+    /** Sin despues_de: las más recientes primero. Con despues_de: solo las nuevas, de la más vieja a la más nueva. */
+    @GET("notificaciones")
+    suspend fun misNotificaciones(
+        @Query("despues_de") despuesDe: Long? = null,
+        @Query("limit") limit: Int = 50
+    ): List<NotificacionDto>
+
+    @GET("notificaciones/resumen")
+    suspend fun resumenNotificaciones(): ResumenNotificacionesDto
+
+    @POST("notificaciones/{id}/leida")
+    suspend fun marcarNotificacionLeida(@Path("id") id: Long)
+
+    @POST("notificaciones/leidas")
+    suspend fun marcarTodasLeidas()
+
 }

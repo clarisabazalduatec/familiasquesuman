@@ -35,7 +35,14 @@ import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.CremaFondo
 import kotlinx.coroutines.launch
-
+import com.example.familiasquesuman.data.repository.NotificacionesRepository
+import com.example.familiasquesuman.notificaciones.EstadoNotificaciones
+import com.example.familiasquesuman.ui.theme.Ambar
+import com.example.familiasquesuman.ui.theme.Blanco
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +62,11 @@ fun PantallaPrincipalConMenu(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val tipoSesion = SesionManager.tipoSesion
+
+    // Cada pantalla principal actualiza el numerito de la campana (consulta muy ligera)
+    LaunchedEffect(tipoSesion) {
+        if (tipoSesion != TipoSesion.INVITADO) NotificacionesRepository().refrescarContador()
+    }
 
     val navigateTo: (String) -> Unit = { route ->
         scope.launch { drawerState.close() }
@@ -162,11 +174,22 @@ fun PantallaPrincipalConMenu(
                                     )
                                 }
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Notifications,
-                                    contentDescription = "Notificaciones",
-                                    tint = AzulMarino
-                                )
+                                val noLeidas = EstadoNotificaciones.noLeidas
+                                BadgedBox(
+                                    badge = {
+                                        if (noLeidas > 0) {
+                                            Badge(containerColor = Ambar, contentColor = Blanco) {
+                                                Text(if (noLeidas > 9) "9+" else noLeidas.toString())
+                                            }
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Notifications,
+                                        contentDescription = if (noLeidas > 0) "Notificaciones, $noLeidas sin leer" else "Notificaciones",
+                                        tint = AzulMarino
+                                    )
+                                }
                             }
                         }
                     }
