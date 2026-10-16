@@ -61,6 +61,13 @@ interface FamiliasApiService {
     @PATCH("usuarios/me")
     suspend fun actualizarMiPerfil(@Body datos: PerfilActualizarDto): PerfilDto
 
+    @Multipart
+    @PUT("usuarios/me/foto")
+    suspend fun cambiarMiFoto(@Part archivo: MultipartBody.Part): PerfilDto
+
+    @DELETE("usuarios/me/foto")
+    suspend fun quitarMiFoto(): PerfilDto
+
     // ---------- Familia ----------
     @GET("familias/mia")
     suspend fun miFamilia(): FamiliaDto // 404 = todavía no tiene familia

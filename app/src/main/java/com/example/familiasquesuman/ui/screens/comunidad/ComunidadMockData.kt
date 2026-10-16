@@ -15,6 +15,7 @@ data class ComentarioUi(
     val likes: Int = 0,
     val numeroComentarios: Int = 0,
     val meGusta: Boolean = false,
+    val autorFotoUrl: String? = null, // foto de perfil de quien comentó
 )
 
 
@@ -40,7 +41,8 @@ data class PublicacionComunidadUi(
     val documentoNombre: String? = null,
     val documentoDetalle: String? = null,
     val estado: EstadoPublicacion? = null,
-    val comentarios: List<ComentarioUi> = emptyList()
+    val comentarios: List<ComentarioUi> = emptyList(),
+    val autorFotoUrl: String? = null // foto de perfil de quien publicó
 )
 
 

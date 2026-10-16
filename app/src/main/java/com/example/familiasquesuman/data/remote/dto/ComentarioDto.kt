@@ -4,7 +4,11 @@ package com.example.familiasquesuman.data.remote.dto
 import com.google.gson.annotations.SerializedName
 import com.example.familiasquesuman.ui.screens.comunidad.ComentarioUi
 
-data class AutorComentarioDto(val id: String, val nombre: String)
+data class AutorComentarioDto(
+    val id: String,
+    val nombre: String,
+    @SerializedName("foto_url") val fotoUrl: String? = null // "/imagenes/abc.jpg" o null
+)
 data class ComentarioDto(
     val id: String,
     @SerializedName("publicacion_id")
@@ -20,6 +24,7 @@ fun ComentarioDto.toDomain(): ComentarioUi {
     return ComentarioUi(
         autor = autor.nombre,
         tiempo = creadoEn.substring(0, 10).split("-").reversed().joinToString("/"),
-        comentario = contenido
+        comentario = contenido,
+        autorFotoUrl = autor.fotoUrl
     )
 }

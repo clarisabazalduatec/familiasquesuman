@@ -36,6 +36,7 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
+import com.example.familiasquesuman.ui.components.FotoPerfil
 
 private enum class SeccionComunidad { OFICIAL, COMUNIDAD }
 
@@ -440,13 +441,10 @@ private fun CajaCrearPublicacion(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(R.drawable.mariana),
-                    contentDescription = "Perfil",
-                    modifier = Modifier
-                        .size(44.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
+                FotoPerfil(
+                    fotoUrl = SesionManager.usuario?.fotoUrl,
+                    nombre = SesionManager.usuario?.nombre,
+                    tamano = 44.dp
                 )
 
                 Spacer(Modifier.width(10.dp))

@@ -9,7 +9,9 @@ import com.example.familiasquesuman.ui.screens.comunidad.EstadoPublicacion
 
 data class AutorPublicacionDto(
     @SerializedName("id") val id: String,
-    @SerializedName("nombre") val nombre: String
+    @SerializedName("nombre") val nombre: String,
+    @SerializedName("foto_url") val fotoUrl: String? = null // "/imagenes/abc.jpg" o null
+
 )
 
 data class ImagenPublicacionDto(
@@ -79,6 +81,7 @@ fun PublicacionDto.toDomain(): PublicacionComunidadUi {
         ubicacion = ubicacion,
         documentoNombre = documentoNombre,
         documentoDetalle = documentoUrl,
-        estado = estadoUi
+        estado = estadoUi,
+        autorFotoUrl = autor.fotoUrl
     )
 }

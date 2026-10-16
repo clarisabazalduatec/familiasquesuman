@@ -12,6 +12,7 @@ sealed interface DialogoPerfil {
     data class BorrarMenor(val menor: MenorDto) : DialogoPerfil
     object MiParentesco : DialogoPerfil
     object SalirDeFamilia : DialogoPerfil
+    object Foto : DialogoPerfil // opciones: cambiar o quitar la foto de perfil
 }
 
 data class PerfilUiState(
@@ -25,7 +26,8 @@ data class PerfilUiState(
 
     val dialogo: DialogoPerfil? = null,
     val errorDialogo: String? = null,  // error que se muestra dentro del diálogo abierto
-    val guardando: Boolean = false,    // una acción está en curso (deshabilita botones)
+    val guardando: Boolean = false,
+    val subiendoFoto: Boolean = false, // se está subiendo o quitando la foto de perfil// una acción está en curso (deshabilita botones)
     val mensaje: String? = null        // aviso corto tras una acción
 ) {
     val tieneFamilia: Boolean get() = familia != null

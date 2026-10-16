@@ -13,15 +13,27 @@ import com.google.gson.JsonParser
 import retrofit2.HttpException
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
+import android.content.ContentResolver
+import android.net.Uri
 
 class FamiliaRepository {
 
     private val api get() = RetrofitInstance.api
+    private val imagenes = ImagenRepository()
 
     suspend fun miPerfil(): Result<PerfilDto> = llamarApi {
         api.miPerfil().also { SesionManager.actualizarUsuario(it.aUsuarioDto()) }
     }
 
+    /** Sube la foto elegida en la galería; la sesión se actualiza para que se vea en toda la app. */
+    suspend fun cambiarMiFoto(resolver: ContentResolver, uri: Uri): Result<PerfilDto> = llamarApi {
+        val parte = imagenes.parteMultipart(resolver, uri, ladoMaximo = ImagenRepository.LADO_FOTO_PERFIL)
+        api.cambiarMiFoto(parte).also { SesionManager.actualizarUsuario(it.aUsuarioDto()) }
+    }
+
+    suspend fun quitarMiFoto(): Result<PerfilDto> = llamarApi {
+        api.quitarMiFoto().also { SesionManager.actualizarUsuario(it.aUsuarioDto()) }
+    }
     suspend fun cambiarMiParentesco(parentesco: String): Result<PerfilDto> = llamarApi {
         api.actualizarMiPerfil(PerfilActualizarDto(parentesco = parentesco))
     }
