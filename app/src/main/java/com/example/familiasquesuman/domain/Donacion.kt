@@ -2,7 +2,8 @@ package com.example.familiasquesuman.domain
 
 enum class TipoDonacion {
     CAMPANA,
-    ESPECIE
+    ESPECIE,
+    TIEMPO
 }
 
 data class Donacion(
@@ -39,6 +40,11 @@ data class Donacion(
     val condicionesArticulos: List<String>? = null,
     val metodosEntrega: List<String>? = null,
     val condicionesRecepcion: String? = null,
+
+    // Para Tiempo / Voluntariado
+    val fechaLimite: String? = null,
+    val horario: String? = null,
+
     val imagenesUrl: List<String> = emptyList(),
     val activa: Boolean = true
 )

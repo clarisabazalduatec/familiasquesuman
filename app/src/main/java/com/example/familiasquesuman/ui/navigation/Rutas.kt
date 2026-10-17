@@ -9,6 +9,10 @@ sealed class Rutas(val ruta: String) {
     object Donar : Rutas("donar_screen")
     object Proyectos : Rutas("proyectos")
     object Directorio : Rutas("directorio")
+
+    object DonacionDetalle : Rutas("detalle_donacion/{donacionId}") {
+        fun crearRuta(donacionId: String) = "detalle_donacion/$donacionId"
+    }
     
     object DirectorioDetalle : Rutas("directorio_detalle/{centroId}") {
         fun crearRuta(centroId: String) = "directorio_detalle/$centroId"

@@ -4,7 +4,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -83,7 +82,7 @@ fun NavGraphFamilias(
             DonacionScreen(navController = navController)
         }
         composable(
-            route = "detalle_donacion/{donacionId}",
+            route = Rutas.DonacionDetalle.ruta, // Usando la constante de la clase Rutas
             arguments = listOf(navArgument("donacionId") { type = NavType.StringType })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("donacionId") ?: ""
@@ -165,11 +164,13 @@ fun NavGraphFamilias(
                 navArgument("id") { type = NavType.StringType }
             )
         ) { backStackEntry ->
-            val tipo = backStackEntry.arguments?.getString("tipo").orEmpty()
+            val tipoStr = backStackEntry.arguments?.getString("tipo") ?: "DONACION"
             val id = backStackEntry.arguments?.getString("id")
+            val tipo = TipoContenidoAdmin.desdeRuta(tipoStr)
+
             AdminFormularioScreen(
                 navController = navController,
-                tipoInicial = TipoContenidoAdmin.desdeRuta(tipo),
+                tipoInicial = tipo,
                 id = id
             )
         }
@@ -202,7 +203,7 @@ fun NavGraphFamilias(
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: ""
             com.example.familiasquesuman.ui.screens.actividad.ActividadDetalleScreen(
-                navController = navController, 
+                navController = navController,
                 actividadId = id
             )
         }
@@ -212,7 +213,7 @@ fun NavGraphFamilias(
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: ""
             com.example.familiasquesuman.ui.screens.actividad.ActividadParticiparScreen(
-                navController = navController, 
+                navController = navController,
                 actividadId = id
             )
         }
@@ -222,7 +223,7 @@ fun NavGraphFamilias(
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: ""
             com.example.familiasquesuman.ui.screens.actividad.ActividadSeleccionParticipantesScreen(
-                navController = navController, 
+                navController = navController,
                 actividadId = id
             )
         }
@@ -232,7 +233,7 @@ fun NavGraphFamilias(
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id") ?: ""
             com.example.familiasquesuman.ui.screens.actividad.ActividadConfirmacionScreen(
-                navController = navController, 
+                navController = navController,
                 actividadId = id
             )
         }

@@ -11,8 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
 
-    // Emulador: 10.0.2.2 apunta al localhost de tu computadora.
-    private val BASE_URL = BuildConfig.API_BASE_URL
+    private const val BASE_URL = BuildConfig.API_BASE_URL
 
     /** Agrega el token a todas las peticiones; si el backend responde 401, cierra la sesión. */
     private class AuthInterceptor : Interceptor {
