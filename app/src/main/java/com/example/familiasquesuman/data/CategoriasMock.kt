@@ -2,26 +2,21 @@ package com.example.familiasquesuman.data
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.toMutableStateList
-import com.example.familiasquesuman.data.repository.donacionesMockData
 
 /**
- * Categorías en memoria, mientras no exista el backend.
- * Arrancan con lo que ya hay en los datos de ejemplo; el admin puede agregar más desde el formulario.
- * Cuando haya backend, esto se reemplaza por GET/POST /categorias.
+ * Categorías dinámicas en memoria para los formularios del administrador.
+ * Se pueden agregar nuevas categorías en tiempo de ejecución.
  */
 object CategoriasMock {
     val actividades: SnapshotStateList<String> =
         (listOf("Medio Ambiente", "Educación", "Apoyo Social", "Otros") +
-                actividadesMockData.mapNotNull { it.categoria })
+                actividadesMockData.map { it.categoria })
             .filter { it.isNotBlank() }
             .distinct()
             .toMutableStateList()
 
     val donaciones: SnapshotStateList<String> =
-        donacionesMockData
-            .mapNotNull { it.categoria }
-            .filter { it.isNotBlank() }
-            .distinct()
+        listOf("Juguetes", "Ropa", "Alimentos", "Higiene", "Electrónicos", "Salud", "Útiles", "Otros")
             .toMutableStateList()
 }
 

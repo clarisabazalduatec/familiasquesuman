@@ -14,8 +14,7 @@ import java.util.Locale
 import java.util.TimeZone
 
 // ---------------------------------------------------------------------------
-// Estado del formulario: un data class por grupo de campos, en vez de ~25 variables sueltas.
-// Todo lo que el usuario escribe es String; se convierte a número/enum solo al guardar.
+// Estado del formulario: un data class por grupo de campos.
 // ---------------------------------------------------------------------------
 
 /** Campos que comparten los 3 tipos. */
@@ -200,20 +199,50 @@ fun Proyecto.aFormulario(): Pair<ComunForm, ProyectoForm> =
         opciones = opcionesApoyo.map { OpcionApoyoForm(titulo = it.titulo, descripcion = it.descripcion) },
     )
 
-fun Donacion.aFormulario(): Pair<ComunForm, DonacionForm> =
-    ComunForm(titulo, descripcionCorta, ubicacion.orEmpty(), activa) to DonacionForm(
+fun Donacion.aFormulario(): Pair<ComunForm, DonacionForm> {
+    val esMonetaria = tipo == TipoDonacion.CAMPANA
+    val esEspecie = tipo == TipoDonacion.ESPECIE
+
+    // Forma súper segura de Kotlin sin usar operadores '?' dudosos
+    val montosTexto = if (esMonetaria && !opcionesDetalle.isNullOrEmpty()) {
+        opcionesDetalle!!.map { pair ->
+            val valor = pair.second.ifBlank { pair.first }
+            valor.replace("$", "").replace("MXN", "").replace(".0", "").trim()
+        }.filter { it.isNotBlank() }.joinToString(", ")
+    } else ""
+
+    val articulosTexto = if (esEspecie && !opcionesDetalle.isNullOrEmpty()) {
+        opcionesDetalle!!.map { pair ->
+            pair.first.ifBlank { pair.second }.trim()
+        }.filter { it.isNotBlank() }.joinToString(", ")
+    } else ""
+
+    return ComunForm(
+        titulo = titulo,
+        descripcionCorta = descripcionCorta,
+        ubicacion = ubicacion.orEmpty(),
+        activa = activa
+    ) to DonacionForm(
         tipo = tipo,
-        tipoDonacionAdmin = if (tipo == TipoDonacion.ESPECIE) TipoDonacionAdmin.ESPECIE else TipoDonacionAdmin.MONETARIA,
+        tipoDonacionAdmin = when (tipo) {
+            TipoDonacion.ESPECIE -> TipoDonacionAdmin.ESPECIE
+            TipoDonacion.TIEMPO -> TipoDonacionAdmin.TIEMPO
+            else -> TipoDonacionAdmin.MONETARIA
+        },
         categoria = categoria.orEmpty(),
         fundacion = fundacion,
         recaudado = recaudado.toInt().toString(),
         meta = meta.toInt().toString(),
-        tieneMeta = (meta.toString().toFloatOrNull() ?: 0f) > 0f,
+        tieneMeta = meta > 0f,
+        montosSugeridos = montosTexto,
+        articulosNecesarios = articulosTexto.ifBlank { condiciones.orEmpty() },
         descripcionLarga = descripcionLarga,
         whatsapp = telefonoWhatsapp.orEmpty(),
         condiciones = condiciones.orEmpty(),
-        articulosNecesarios = condiciones.orEmpty(),
+        fechaLimite = fechaLimite.orEmpty(),
+        horario = horario.orEmpty()
     )
+}
 
 fun CentroVisiteo.aFormulario(): Pair<ComunForm, CentroForm> =
     ComunForm(nombre, descripcionCorta, direccion, activo) to CentroForm(
@@ -229,8 +258,7 @@ fun CentroVisiteo.aFormulario(): Pair<ComunForm, CentroForm> =
     )
 
 // ---------------------------------------------------------------------------
-// Validación: devuelve el mensaje de error, o null si todo está bien.
-// Reemplaza los valores inventados que antes se guardaban en silencio.
+// Validación de Formulario
 // ---------------------------------------------------------------------------
 
 private const val MSG_TELEFONO = "Los teléfonos deben tener solo dígitos, con lada (ej. 528112345678)."
@@ -287,11 +315,10 @@ fun validarFormulario(
 
         TipoContenidoAdmin.DONACION -> when {
             donacion.fundacion.isBlank() -> "Indica la fundación u organización."
-            donacion.categoria.isBlank() -> "Elige o crea una categoría."
+            donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && donacion.categoria.isBlank() -> "Elige o crea una categoría."
             imagenes.isEmpty() -> "Agrega una imagen para la donación."
             !telefonoValido(donacion.whatsapp) -> MSG_TELEFONO
 
-            // Validaciones dinámicas por tipo
             donacion.tipoDonacionAdmin == TipoDonacionAdmin.MONETARIA && donacion.tieneMeta && (donacion.meta.toFloatOrNull() ?: 0f) <= 0f -> "La meta económica debe ser mayor a 0."
             donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && donacion.articulosNecesarios.isBlank() -> "Indica los artículos requeridos."
             donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && donacion.tieneMeta && (donacion.meta.toFloatOrNull() ?: 0f) <= 0f -> "La meta de artículos debe ser mayor a 0."

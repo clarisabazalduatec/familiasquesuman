@@ -17,6 +17,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +36,7 @@ import com.example.familiasquesuman.domain.Donacion
 import com.example.familiasquesuman.domain.TipoDonacion
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
@@ -47,17 +49,32 @@ fun DonacionScreen(
     viewModel: DonacionViewModel = viewModel(),
 ) {
     val donaciones by viewModel.donaciones.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val tabSeleccionada by viewModel.tabSeleccionada.collectAsState()
     val categoriaSeleccionada by viewModel.categoriaSeleccionada.collectAsState()
     val listaFiltros = listOf("Todos", "Juguetes", "Ropa", "Alimentos", "Higiene", "Electrónicos", "Salud", "Útiles")
 
-    val donacionesAMostrar = donaciones.filter { it.activa }.filter { donacion ->
-        if (tabSeleccionada == 0) {
-            donacion.tipo == TipoDonacion.CAMPANA
-        } else {
-            val esArticulo = donacion.tipo == TipoDonacion.ESPECIE
-            val coincideFiltro = categoriaSeleccionada == "Todos" || donacion.categoria == categoriaSeleccionada
-            esArticulo && coincideFiltro
+    val donacionesAMostrar = remember(donaciones, tabSeleccionada, categoriaSeleccionada) {
+        donaciones.filter { donacion ->
+            val estaActiva = donacion.activa
+
+            when (tabSeleccionada) {
+                0 -> {
+                    // Pestaña "Donar a campaña" (Campañas monetarias y Voluntariados)
+                    val esCampanaOTiempo = donacion.tipo == TipoDonacion.CAMPANA || donacion.tipo == TipoDonacion.TIEMPO
+                    estaActiva && esCampanaOTiempo
+                }
+                1 -> {
+                    // Pestaña "Tengo algo para donar" (ÚNICAMENTE donaciones en especie)
+                    val esEspecie = donacion.tipo == TipoDonacion.ESPECIE
+                    val coincideFiltro = categoriaSeleccionada == "Todos" ||
+                            donacion.categoria.isNullOrBlank() ||
+                            donacion.categoria.equals(categoriaSeleccionada, ignoreCase = true)
+
+                    estaActiva && esEspecie && coincideFiltro
+                }
+                else -> estaActiva
+            }
         }
     }
 
@@ -104,13 +121,36 @@ fun DonacionScreen(
                 }
             }
 
-            items(donacionesAMostrar) { donacion ->
-                TarjetaDonacion(
-                    donacion = donacion,
-                    onVerMasClick = {
-                        navController.navigate("detalle_donacion/${donacion.id}")
-                    },
-                )
+            // --- Lógica de Carga y Estado Vacío ---
+            if (isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    }
+                }
+            } else if (donacionesAMostrar.isEmpty()) {
+                item {
+                    EstadoVacioDonaciones(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(min = 350.dp)
+                            .padding(vertical = 24.dp)
+                    )
+                }
+            } else {
+                items(donacionesAMostrar) { donacion ->
+                    TarjetaDonacion(
+                        donacion = donacion,
+                        onVerMasClick = {
+                            navController.navigate(Rutas.DonacionDetalle.crearRuta(donacion.id))
+                        },
+                    )
+                }
             }
         }
     }
@@ -268,7 +308,7 @@ fun TarjetaDonacion(
                     onClick = onVerMasClick,
                     modifier = Modifier.height(48.dp),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = AzulMarino),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Ver más")
                     Spacer(modifier = Modifier.width(4.dp))

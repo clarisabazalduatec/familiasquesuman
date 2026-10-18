@@ -1,78 +1,67 @@
 package com.example.familiasquesuman.ui.screens.admin.formulario
 
-import com.example.familiasquesuman.data.repository.agregarDonacionMock
-import com.example.familiasquesuman.data.repository.donacionesMockData
-import com.example.familiasquesuman.domain.Donacion
-import com.example.familiasquesuman.domain.TipoDonacion
+import com.example.familiasquesuman.data.remote.dto.DonacionGuardarDto
+import com.example.familiasquesuman.data.remote.dto.DonacionOpcionInDto
 
-// ---------------------------------------------------------------------------
-// TEMPORAL: todo lo que toca las listas mock vive SOLO en este archivo.
-// Cuando exista el backend, se reemplaza por un repositorio + ViewModel (Fase 5)
-// y la pantalla y los formularios no cambian.
-// ---------------------------------------------------------------------------
-
-fun guardarDonacion(base: Donacion?, comun: ComunForm, form: DonacionForm, imagenes: List<String>) {
-    val esCampana = form.tipo == TipoDonacion.CAMPANA
-    val recaudado = form.recaudado.toFloatOrNull() ?: 0f
-    val meta = form.meta.toFloat()
-    val descripcion = comun.descripcionCorta.trim()
-    val descripcionLarga = form.descripcionLarga.trim().ifBlank { descripcion }
-    // WhatsApp solo aplica a campañas; condiciones solo a donaciones en especie.
-    val whatsapp = if (esCampana) form.whatsapp.trim().ifBlank { null } else null
-    val condiciones = if (esCampana) null else form.condiciones.trim().ifBlank { null }
-
-    if (base == null) {
-        agregarDonacionMock(
-            Donacion(
-                id = System.currentTimeMillis().toString(),
-                titulo = comun.titulo.trim(),
-                descripcionCorta = descripcion,
-                descripcionLarga = descripcionLarga,
-                fundacion = form.fundacion.trim(),
-                imagenUrl = imagenes.first(),
-                tipo = form.tipo,
-                categoria = form.categoria,
-                recaudado = 0f,
-                meta = meta,
-                textoProgreso = textoProgresoDonacion(form.tipo, 0f),
-                telefonoWhatsapp = whatsapp,
-                condiciones = condiciones,
-                ubicacion = comun.ubicacion.trim().ifBlank { null },
-                imagenesUrl = imagenes,
-                activa = comun.activa,
-            ),
-        )
-    } else {
-        val index = donacionesMockData.indexOfFirst { it.id == base.id }
-        if (index == -1) return
-        donacionesMockData[index] = donacionesMockData[index].copy(
-            titulo = comun.titulo.trim(),
-            descripcionCorta = descripcion,
-            descripcionLarga = descripcionLarga,
-            fundacion = form.fundacion.trim(),
-            imagenUrl = imagenes.first(),
-            tipo = form.tipo,
-            categoria = form.categoria,
-            recaudado = recaudado,
-            meta = meta,
-            textoProgreso = textoProgresoDonacion(form.tipo, recaudado),
-            telefonoWhatsapp = whatsapp,
-            condiciones = condiciones,
-            ubicacion = comun.ubicacion.trim().ifBlank { null },
-            imagenesUrl = imagenes,
-            activa = comun.activa,
-        )
+/** Convierte los campos del formulario de donación al DTO que acepta el Backend (FastAPI). */
+fun DonacionForm.toGuardarDto(comun: ComunForm, imagenes: List<String>): DonacionGuardarDto {
+    val modalidad = when (tipoDonacionAdmin) {
+        TipoDonacionAdmin.ESPECIE -> "ESPECIE"
+        TipoDonacionAdmin.TIEMPO -> "TIEMPO"
+        TipoDonacionAdmin.MONETARIA -> "CAMPANA"
     }
+
+    val esTiempo = tipoDonacionAdmin == TipoDonacionAdmin.TIEMPO
+    val esEspecie = tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE
+    val esMonetaria = tipoDonacionAdmin == TipoDonacionAdmin.MONETARIA
+
+    // Usa DonacionOpcionInDto y asigna 0.0 en lugar de null para evitar errores de tipo
+    val listaOpciones: List<DonacionOpcionInDto> = when {
+        esMonetaria && montosSugeridos.isNotBlank() -> {
+            montosSugeridos.split(",")
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+                .map { valor ->
+                    val montoNum = valor.replace("$", "").replace("MXN", "").trim().toDoubleOrNull() ?: 0.0
+                    DonacionOpcionInDto(titulo = "Aporte sugerido", monto = montoNum)
+                }
+        }
+        esEspecie && articulosNecesarios.isNotBlank() -> {
+            articulosNecesarios.split(",")
+                .map { it.trim() }
+                .filter { it.isNotBlank() }
+                .map { articulo ->
+                    DonacionOpcionInDto(titulo = articulo, monto = 0.0)
+                }
+        }
+        else -> emptyList()
+    }
+
+    return DonacionGuardarDto(
+        titulo = comun.titulo.trim(),
+        descripcionCorta = comun.descripcionCorta.trim(),
+        modalidad = modalidad,
+        categoria = if (esEspecie) categoria.trim().ifBlank { null } else null,
+        ubicacion = comun.ubicacion.trim().ifBlank { null },
+        meta = if (tieneMeta) meta.toDoubleOrNull() else null,
+        recaudado = recaudado.toDoubleOrNull() ?: 0.0,
+        descripcionLarga = descripcionLarga.trim().ifBlank { null },
+        whatsapp = whatsapp.trim().ifBlank { null },
+        condicionesRecepcion = if (esEspecie) condiciones.trim().ifBlank { null } else null,
+        fechaLimite = if (esTiempo) fechaLimite.trim().ifBlank { null } else null,
+        horario = if (esTiempo) horario.trim().ifBlank { null } else null,
+        activa = comun.activa,
+        imagenes = imagenes,
+        organizacionNombre = fundacion.trim().ifBlank { null },
+        opciones = listaOpciones
+    )
 }
 
 fun eliminarIniciativa(tipo: TipoContenidoAdmin, id: String) {
     when (tipo) {
         TipoContenidoAdmin.ACTIVIDAD -> Unit // se borra en el backend (AdminActividadViewModel)
         TipoContenidoAdmin.PROYECTO -> Unit  // se borra en el backend (AdminProyectoViewModel)
-        TipoContenidoAdmin.DONACION -> donacionesMockData.removeAll { it.id == id }
+        TipoContenidoAdmin.DONACION -> Unit // DonacionViewModel
         TipoContenidoAdmin.DIRECTORIO -> Unit // se borra en el backend (AdminCentroViewModel)
     }
 }
-
-private fun textoProgresoDonacion(tipo: TipoDonacion, cantidad: Float): String =
-    if (tipo == TipoDonacion.CAMPANA) "\$${cantidad.toInt()} recaudados" else "${cantidad.toInt()} entregadas"

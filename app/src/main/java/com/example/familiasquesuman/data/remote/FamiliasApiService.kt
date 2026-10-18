@@ -13,6 +13,8 @@ import com.example.familiasquesuman.data.remote.dto.CategoriaCrearDto
 import com.example.familiasquesuman.data.remote.dto.CategoriaDto
 import com.example.familiasquesuman.data.remote.dto.ChatMensajeEntradaDto
 import com.example.familiasquesuman.data.remote.dto.ChatMensajeRespuestaDto
+import com.example.familiasquesuman.data.remote.dto.DonacionDto
+import com.example.familiasquesuman.data.remote.dto.DonacionGuardarDto
 import com.example.familiasquesuman.data.remote.dto.FamiliaCrearDto
 import com.example.familiasquesuman.data.remote.dto.FamiliaDto
 import com.example.familiasquesuman.data.remote.dto.InvitacionCrearDto
@@ -163,6 +165,26 @@ interface FamiliasApiService {
     @GET("categorias")
     suspend fun getCategorias(@Query("ambito") ambito: String? = "ACTIVIDAD"): List<CategoriaDto>
 
+    // ---------- Donaciones ----------
+    @GET("donaciones")
+    suspend fun listarDonaciones(
+        @Query("modalidad") modalidad: String? = null,
+        @Query("categoria_id") categoriaId: Int? = null,
+        @Query("ciudad_id") ciudadId: Int? = null,
+        @Query("incluir_desactivadas") incluirDesactivadas: Boolean? = true
+    ): List<DonacionDto>
+
+    @GET("donaciones/{id}")
+    suspend fun detalleDonacion(@Path("id") id: String): DonacionDto
+
+    @POST("donaciones")
+    suspend fun crearDonacion(@Body datos: DonacionGuardarDto): DonacionDto
+
+    @PUT("donaciones/{id}")
+    suspend fun editarDonacion(@Path("id") id: String, @Body datos: DonacionGuardarDto): DonacionDto
+
+    @DELETE("donaciones/{id}")
+    suspend fun borrarDonacion(@Path("id") id: String)
 
     // ---- COMUNIDAD -----
     @GET("comunidad") suspend fun listarPublicacionesComunidad(@Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<PublicacionDto>

@@ -49,12 +49,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.familiasquesuman.data.CategoriasMock
 import com.example.familiasquesuman.data.agregarCategoria
-import com.example.familiasquesuman.data.repository.donacionesMockData
 import com.example.familiasquesuman.domain.EstadoProyecto
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.components.SeleccionadorImagenes
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.screens.donar.DonacionViewModel
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.ColorError
@@ -99,12 +99,18 @@ fun AdminFormularioScreen(
     LaunchedEffect(id) { if (esEdicionCentro && id != null) vmCentro.cargar(id) }
     LaunchedEffect(estadoCentro.guardado) { if (estadoCentro.guardado != null) mostrarExitoBackend = true }
 
+    // Donaciones: también contra el backend (usa el DonacionViewModel de la sección Donar)
+    val vmDonacion: DonacionViewModel = viewModel()
+    val donacionCargada by vmDonacion.donacionSeleccionada.collectAsState()
+    val guardandoDonacion by vmDonacion.isLoading.collectAsState()
+    val errorDonacion by vmDonacion.error.collectAsState()
+    val esEdicionDonacion = esEdicion && tipoInicial == TipoContenidoAdmin.DONACION
+    LaunchedEffect(id) { if (esEdicionDonacion && id != null) vmDonacion.cargarDetalleDonacion(id) }
+
     // Elemento original (solo al editar).
     val actividadOriginal = if (esEdicionActividad) estadoActividad.actividad else null
     val proyectoOriginal = if (esEdicionProyecto) estadoProyecto.proyecto else null
-    val donacionOriginal = remember(id) {
-        if (esEdicion && tipoInicial == TipoContenidoAdmin.DONACION) donacionesMockData.find { it.id == id } else null
-    }
+    val donacionOriginal = if (esEdicionDonacion) donacionCargada else null
     val centroOriginal = if (esEdicionCentro) estadoCentro.centro else null
 
     // Estado del formulario.
@@ -119,15 +125,15 @@ fun AdminFormularioScreen(
     }
     var actividad by remember(id, actividadOriginal) { mutableStateOf(actividadOriginal?.aFormulario()?.second ?: ActividadForm()) }
     var proyecto by remember(id, proyectoOriginal) { mutableStateOf(proyectoOriginal?.aFormulario()?.second ?: ProyectoForm()) }
-    var donacion by remember(id) { mutableStateOf(donacionOriginal?.aFormulario()?.second ?: DonacionForm()) }
+    var donacion by remember(id, donacionOriginal) { mutableStateOf(donacionOriginal?.aFormulario()?.second ?: DonacionForm()) }
     var centro by remember(id, centroOriginal) { mutableStateOf(centroOriginal?.aFormulario()?.second ?: CentroForm()) }
 
     // Lista de imágenes.
-    val listaImagenes = remember(tipo, id, actividadOriginal, proyectoOriginal, centroOriginal) {
+    val listaImagenes = remember(tipo, id, actividadOriginal, proyectoOriginal, donacionOriginal, centroOriginal) {
         mutableStateListOf<String>().apply {
             actividadOriginal?.let { a -> if (a.imagenes.isNotEmpty()) addAll(a.imagenes) }
             proyectoOriginal?.let { p -> if (p.imagenesUrl.isNotEmpty()) addAll(p.imagenesUrl) else p.logoUrl?.let { add(it) } }
-            donacionOriginal?.let { d -> if (d.imagenesUrl.isNotEmpty()) addAll(d.imagenesUrl) else add(d.imagenUrl) }
+            donacionOriginal?.let { d -> if (d.imagenesUrl.isNotEmpty()) addAll(d.imagenesUrl) else if (d.imagenUrl.isNotEmpty()) add(d.imagenUrl) }
             centroOriginal?.logoUrl?.let { add(it) }
         }
     }
@@ -137,17 +143,27 @@ fun AdminFormularioScreen(
     var mostrarEliminar by remember { mutableStateOf(false) }
 
     // Editando algo del backend que todavía no llega: cargando o error.
-    if ((esEdicionActividad && actividadOriginal == null) || (esEdicionProyecto && proyectoOriginal == null) || (esEdicionCentro && centroOriginal == null)) {
+    if ((esEdicionActividad && actividadOriginal == null) || (esEdicionProyecto && proyectoOriginal == null) ||
+        (esEdicionDonacion && donacionOriginal == null) || (esEdicionCentro && centroOriginal == null)
+    ) {
         Box(modifier = Modifier.fillMaxSize().background(CremaFondo), contentAlignment = Alignment.Center) {
-            val error = if (esEdicionActividad) estadoActividad.errorCarga else if (esEdicionProyecto) estadoProyecto.errorCarga else estadoCentro.errorCarga
+            val error = when {
+                esEdicionActividad -> estadoActividad.errorCarga
+                esEdicionProyecto -> estadoProyecto.errorCarga
+                esEdicionDonacion -> errorDonacion
+                else -> estadoCentro.errorCarga
+            }
             if (error != null) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(error, color = GrisTexto)
                     TextButton(onClick = {
                         id?.let {
-                            if (esEdicionActividad) vmActividad.cargar(it)
-                            else if (esEdicionProyecto) vmProyecto.cargar(it)
-                            else vmCentro.cargar(it)
+                            when {
+                                esEdicionActividad -> vmActividad.cargar(it)
+                                esEdicionProyecto -> vmProyecto.cargar(it)
+                                esEdicionDonacion -> vmDonacion.cargarDetalleDonacion(it)
+                                else -> vmCentro.cargar(it)
+                            }
                         }
                     }) { Text("Reintentar", color = AzulMarino) }
                 }
@@ -181,14 +197,15 @@ fun AdminFormularioScreen(
             vmCentro.guardar(id, comun, centro, listaImagenes.toList(), context.contentResolver)
             return
         }
-
-        when (tipo) {
-            TipoContenidoAdmin.ACTIVIDAD -> Unit
-            TipoContenidoAdmin.PROYECTO -> Unit
-            TipoContenidoAdmin.DONACION -> guardarDonacion(donacionOriginal, comun, donacion, listaImagenes.toList())
-            TipoContenidoAdmin.DIRECTORIO -> Unit
+        if (tipo == TipoContenidoAdmin.DONACION) {
+            vmDonacion.guardarDonacion(
+                id = id, // null = crear; con valor = editar
+                contentResolver = context.contentResolver,
+                datos = donacion.toGuardarDto(comun, listaImagenes.toList()),
+                onSuccess = { mostrarExitoBackend = true },
+                onError = { error -> errorMensaje = error },
+            )
         }
-        mostrarExito = true
     }
 
     LaunchedEffect(estadoActividad.error) {
@@ -211,7 +228,8 @@ fun AdminFormularioScreen(
     }
     val guardandoBackend = (tipo == TipoContenidoAdmin.ACTIVIDAD && estadoActividad.guardando) ||
             (tipo == TipoContenidoAdmin.PROYECTO && estadoProyecto.guardando) ||
-            (tipo == TipoContenidoAdmin.DIRECTORIO && estadoCentro.guardando)
+            (tipo == TipoContenidoAdmin.DIRECTORIO && estadoCentro.guardando) ||
+            (tipo == TipoContenidoAdmin.DONACION && guardandoDonacion)
 
     val maxFotos = if (tipo == TipoContenidoAdmin.ACTIVIDAD) 5 else 1
     val tituloFotos = when (tipo) {
@@ -418,6 +436,14 @@ fun AdminFormularioScreen(
                             id?.let { vmProyecto.borrar(it) { navController.popBackStack() } }
                         } else if (tipo == TipoContenidoAdmin.DIRECTORIO) {
                             id?.let { vmCentro.borrar(it) { navController.popBackStack() } }
+                        } else if (tipo == TipoContenidoAdmin.DONACION) {
+                            id?.let {
+                                vmDonacion.eliminarDonacion(
+                                    id = it,
+                                    onSuccess = { navController.popBackStack() },
+                                    onError = { error -> errorMensaje = error },
+                                )
+                            }
                         } else {
                             id?.let { eliminarIniciativa(tipo, it) }
                             navController.popBackStack()
