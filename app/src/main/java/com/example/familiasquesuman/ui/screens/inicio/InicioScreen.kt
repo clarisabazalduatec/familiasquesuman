@@ -35,6 +35,12 @@ import com.example.familiasquesuman.ui.components.TarjetaComunidad
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.example.familiasquesuman.data.repository.ComunidadRepository
+import com.example.familiasquesuman.ui.screens.comunidad.PublicacionComunidadUi
 
 // Sección Tu Impacto
 @Composable
@@ -96,6 +102,39 @@ private fun EstadisticaImpacto(
 fun InicioScreen(
     navController: NavHostController
 ) {
+    //comunidad
+    val comunidadRepository = remember { ComunidadRepository() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var ultimoAviso by remember { mutableStateOf<PublicacionComunidadUi?>(null) }
+    var ultimaPublicacion by remember { mutableStateOf<PublicacionComunidadUi?>(null) }
+    var actualizacion by remember { mutableIntStateOf(0) }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, evento ->
+            if (evento == Lifecycle.Event.ON_RESUME) {
+                actualizacion++
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    LaunchedEffect(actualizacion) {
+        comunidadRepository.obtenerAvisosOficiales()
+            .onSuccess { avisos ->
+                ultimoAviso = avisos.firstOrNull()
+            }
+
+        comunidadRepository.obtenerPublicaciones()
+            .onSuccess { publicaciones ->
+                ultimaPublicacion = publicaciones.firstOrNull()
+            }
+    }
+    //comunidad
+
     val navegarASeccionPrincipal: (String) -> Unit = { ruta ->
         if (navController.currentDestination?.route != ruta) {
             try {
@@ -196,9 +235,19 @@ fun InicioScreen(
             // Tarjeta de comunidad
             item {
                 TarjetaComunidad(
+                    ultimoAviso = ultimoAviso,
+                    ultimaPublicacion = ultimaPublicacion,
+
                     onVerComunidad = {
                         navegarASeccionPrincipal(Rutas.Comunidad.ruta)
                     },
+
+                    onAbrirPublicacion = { id ->
+                        navController.navigate(
+                            Rutas.DetallePublicacion.crearRuta(id)
+                        )
+                    },
+
                     onChatbot = {
                         navegarASeccionPrincipal(Rutas.Chatbot.ruta)
                     }

@@ -245,11 +245,6 @@ fun SeleccionadorImagenes(
                     mostrarUrlDialog = true
                 },
             ) {
-                Text(
-                    text = "Ingresar enlace / URL externa",
-                    fontSize = 11.sp,
-                    color = GrisTexto,
-                )
             }
         }
     }

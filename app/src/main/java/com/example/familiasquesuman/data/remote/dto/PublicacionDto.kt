@@ -39,10 +39,22 @@ data class PublicacionDto(
     @SerializedName("documento_nombre") val documentoNombre: String? = null,
     @SerializedName("total_likes") val totalLikes: Int = 0,
     @SerializedName("total_comentarios") val totalComentarios: Int = 0,
-    @SerializedName("me_gusta") val meGusta: Boolean = false
+    @SerializedName("me_gusta") val meGusta: Boolean = false,
+    @SerializedName("motivo_rechazo") val motivoRechazo: String? = null
 )
 
+fun formatearFecha(fecha: String?): String {
+    if (fecha.isNullOrBlank()) return ""
 
+    val parteFecha = fecha.substringBefore("T")
+    val partes = parteFecha.split("-")
+
+    return if (partes.size == 3) {
+        "${partes[2]}/${partes[1]}/${partes[0]}"
+    } else {
+        fecha
+    }
+}
 fun PublicacionDto.toDomain(): PublicacionComunidadUi {
     val tipoUi = when (tipo) {
         "OFICIAL" -> TipoPublicacion.OFICIAL
@@ -62,7 +74,7 @@ fun PublicacionDto.toDomain(): PublicacionComunidadUi {
         id = id,
         tipo = tipoUi,
         autor = autor.nombre,
-        tiempoRelativo = fecha,
+        tiempoRelativo = formatearFecha(fecha),
         titulo = titulo,
         contenido = contenido,
         categoria = categoria?.nombre,
@@ -72,16 +84,50 @@ fun PublicacionDto.toDomain(): PublicacionComunidadUi {
         numeroLikes = totalLikes,
         numeroComentarios = totalComentarios,
         meGusta = meGusta,
-        fechaEvento = eventoIniciaEn,
+        fechaEvento = eventoIniciaEn?.let { formatearFechaEvento(it) },
         horarioEvento = if (eventoIniciaEn != null && eventoTerminaEn != null) {
-            "$eventoIniciaEn - $eventoTerminaEn"
+            "${formatearHora(eventoIniciaEn)} - ${formatearHora(eventoTerminaEn)}"
         } else {
             null
         },
+
         ubicacion = ubicacion,
+        publicoObjetivo = publicoObjetivo,
         documentoNombre = documentoNombre,
         documentoDetalle = documentoUrl,
         estado = estadoUi,
         autorFotoUrl = autor.fotoUrl
     )
+}
+
+private fun formatearFechaEvento(fecha: String): String {
+    return formatearFechaHora(fecha, "dd/MM/yyyy")
+}
+
+private fun formatearHora(fecha: String): String {
+    return formatearFechaHora(fecha, "HH:mm")
+}
+
+private fun formatearFechaHora(fecha: String, formato: String): String {
+    return try {
+        val entrada = java.text.SimpleDateFormat(
+            "yyyy-MM-dd'T'HH:mm:ssXXX",
+            java.util.Locale.US
+        )
+
+        val fechaConvertida = entrada.parse(fecha) ?: return fecha
+
+        val salida = java.text.SimpleDateFormat(
+            formato,
+            java.util.Locale("es", "MX")
+        )
+        salida.format(fechaConvertida)
+
+    } catch (e: Exception) {
+        if (formato == "dd/MM/yyyy") {
+            formatearFecha(fecha)
+        } else {
+            fecha.substringAfter("T").take(5)
+        }
+    }
 }

@@ -21,6 +21,8 @@ import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.data.repository.ComunidadRepository
 import kotlinx.coroutines.launch
 import com.example.familiasquesuman.ui.components.FotoPerfil
+import coil.compose.AsyncImage
+
 @Composable
 fun TarjetaPublicacion(publicacion: PublicacionComunidadUi, onClick: () -> Unit, modifier: Modifier = Modifier, onRequiereLogin: () -> Unit = {}) {
     if (publicacion.tipo == TipoPublicacion.OFICIAL) {
@@ -47,8 +49,10 @@ private fun TarjetaPublicacionOficial(publicacion: PublicacionComunidadUi, onCli
         colors = CardDefaults.cardColors(containerColor = Blanco),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column { publicacion.imagenRes?.let { imagen ->
-                Image(painter = painterResource(imagen),
+        Column {
+            publicacion.imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
+                AsyncImage(
+                    model = url,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -161,12 +165,13 @@ private fun TarjetaPublicacionComunidad(publicacion: PublicacionComunidadUi, onC
                     }
                 }
             }
-            publicacion.imagenRes?.let {
-                Image(painter = painterResource(it),
+            publicacion.imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
+                AsyncImage(
+                    model = url,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(215.dp),
+                        .height(165.dp),
                     contentScale = ContentScale.Crop
                 )
             }
