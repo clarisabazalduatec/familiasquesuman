@@ -126,8 +126,19 @@ fun PantallaPrincipalConMenu(
                 onIniciarSesionClick = { navigateTo(Rutas.Login.ruta) },
                 onCrearCuentaClick = { navigateTo(Rutas.Registro.ruta) },
                 onCerrarSesionClick = {
+
+// Antes, al cerrar sesión se podían conservar pantallas y datos del usuario anterior.
+// Ahora se limpia la navegación para evitar que esa información aparezca al iniciar sesión con otra cuenta.
                     SesionManager.cerrarSesion()
-                    navigateTo(Rutas.Inicio.ruta)
+                    scope.launch { drawerState.close() }
+                    navController.navigate(Rutas.Inicio.ruta) {
+                        popUpTo(navController.graph.id) {
+                            inclusive = true
+                            saveState = false
+                        }
+                        launchSingleTop = true
+                        restoreState = false
+                    }
                 },
                 onBackClick = { scope.launch { drawerState.close() } }
             )

@@ -30,12 +30,16 @@ import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.Blanco
 import com.example.familiasquesuman.ui.theme.GrisBorde
 import com.example.familiasquesuman.ui.theme.GrisTexto
-
-
+import coil.compose.AsyncImage
+import com.example.familiasquesuman.ui.screens.comunidad.PublicacionComunidadUi
+import androidx.compose.material.icons.filled.Favorite
 @Composable
 fun TarjetaComunidad(
     onVerComunidad: () -> Unit,
-    onChatbot: () -> Unit = {}
+    onChatbot: () -> Unit = {},
+    ultimoAviso: PublicacionComunidadUi? = null,
+    ultimaPublicacion: PublicacionComunidadUi? = null,
+    onAbrirPublicacion: (String) -> Unit = {}
 ) {
 
 
@@ -206,16 +210,33 @@ fun TarjetaComunidad(
 
 
             if (pestanaSeleccionada == "Oficial") {
-
-                ContenidoAvisoOficial(
-                    onClick = onVerComunidad
-                )
-
+                if (ultimoAviso != null) {
+                    ContenidoAvisoOficial(
+                        publicacion = ultimoAviso,
+                        onClick = {
+                            onAbrirPublicacion(ultimoAviso.id)
+                        }
+                    )
+                } else {
+                    Text(
+                        text = "No hay avisos oficiales disponibles.",
+                        color = GrisTexto
+                    )
+                }
             } else {
-
-                ContenidoComunidad(
-                    onClick = onVerComunidad
-                )
+                if (ultimaPublicacion != null) {
+                    ContenidoComunidad(
+                        publicacion = ultimaPublicacion,
+                        onClick = {
+                            onAbrirPublicacion(ultimaPublicacion.id)
+                        }
+                    )
+                } else {
+                    Text(
+                        text = "No hay publicaciones disponibles.",
+                        color = GrisTexto
+                    )
+                }
             }
 
             Spacer(
@@ -256,6 +277,7 @@ fun TarjetaComunidad(
 //avisios oficiales
 @Composable
 private fun ContenidoAvisoOficial(
+    publicacion: PublicacionComunidadUi,
     onClick: () -> Unit
 ) {
 
@@ -268,17 +290,13 @@ private fun ContenidoAvisoOficial(
         verticalAlignment = Alignment.CenterVertically
     ) {
 
-        Image(
-            painter = painterResource(
-                id = R.drawable.parque_comunidad
-            ),
+        AsyncImage(
+            model = publicacion.imagenUrl,
             contentDescription = "Aviso oficial",
             modifier = Modifier
                 .width(120.dp)
                 .height(92.dp)
-                .clip(
-                    RoundedCornerShape(14.dp)
-                ),
+                .clip(RoundedCornerShape(14.dp)),
             contentScale = ContentScale.Crop
         )
 
@@ -317,14 +335,12 @@ private fun ContenidoAvisoOficial(
             )
 
             Text(
-                text = "Cambio de horario:",
-                style = MaterialTheme.typography.titleSmall,
+                text = publicacion.titulo.orEmpty(),                style = MaterialTheme.typography.titleSmall,
                 color = AzulMarino
             )
 
             Text(
-                text = "Reforestación Parque Central iniciará a las 9:00 AM.",
-                style = MaterialTheme.typography.bodySmall,
+                text = publicacion.contenido,                style = MaterialTheme.typography.bodySmall,
                 color = GrisTexto,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
@@ -337,6 +353,7 @@ private fun ContenidoAvisoOficial(
 //comunidad
 @Composable
 private fun ContenidoComunidad(
+    publicacion: PublicacionComunidadUi,
     onClick: () -> Unit
 ) {
 
@@ -380,13 +397,13 @@ private fun ContenidoComunidad(
             ) {
 
                 Text(
-                    text = "Carlos M.",
+                    text = publicacion.autor,
                     style = MaterialTheme.typography.titleSmall,
                     color = AzulMarino
                 )
 
                 Text(
-                    text = "Hace 5 horas",
+                    text = publicacion.tiempoRelativo,
                     style = MaterialTheme.typography.labelSmall,
                     color = GrisTexto
                 )
@@ -399,17 +416,13 @@ private fun ContenidoComunidad(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically)
         {
-            Image(
-                painter = painterResource(
-                    id = R.drawable.parque_comunidad
-                ),
+            AsyncImage(
+                model = publicacion.imagenUrl,
                 contentDescription = "Publicación de comunidad",
                 modifier = Modifier
                     .width(120.dp)
                     .height(92.dp)
-                    .clip(
-                        RoundedCornerShape(14.dp)
-                    ),
+                    .clip(RoundedCornerShape(14.dp)),
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(12.dp))
@@ -419,7 +432,7 @@ private fun ContenidoComunidad(
             {
 
                 Text(
-                    text = "Mil gracias a todos los que donaron alimentos hoy. Juntos alimentamos a 50 familias. 🌳💚",
+                    text = publicacion.contenido,
                     style = MaterialTheme.typography.bodySmall,
                     color = GrisTexto,
                     maxLines = 4,
@@ -430,16 +443,23 @@ private fun ContenidoComunidad(
                 Row(verticalAlignment = Alignment.CenterVertically)
                 {
                     Icon(
-                        imageVector =
-                            Icons.Outlined.FavoriteBorder,
+                        imageVector = if (publicacion.meGusta) {
+                            Icons.Filled.Favorite
+                        } else {
+                            Icons.Outlined.FavoriteBorder
+                        },
                         contentDescription = null,
-                        tint = AzulMarino,
+                        tint = if (publicacion.meGusta) {
+                            Color.Red
+                        } else {
+                            AzulMarino
+                        },
                         modifier = Modifier.size(17.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
-                        text = "24",
+                        text = "${publicacion.numeroLikes}",
                         style = MaterialTheme.typography.labelSmall,
                         color = AzulMarino
                     )
@@ -455,7 +475,7 @@ private fun ContenidoComunidad(
 
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "5",
+                        text = "${publicacion.numeroComentarios}",
                         style = MaterialTheme.typography.labelSmall,
                         color = AzulMarino
                     )

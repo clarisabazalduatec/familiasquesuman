@@ -30,6 +30,8 @@ import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.data.repository.ComunidadRepository
 import kotlinx.coroutines.launch
 import com.example.familiasquesuman.ui.components.FotoPerfil
+import coil.compose.AsyncImage
+
 @Composable
 fun PublicacionDetalleScreen(navController: NavHostController, publicacionId: String){
     val repository = remember { ComunidadRepository() }
@@ -155,13 +157,15 @@ private fun DetalleOficial(publicacion: PublicacionComunidadUi, navController: N
                 Spacer(modifier = Modifier.height(14.dp))
             }
 
-            publicacion.imagenRes?.let { imagen -> Image(painter = painterResource(imagen),
-                contentDescription = publicacion.titulo,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(245.dp),
-                contentScale = ContentScale.Crop
-            )
+            publicacion.imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
+                AsyncImage(
+                    model = url,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(165.dp),
+                    contentScale = ContentScale.Crop
+                )
             }
             Column(modifier = Modifier.padding(18.dp)) {
                 Text(text = publicacion.contenido,
@@ -182,10 +186,14 @@ private fun DetalleOficial(publicacion: PublicacionComunidadUi, navController: N
                         publicacion.horarioEvento?.let {
                             DatoDetalle(icono = Icons.Outlined.Schedule, texto = it)
                         }
-                        publicacion.ubicacion?.let {
-                            DatoDetalle(icono = Icons.Outlined.LocationOn, texto = it)
-                        }
-                        DatoDetalle(icono = Icons.Outlined.Groups, texto = "Abierto a todas las familias")
+                        publicacion.publicoObjetivo
+                            ?.takeIf { it.isNotBlank() }
+                            ?.let { publico ->
+                                DatoDetalle(
+                                    icono = Icons.Outlined.Groups,
+                                    texto = publico
+                                )
+                            }
                     }
                 }
                 publicacion.documentoNombre?.let { nombre ->
@@ -365,12 +373,13 @@ private fun DetalleComunidad(
             )
             Spacer(modifier = Modifier.height(14.dp))
         }
-            publicacion.imagenRes?.let {
-                Image(painter = painterResource(it),
+            publicacion.imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
+                AsyncImage(
+                    model = url,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(285.dp),
+                        .height(165.dp),
                     contentScale = ContentScale.Crop
                 )
             }
