@@ -14,10 +14,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.familiasquesuman.data.remote.dto.MiInscripcionDto
@@ -26,42 +33,95 @@ import com.example.familiasquesuman.data.repository.InscripcionRepository
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AzulMarino
+import kotlinx.coroutines.launch
 import java.util.Date
+
+class MisActividadesViewModel(
+    private val repository: InscripcionRepository = InscripcionRepository(),
+) : ViewModel() {
+    var cargando by mutableStateOf(value = true)
+        private set
+    var error by mutableStateOf<String?>(null)
+        private set
+    var inscripciones by mutableStateOf<List<MiInscripcionDto>>(emptyList())
+        private set
+
+    fun cargar() {
+        viewModelScope.launch {
+            cargando = true
+            error = null
+            repository.misInscripciones(incluirCanceladas = true)
+                .onSuccess {
+                    inscripciones = it
+                    cargando = false
+                }
+                .onFailure {
+                    error = it.message
+                    cargando = false
+                }
+        }
+    }
+}
+
+private fun MiInscripcionDto.yaPaso(ahora: Date): Boolean {
+    val domain = actividad?.toDomain()
+    val fechaRef = domain?.terminaEn ?: domain?.iniciaEn
+    return (fechaRef != null) && fechaRef.before(ahora)
+}
+
+private fun MiInscripcionDto.esCancelada(): Boolean {
+    return estado?.equals("CANCELADA", ignoreCase = true) == true
+}
 
 @Composable
 fun MisActividadesPerfil(
     navController: NavHostController,
-    repository: InscripcionRepository = remember { InscripcionRepository() }
+    viewModel: MisActividadesViewModel = viewModel()
 ) {
-    var cargando by remember { mutableStateOf(true) }
-    var error by remember { mutableStateOf<String?>(null) }
-    var inscripciones by remember { mutableStateOf<List<MiInscripcionDto>>(emptyList()) }
-    var tabSeleccionada by remember { mutableIntStateOf(0) } // 0 = Próximas, 1 = Pasadas
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(Unit) {
-        cargando = true
-        repository.misInscripciones()
-            .onSuccess {
-                inscripciones = it
-                cargando = false
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.cargar()
             }
-            .onFailure {
-                error = it.message
-                cargando = false
-            }
-    }
-
-    val ahora = remember { Date() }
-
-    val (proximas, pasadas) = remember(inscripciones) {
-        inscripciones.partition { miInscripcion ->
-            val domain = miInscripcion.actividad?.toDomain()
-            val fechaReferencia = domain?.terminaEn ?: domain?.iniciaEn
-            fechaReferencia == null || fechaReferencia.after(ahora)
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
-    val listaActual = if (tabSeleccionada == 0) proximas else pasadas
+    var tabSeleccionada by remember { mutableIntStateOf(0) } // 0 = Próximas, 1 = Historial
+    var mostrarPopUpConcluida by remember { mutableStateOf(false) }
+
+    val ahora = remember { Date() }
+
+    val (proximas, historial) = remember(viewModel.inscripciones, ahora) {
+        val proxi = viewModel.inscripciones
+            .filter { !it.esCancelada() && !it.yaPaso(ahora) }
+            .sortedBy { it.actividad?.toDomain()?.iniciaEn?.time ?: Long.MAX_VALUE }
+
+        val histo = viewModel.inscripciones
+            .filter { it.esCancelada() || it.yaPaso(ahora) }
+            .sortedByDescending { it.actividad?.toDomain()?.iniciaEn?.time ?: 0L }
+
+        Pair(proxi, histo)
+    }
+
+    val actividadesConAsistencia = remember(viewModel.inscripciones, ahora) {
+        viewModel.inscripciones.count {
+            it.yaPaso(ahora) && !it.esCancelada() && it.participantes.any { p -> p.asistencia == "ASISTIO" }
+        }
+    }
+
+    val personasAsistenciasTotal = remember(viewModel.inscripciones) {
+        viewModel.inscripciones
+            .filter { !it.esCancelada() }
+            .sumOf { item -> item.participantes.count { p -> p.asistencia == "ASISTIO" } }
+    }
+
+    val listaActual = if (tabSeleccionada == 0) proximas else historial
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -81,7 +141,7 @@ fun MisActividadesPerfil(
             lineHeight = 19.sp
         )
 
-        // Pestañas Próximas / Pasadas
+        // Pestañas Próximas / Historial
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -120,7 +180,7 @@ fun MisActividadesPerfil(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Pasadas (${pasadas.size})",
+                    text = "Historial (${historial.size})",
                     color = if (tabSeleccionada == 1) Color.White else AzulMarino.copy(alpha = 0.7f),
                     fontWeight = if (tabSeleccionada == 1) FontWeight.Bold else FontWeight.Normal,
                     fontSize = 14.sp
@@ -128,7 +188,7 @@ fun MisActividadesPerfil(
             }
         }
 
-        if (cargando) {
+        if (viewModel.cargando) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -137,7 +197,7 @@ fun MisActividadesPerfil(
             ) {
                 CircularProgressIndicator(color = Ambar)
             }
-        } else if (error != null) {
+        } else if (viewModel.error != null) {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -148,44 +208,137 @@ fun MisActividadesPerfil(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = error ?: "Ocurrió un error",
+                        text = viewModel.error ?: "Ocurrió un error",
                         color = MaterialTheme.colorScheme.error,
                         fontSize = 14.sp
                     )
                 }
             }
-        } else if (listaActual.isEmpty()) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                color = Color.White
-            ) {
-                Column(
-                    modifier = Modifier.padding(28.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+        } else {
+            if (tabSeleccionada == 1) {
+                ResumenHistorialCard(
+                    actividadesConAsistencia = actividadesConAsistencia,
+                    personasAsistenciasTotal = personasAsistenciasTotal
+                )
+            }
+
+            if (listaActual.isEmpty()) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    color = Color.White
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Groups,
-                        contentDescription = null,
-                        tint = AzulMarino.copy(alpha = 0.35f),
-                        modifier = Modifier.size(42.dp)
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = if (tabSeleccionada == 0) "No tienes actividades próximas registradas." else "No tienes actividades pasadas.",
-                        color = AzulMarino.copy(alpha = 0.60f),
-                        fontSize = 15.sp
+                    Column(
+                        modifier = Modifier.padding(28.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Groups,
+                            contentDescription = null,
+                            tint = AzulMarino.copy(alpha = 0.35f),
+                            modifier = Modifier.size(42.dp)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Text(
+                            text = if (tabSeleccionada == 0) "No tienes actividades próximas registradas." else "No tienes actividades en tu historial.",
+                            color = AzulMarino.copy(alpha = 0.60f),
+                            fontSize = 15.sp
+                        )
+                    }
+                }
+            } else {
+                listaActual.forEach { item ->
+                    TarjetaMiInscripcion(
+                        inscripcion = item,
+                        ahora = ahora,
+                        onClick = {
+                            val actId = item.actividad?.id ?: item.actividadId ?: ""
+                            if (!item.esCancelada() && !item.yaPaso(ahora)) {
+                                navController.navigate(Rutas.ActividadDetalle.crearRuta(actId))
+                            } else {
+                                mostrarPopUpConcluida = true
+                            }
+                        }
                     )
                 }
             }
-        } else {
-            listaActual.forEach { item ->
-                TarjetaMiInscripcion(
-                    inscripcion = item,
-                    onClick = {
-                        val actId = item.actividad?.id ?: item.actividadId ?: ""
-                        navController.navigate(Rutas.ActividadDetalle.crearRuta(actId))
-                    }
+        }
+    }
+
+    if (mostrarPopUpConcluida) {
+        AlertDialog(
+            onDismissRequest = { mostrarPopUpConcluida = false },
+            containerColor = Color.White,
+            title = {
+                Text(
+                    text = "Actividad concluida",
+                    color = AzulMarino,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
+            },
+            text = {
+                Text(
+                    text = "Esta actividad ya concluyó",
+                    color = AzulMarino,
+                    fontSize = 15.sp
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { mostrarPopUpConcluida = false }) {
+                    Text("Aceptar", color = Ambar, fontWeight = FontWeight.Bold)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun ResumenHistorialCard(
+    actividadesConAsistencia: Int,
+    personasAsistenciasTotal: Int
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = actividadesConAsistencia.toString(),
+                    color = AzulMarino,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Actividades participadas",
+                    color = AzulMarino.copy(alpha = 0.7f),
+                    fontSize = 12.sp
+                )
+            }
+            VerticalDivider(
+                modifier = Modifier.height(36.dp),
+                color = AzulMarino.copy(alpha = 0.12f)
+            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = personasAsistenciasTotal.toString(),
+                    color = Ambar,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = "Personas-asistencia",
+                    color = AzulMarino.copy(alpha = 0.7f),
+                    fontSize = 12.sp
                 )
             }
         }
@@ -195,17 +348,24 @@ fun MisActividadesPerfil(
 @Composable
 private fun TarjetaMiInscripcion(
     inscripcion: MiInscripcionDto,
+    ahora: Date,
     onClick: () -> Unit
 ) {
     val actividad = remember(inscripcion.actividad) { inscripcion.actividad?.toDomain() }
+    val esCancelada = remember(inscripcion.estado) { inscripcion.esCancelada() }
+    val yaPaso = remember(inscripcion.actividad, ahora) { inscripcion.yaPaso(ahora) }
+
     val participantesNombres = remember(inscripcion.participantes) {
-        inscripcion.participantes.orEmpty().mapNotNull { it.nombre }.joinToString(", ").ifBlank { "Sin participantes" }
+        inscripcion.participantes.mapNotNull { it.nombre }.joinToString(", ").ifBlank { "Sin participantes" }
     }
+
+    val alphaCard = if (esCancelada) 0.65f else 1.0f
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() },
+            .graphicsLayer { alpha = alphaCard }
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -251,17 +411,36 @@ private fun TarjetaMiInscripcion(
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
-                    Surface(
-                        color = Ambar.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(12.dp)
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = actividad?.categoria ?: "General",
-                            color = AzulMarino,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                        )
+                        Surface(
+                            color = Ambar.copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(
+                                text = actividad?.categoria ?: "General",
+                                color = AzulMarino,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                            )
+                        }
+                        if (esCancelada) {
+                            Surface(
+                                color = Color(0xFFFFEBEE),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Text(
+                                    text = "Cancelada",
+                                    color = Color(0xFFC62828),
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
                     }
                     Spacer(modifier = Modifier.height(6.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -314,20 +493,76 @@ private fun TarjetaMiInscripcion(
 
             HorizontalDivider(color = AzulMarino.copy(alpha = 0.08f))
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Outlined.Groups,
-                    contentDescription = null,
-                    tint = Ambar,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "Inscritos: $participantesNombres",
-                    color = AzulMarino,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+            if (yaPaso) {
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Outlined.Groups,
+                            contentDescription = null,
+                            tint = Ambar,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Asistencia:",
+                            color = AzulMarino,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    val participantes = inscripcion.participantes
+                    if (participantes.isEmpty()) {
+                        Text(
+                            text = "Sin participantes",
+                            color = AzulMarino.copy(alpha = 0.6f),
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(start = 22.dp)
+                        )
+                    } else {
+                        participantes.forEach { p ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 22.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = p.nombre ?: "Participante",
+                                    color = AzulMarino,
+                                    fontSize = 13.sp
+                                )
+                                val (textoEstado, colorEstado) = when (p.asistencia) {
+                                    "ASISTIO" -> "Asistió" to Color(0xFF2E7D32)
+                                    "FALTO" -> "No asistió" to Color(0xFFC62828)
+                                    else -> "Sin registrar" to AzulMarino.copy(alpha = 0.6f)
+                                }
+                                Text(
+                                    text = textoEstado,
+                                    color = colorEstado,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+                }
+            } else {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Outlined.Groups,
+                        contentDescription = null,
+                        tint = Ambar,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Inscritos: $participantesNombres",
+                        color = AzulMarino,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     }

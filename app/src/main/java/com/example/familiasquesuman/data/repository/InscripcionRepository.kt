@@ -43,9 +43,9 @@ class InscripcionRepository {
     }
 
     /** Si no tiene familia o no tiene inscripciones y el backend responde 404, regresa lista vacía. */
-    suspend fun misInscripciones(): Result<List<MiInscripcionDto>> = llamarApi {
+    suspend fun misInscripciones(incluirCanceladas: Boolean = false): Result<List<MiInscripcionDto>> = llamarApi {
         try {
-            api.misInscripcionesFamilia()
+            api.misInscripcionesFamilia(incluirCanceladas)
         } catch (e: HttpException) {
             if (e.code() == 404) emptyList() else throw e
         }

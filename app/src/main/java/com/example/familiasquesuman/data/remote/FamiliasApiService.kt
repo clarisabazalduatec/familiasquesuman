@@ -233,7 +233,7 @@ interface FamiliasApiService {
     suspend fun cancelarInscripcionActividad(@Path("id") id: String)
 
     @GET("familias/mia/inscripciones")
-    suspend fun misInscripcionesFamilia(): List<MiInscripcionDto>
+    suspend fun misInscripcionesFamilia(@Query("incluir_canceladas") incluirCanceladas: Boolean = false): List<MiInscripcionDto>
 
     // Admin:
     @GET("actividades/{id}/inscripciones")
