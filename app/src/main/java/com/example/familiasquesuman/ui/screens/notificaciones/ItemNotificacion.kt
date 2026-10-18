@@ -32,6 +32,7 @@ private fun iconoPara(tipo: String): ImageVector = when (tipo) {
     "PUBLICACION_POR_REVISAR" -> Icons.Default.RateReview
     "ACTIVIDAD_LLENA" -> Icons.Default.EventBusy
     "LUGAR_CONFIRMADO" -> Icons.Default.CheckCircle
+    "INSCRIPCION_ACTIVIDAD" -> Icons.Default.EventAvailable
     else -> Icons.Default.Notifications
 }
 
