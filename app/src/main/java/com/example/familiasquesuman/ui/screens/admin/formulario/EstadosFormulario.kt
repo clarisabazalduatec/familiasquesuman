@@ -1,13 +1,17 @@
 package com.example.familiasquesuman.ui.screens.admin.formulario
 
-import com.example.familiasquesuman.data.ActividadMock
+import com.example.familiasquesuman.domain.Actividad
 import com.example.familiasquesuman.domain.CentroVisiteo
 import com.example.familiasquesuman.domain.Donacion
 import com.example.familiasquesuman.domain.EstadoProyecto
 import com.example.familiasquesuman.domain.Proyecto
-import com.example.familiasquesuman.domain.TipoApoyo
 import com.example.familiasquesuman.domain.TipoCentro
 import com.example.familiasquesuman.domain.TipoDonacion
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 // ---------------------------------------------------------------------------
 // Estado del formulario: un data class por grupo de campos.
@@ -22,9 +26,11 @@ data class ComunForm(
 )
 
 data class ActividadForm(
-    val categoria: String = "",
-    val fecha: String = "",
-    val horario: String = "",
+    val categoriaId: Int? = null,
+    val categoriaNombre: String = "",
+    val fechaMillis: Long? = null,
+    val horaInicio: Pair<Int, Int>? = null, // (hora 0..23, minuto 0..59)
+    val horaFin: Pair<Int, Int>? = null,
     val organizador: String = "Familias que Suman",
     val lugaresTotales: String = "30",
     val acercaDe: String = "",
@@ -72,6 +78,11 @@ data class DonacionForm(
     val horario: String = "", // Para Tiempo
 )
 
+/**
+- Centro de visiteo. Campos de la tabla centros_visiteo; nombre, descripción corta, dirección y
+- "activo" viajan en ComunForm (titulo, descripcionCorta, ubicacion, activa).
+- `necesidades` = filas de centro_necesidades; el orden de la lista es la columna `orden`.
+ */
 data class CentroForm(
     val tipo: TipoCentro = TipoCentro.ASILO,
     val informacionGeneral: String = "",
@@ -80,22 +91,100 @@ data class CentroForm(
     val recomendaciones: String = "",
     val telefono: String = "",
     val whatsapp: String = "",
+    val mapaUrl: String = "",      // link de "Cómo llegar" (Google Maps, etc.)
     val verificado: Boolean = true,
 )
+
+// ---------------------------------------------------------------------------
+// Helpers de Fecha y Hora
+// ---------------------------------------------------------------------------
+
+fun obtenerDateDesdeFechaYHora(fechaMillis: Long, hora: Pair<Int, Int>): Date {
+    val calUtc = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+        timeInMillis = fechaMillis
+    }
+    val year = calUtc.get(Calendar.YEAR)
+    val month = calUtc.get(Calendar.MONTH)
+    val day = calUtc.get(Calendar.DAY_OF_MONTH)
+
+    val calMty = Calendar.getInstance(TimeZone.getTimeZone("America/Monterrey")).apply {
+        set(year, month, day, hora.first, hora.second, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+    return calMty.time
+}
+
+fun formarIsoConZona(fechaMillis: Long, hora: Pair<Int, Int>): String {
+    val date = obtenerDateDesdeFechaYHora(fechaMillis, hora)
+    val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US).apply {
+        timeZone = TimeZone.getTimeZone("America/Monterrey")
+    }
+    return sdf.format(date)
+}
+
+fun formatearFechaDisplay(fechaMillis: Long?): String {
+    if (fechaMillis == null) return ""
+    val calUtc = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply { timeInMillis = fechaMillis }
+    val localeEsMx = Locale.forLanguageTag("es-MX")
+    val sdf = SimpleDateFormat("EEE, d 'de' MMM, yyyy", localeEsMx).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+    val raw = sdf.format(calUtc.time)
+    return raw.replace(".", "").split(" ").joinToString(" ") { palabra ->
+        if (palabra.equals("de", ignoreCase = true)) "de"
+        else palabra.replaceFirstChar { if (it.isLowerCase()) it.titlecase(localeEsMx) else it.toString() }
+    }
+}
+
+fun formatearHoraDisplay(hora: Pair<Int, Int>?): String {
+    if (hora == null) return ""
+    val cal = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, hora.first)
+        set(Calendar.MINUTE, hora.second)
+    }
+    val sdf = SimpleDateFormat("hh:mm a", Locale.US)
+    return sdf.format(cal.time)
+}
 
 // ---------------------------------------------------------------------------
 // Modelo -> formulario (para precargar al editar)
 // ---------------------------------------------------------------------------
 
-fun ActividadMock.aFormulario(): Pair<ComunForm, ActividadForm> =
-    ComunForm(titulo, descripcion, ubicacion, activa) to ActividadForm(
-        categoria = categoria,
-        fecha = fecha,
-        horario = horario,
+fun Actividad.aFormulario(): Pair<ComunForm, ActividadForm> {
+    val calInicio = iniciaEn?.let {
+        Calendar.getInstance(TimeZone.getTimeZone("America/Monterrey")).apply { time = it }
+    }
+    val calFin = terminaEn?.let {
+        Calendar.getInstance(TimeZone.getTimeZone("America/Monterrey")).apply { time = it }
+    }
+
+    val fechaMillis = calInicio?.run {
+        val calUtc = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+            clear()
+            set(get(Calendar.YEAR), get(Calendar.MONTH), get(Calendar.DAY_OF_MONTH))
+        }
+        calUtc.timeInMillis
+    }
+
+    val horaInicioPair = calInicio?.let { it.get(Calendar.HOUR_OF_DAY) to it.get(Calendar.MINUTE) }
+    val horaFinPair = calFin?.let { it.get(Calendar.HOUR_OF_DAY) to it.get(Calendar.MINUTE) }
+
+    return ComunForm(
+        titulo = titulo,
+        descripcionCorta = descripcion,
+        ubicacion = ubicacion,
+        activa = activa
+    ) to ActividadForm(
+        categoriaId = categoriaId,
+        categoriaNombre = categoria,
+        fechaMillis = fechaMillis,
+        horaInicio = horaInicioPair,
+        horaFin = horaFinPair,
         organizador = organizador,
         lugaresTotales = lugaresTotales.toString(),
-        acercaDe = acercaDe,
+        acercaDe = acercaDe
     )
+}
 
 fun Proyecto.aFormulario(): Pair<ComunForm, ProyectoForm> =
     ComunForm(nombre, descripcionCorta, ubicacion, activo) to ProyectoForm(
@@ -164,6 +253,7 @@ fun CentroVisiteo.aFormulario(): Pair<ComunForm, CentroForm> =
         recomendaciones = recomendaciones.orEmpty(),
         telefono = telefono.orEmpty(),
         whatsapp = whatsapp.orEmpty(),
+        mapaUrl = mapaUrl.orEmpty(),
         verificado = verificado,
     )
 
@@ -184,19 +274,32 @@ fun validarFormulario(
     donacion: DonacionForm,
     centro: CentroForm,
     imagenes: List<String>,
+    esEdicion: Boolean = false,
 ): String? {
     if (comun.titulo.isBlank()) return "El título no puede estar vacío."
     if (comun.descripcionCorta.isBlank()) return "Agrega una descripción corta."
 
     return when (tipo) {
-        TipoContenidoAdmin.ACTIVIDAD -> when {
-            comun.ubicacion.isBlank() -> "Indica la ubicación."
-            actividad.categoria.isBlank() -> "Elige o crea una categoría."
-            actividad.fecha.isBlank() -> "Indica la fecha."
-            actividad.horario.isBlank() -> "Indica el horario."
-            actividad.organizador.isBlank() -> "Indica el organizador."
-            (actividad.lugaresTotales.toIntOrNull() ?: 0) <= 0 -> "Los lugares deben ser un número mayor a 0."
-            else -> null
+        TipoContenidoAdmin.ACTIVIDAD -> {
+            val dateInicio = if (actividad.fechaMillis != null && actividad.horaInicio != null) {
+                obtenerDateDesdeFechaYHora(actividad.fechaMillis, actividad.horaInicio)
+            } else null
+            val dateFin = if (actividad.fechaMillis != null && actividad.horaFin != null) {
+                obtenerDateDesdeFechaYHora(actividad.fechaMillis, actividad.horaFin)
+            } else null
+
+            when {
+                comun.ubicacion.isBlank() -> "Indica la ubicación."
+                actividad.categoriaId == null && actividad.categoriaNombre.isBlank() -> "Elige o crea una categoría."
+                actividad.fechaMillis == null -> "Indica la fecha."
+                actividad.horaInicio == null -> "Indica la hora de inicio."
+                actividad.horaFin == null -> "Indica la hora de fin."
+                dateInicio != null && dateFin != null && !dateFin.after(dateInicio) -> "La hora de fin debe ser posterior a la hora de inicio."
+                !esEdicion && dateInicio != null && dateInicio.before(Date()) -> "La fecha y hora de inicio deben ser en el futuro."
+                actividad.organizador.isBlank() -> "Indica el organizador."
+                (actividad.lugaresTotales.toIntOrNull() ?: 0) <= 0 -> "Los lugares deben ser un número mayor a 0."
+                else -> null
+            }
         }
 
         TipoContenidoAdmin.PROYECTO -> when {
@@ -230,6 +333,8 @@ fun validarFormulario(
             centro.informacionGeneral.isBlank() -> "Agrega la información general del centro."
             centro.comoAyudar.isBlank() -> "Explica cómo se puede ayudar al centro."
             !telefonoValido(centro.telefono) || !telefonoValido(centro.whatsapp) -> MSG_TELEFONO
+            centro.mapaUrl.isNotBlank() && !centro.mapaUrl.trim().startsWith("http") ->
+                "El link de cómo llegar debe ser un enlace completo (https://maps.app.goo.gl/...)."
             else -> null
         }
     }

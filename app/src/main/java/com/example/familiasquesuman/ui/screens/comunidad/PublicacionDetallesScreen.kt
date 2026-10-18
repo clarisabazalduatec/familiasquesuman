@@ -27,80 +27,104 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
 import com.example.familiasquesuman.ui.model.TipoSesion
-
+import com.example.familiasquesuman.data.repository.ComunidadRepository
+import kotlinx.coroutines.launch
+import com.example.familiasquesuman.ui.components.FotoPerfil
 @Composable
-fun PublicacionDetalleScreen(
-    navController: NavHostController,
-    publicacionId: String
-) {
-
-    val publicacion = buscarPublicacion(publicacionId)
+fun PublicacionDetalleScreen(navController: NavHostController, publicacionId: String){
+    val repository = remember { ComunidadRepository() }
+    var publicacion by remember(publicacionId) { mutableStateOf<PublicacionComunidadUi?>(null) }
+    var cargando by remember(publicacionId) { mutableStateOf(true) }
+    var errorCarga by remember(publicacionId) { mutableStateOf<String?>(null) }
     val sesionIniciada = SesionManager.tipoSesion != TipoSesion.INVITADO
+    LaunchedEffect(publicacionId) {
+        cargando = true
+        errorCarga = null
+        publicacion = null
+        repository.obtenerPublicacionPorId(publicacionId)
+            .onSuccess { publicacion = it }
+            .onFailure { errorCarga = "No se pudo cargar la publicación." }
+        cargando = false
+    }
 
-    PantallaPrincipalConMenu(
-        navController = navController,
-        pantallaActual = PantallaPrincipal.INICIO,
-
-    ) { paddingInterno ->
-        if (publicacion == null) {
-            Box(modifier = Modifier
+    PantallaPrincipalConMenu(navController = navController, pantallaActual = PantallaPrincipal.INICIO)
+    { paddingInterno ->
+        when {
+            cargando -> { Box(modifier = Modifier
+                .padding(paddingInterno)
+                .fillMaxSize()
+                .background(CremaFondo),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = AzulMarino)
+            }
+            }
+            errorCarga != null -> {
+                Box(modifier = Modifier
                     .padding(paddingInterno)
                     .fillMaxSize()
                     .background(CremaFondo),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = "Publicación no encontrada",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = AzulMarino
-                )
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = errorCarga.orEmpty(),
+                        color = AzulMarino
+                    )
+                }
             }
-            return@PantallaPrincipalConMenu
-        }
-
-        if (publicacion.tipo == TipoPublicacion.OFICIAL) {
-            DetalleOficial(publicacion = publicacion,
-                navController = navController,
-                paddingInterno = paddingInterno
-            )
-
-        } else {
-            DetalleComunidad(
-                publicacion = publicacion,
-                navController = navController,
-                paddingInterno = paddingInterno,
-                sesionIniciada = sesionIniciada
-            )
+            publicacion == null -> {
+                Box(modifier = Modifier
+                    .padding(paddingInterno)
+                    .fillMaxSize()
+                    .background(CremaFondo),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Publicación no encontrada",
+                        color = AzulMarino
+                    )
+                }
+            }
+            else -> {
+                val publicacionActual = publicacion!!
+                if (publicacionActual.tipo == TipoPublicacion.OFICIAL) {
+                    DetalleOficial(publicacion = publicacionActual,
+                        navController = navController,
+                        paddingInterno = paddingInterno
+                    )
+                } else {
+                    DetalleComunidad(publicacion = publicacionActual,
+                        navController = navController,
+                        paddingInterno = paddingInterno,
+                        sesionIniciada = sesionIniciada
+                    )
+                }
+            }
         }
     }
 }
 
-@Composable
-private fun DetalleOficial(
-    publicacion: PublicacionComunidadUi,
-    navController: NavHostController,
-    paddingInterno: PaddingValues
-) {
 
+
+@Composable
+private fun DetalleOficial(publicacion: PublicacionComunidadUi, navController: NavHostController, paddingInterno: PaddingValues) {
     LazyColumn(modifier = Modifier
-            .padding(paddingInterno)
-            .fillMaxSize()
-            .background(CremaFondo),
+        .padding(paddingInterno)
+        .fillMaxSize()
+        .background(CremaFondo),
         contentPadding = PaddingValues(bottom = 28.dp)) {
         item {
             Column(modifier = Modifier.padding(
-                    horizontal = 16.dp,
-                    vertical = 8.dp)
+                horizontal = 16.dp,
+                vertical = 8.dp)
             ) {
-
                 Surface(modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(18.dp),
                     color = Blanco,
                     tonalElevation = 1.dp
                 ) {
                     Row(modifier = Modifier.padding(
-                            horizontal = 6.dp,
-                            vertical = 10.dp
-                        ),
+                        horizontal = 6.dp,
+                        vertical = 10.dp
+                    ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(onClick = { navController.popBackStack() }) {
@@ -132,12 +156,12 @@ private fun DetalleOficial(
             }
 
             publicacion.imagenRes?.let { imagen -> Image(painter = painterResource(imagen),
-                    contentDescription = publicacion.titulo,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(245.dp),
-                    contentScale = ContentScale.Crop
-                )
+                contentDescription = publicacion.titulo,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(245.dp),
+                contentScale = ContentScale.Crop
+            )
             }
             Column(modifier = Modifier.padding(18.dp)) {
                 Text(text = publicacion.contenido,
@@ -153,8 +177,8 @@ private fun DetalleOficial(
                 ) {
                     Column(modifier = Modifier.padding(16.dp))
                     { publicacion.fechaEvento?.let {
-                            DatoDetalle(icono = Icons.Outlined.CalendarMonth, texto = it)
-                        }
+                        DatoDetalle(icono = Icons.Outlined.CalendarMonth, texto = it)
+                    }
                         publicacion.horarioEvento?.let {
                             DatoDetalle(icono = Icons.Outlined.Schedule, texto = it)
                         }
@@ -225,126 +249,124 @@ private fun DetalleOficial(
     }
 }
 
+
 @Composable
 private fun DetalleComunidad(
     publicacion: PublicacionComunidadUi,
     navController: NavHostController,
     paddingInterno: PaddingValues,
     sesionIniciada: Boolean
-
 ) {
-    var tieneLike by rememberSaveable(publicacion.id) { mutableStateOf(false) }
-    var likes by rememberSaveable(publicacion.id) { mutableIntStateOf(publicacion.numeroLikes) }
-    var comentario by rememberSaveable { mutableStateOf("") }
-    val comentarios = remember(publicacion.id) {
-        mutableStateListOf<ComentarioUi>().apply {
-            addAll(publicacion.comentarios)
-        }
+    val repository = remember { ComunidadRepository() }
+    val scope = rememberCoroutineScope()
+    var enviandoComentario by remember(publicacion.id) { mutableStateOf(false) }
+    var errorEnvioComentario by remember(publicacion.id) { mutableStateOf<String?>(null) }
+    var tieneLike by remember(publicacion.id) { mutableStateOf(publicacion.meGusta) }
+    var likes by remember(publicacion.id) { mutableIntStateOf(publicacion.numeroLikes) }
+    var guardandoLike by remember(publicacion.id) { mutableStateOf(false) }
+    var errorLike by remember(publicacion.id) { mutableStateOf<String?>(null) }
+    var comentario by rememberSaveable(publicacion.id) { mutableStateOf("") }
+    val comentarios = remember(publicacion.id) { mutableStateListOf<ComentarioUi>() }
+    var cargandoComentarios by remember(publicacion.id) { mutableStateOf(true) }
+    var errorComentarios by remember(publicacion.id) { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(publicacion.id) {
+        cargandoComentarios = true
+        errorComentarios = null
+        repository.obtenerComentarios(publicacion.id)
+            .onSuccess { resultado ->
+                comentarios.clear()
+                comentarios.addAll(resultado)
+            }
+            .onFailure { errorComentarios = "No se pudieron cargar los comentarios." }
+        cargandoComentarios = false
     }
-    val comentariosNuevos = comentarios.size - publicacion.comentarios.size
-    val totalComentarios = publicacion.numeroComentarios + comentariosNuevos
-    LazyColumn(
-        modifier = Modifier
-            .padding(paddingInterno)
-            .fillMaxSize()
-            .background(CremaFondo),
+
+    val totalComentarios = if (cargandoComentarios || errorComentarios != null) {
+        publicacion.numeroComentarios
+    } else {
+        comentarios.size
+    }
+
+    LazyColumn(modifier = Modifier
+        .padding(paddingInterno)
+        .fillMaxSize()
+        .background(CremaFondo),
         contentPadding = PaddingValues(bottom = 28.dp)
     ) {
-        item {
-            Column(
-                modifier = Modifier.padding(
-                    horizontal = 16.dp,
-                    vertical = 8.dp
-                )
+        item { Column( modifier = Modifier.padding(
+            horizontal = 16.dp,
+            vertical = 8.dp
+        )
+        ) {
+            Surface( modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(18.dp),
+                color = Blanco,
+                tonalElevation = 1.dp
             ) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(18.dp),
-                    color = Blanco,
-                    tonalElevation = 1.dp
+                Row(modifier = Modifier.padding(
+                    horizontal = 6.dp,
+                    vertical = 10.dp
+                ),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier.padding(
-                            horizontal = 6.dp,
-                            vertical = 10.dp
-                        ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                                contentDescription = "Regresar",
-                                tint = AzulMarino
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Surface(
-                            modifier = Modifier.size(42.dp),
-                            shape = CircleShape,
-                            color = AmbarClaro
-                        ) {
-                            Box(
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Person,
-                                    contentDescription = null,
-                                    tint = AzulMarino
-                                )
-                            }
-                        }
-                        Spacer(modifier = Modifier.width(10.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = publicacion.autor,
-                                style = MaterialTheme.typography.titleSmall,
-                                color = AzulMarino
-                            )
-                            Text(
-                                text = publicacion.tiempoRelativo,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = GrisTexto
-                            )
-                        }
-                        EstadoChip(estado = publicacion.estado)
-                    }
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-                publicacion.categoria?.let {
-                    Surface(
-                        shape = RoundedCornerShape(50),
-                        color = Ambar.copy(alpha = .25f)
-                    ) {
-                        Text(
-                            text = it,
-                            modifier = Modifier.padding(
-                                horizontal = 10.dp,
-                                vertical = 5.dp
-                            ),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = AzulMarino
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                            contentDescription = "Regresar",
+                            tint = AzulMarino
                         )
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    FotoPerfil(
+                        fotoUrl = publicacion.autorFotoUrl,
+                        nombre = publicacion.autor,
+                        tamano = 42.dp
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(text = publicacion.autor,
+                            style = MaterialTheme.typography.titleSmall,
+                            color = AzulMarino
+                        )
+                        Text(text = publicacion.tiempoRelativo,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = GrisTexto
+                        )
+                    }
+                    EstadoChip(estado = publicacion.estado)
                 }
-                publicacion.titulo?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.headlineSmall,
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            publicacion.categoria?.let {
+                Surface(shape = RoundedCornerShape(50),
+                    color = Ambar.copy(alpha = .25f)
+                ) {
+                    Text(text = it,
+                        modifier = Modifier.padding(
+                            horizontal = 10.dp,
+                            vertical = 5.dp
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
                         color = AzulMarino
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
                 }
-                Text(
-                    text = publicacion.contenido,
-                    style = MaterialTheme.typography.bodyLarge,
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            publicacion.titulo?.let {
+                Text(text = it,
+                    style = MaterialTheme.typography.headlineSmall,
                     color = AzulMarino
                 )
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(10.dp))
             }
+            Text(text = publicacion.contenido,
+                style = MaterialTheme.typography.bodyLarge,
+                color = AzulMarino
+            )
+            Spacer(modifier = Modifier.height(14.dp))
+        }
             publicacion.imagenRes?.let {
-                Image(
-                    painter = painterResource(it),
+                Image(painter = painterResource(it),
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -352,69 +374,81 @@ private fun DetalleComunidad(
                     contentScale = ContentScale.Crop
                 )
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = 14.dp,
-                        vertical = 8.dp
-                    ),
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = 14.dp,
+                    vertical = 8.dp
+                ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                IconButton(onClick = {
-                    tieneLike = !tieneLike
-                    likes += if (tieneLike) {
-                        1
-                    } else {
-                        -1
-                    }
-                }
+                IconButton(
+                    onClick = {
+                        if (!sesionIniciada || SesionManager.token.isNullOrBlank()) {
+                            navController.navigate(Rutas.Login.ruta)
+                        } else if (!guardandoLike) {
+                            guardandoLike = true
+                            errorLike = null
+                            scope.launch {
+                                try {
+                                    val resultado = if (tieneLike) {
+                                        repository.quitarLike(publicacion.id)
+                                    } else {
+                                        repository.darLike(publicacion.id)
+                                    }
+                                    resultado.onSuccess {
+                                        tieneLike = !tieneLike
+                                        likes += if (tieneLike) 1 else -1
+                                    }.onFailure {
+                                        errorLike = "No se pudo actualizar el like."
+                                    }
+                                } finally {
+                                    guardandoLike = false
+                                }
+                            }
+                        }
+                    },
+                    enabled = !guardandoLike
                 ) {
                     Icon(
-                        imageVector =
-                            if (tieneLike)
-                                Icons.Filled.Favorite
-                            else
-                                Icons.Outlined.FavoriteBorder,
-                        contentDescription = "Me gusta",
-                        tint =
-                            if (tieneLike)
-                                ColorError
-                            else
-                                AzulMarino
+                        imageVector = if (tieneLike) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = if (tieneLike) "Quitar like" else "Dar like",
+                        tint = if (tieneLike) ColorError else AzulMarino
                     )
                 }
 
-                Text(
-                    text = likes.toString(),
+                Text(text = likes.toString(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = AzulMarino
                 )
                 Spacer(modifier = Modifier.width(18.dp))
-                Icon(
-                    imageVector = Icons.Outlined.ChatBubbleOutline,
+                Icon(imageVector = Icons.Outlined.ChatBubbleOutline,
                     contentDescription = "Comentarios",
                     tint = AzulMarino
                 )
                 Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = totalComentarios.toString(),
+                Text(text = totalComentarios.toString(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = AzulMarino
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = {}) {
-                    Icon(
-                        imageVector = Icons.Outlined.Share,
+                    Icon(imageVector = Icons.Outlined.Share,
                         contentDescription = "Compartir",
                         tint = AzulMarino
                     )
                 }
             }
+            errorLike?.let { mensaje ->
+                Text(
+                    text = mensaje,
+                    modifier = Modifier.padding(horizontal = 18.dp),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
             HorizontalDivider(modifier = Modifier.padding(horizontal = 18.dp), color = GrisBorde)
-            Text(
-                text = "Comentarios ($totalComentarios)",
+            Text(text = "Comentarios ($totalComentarios)",
                 modifier = Modifier.padding(
                     start = 18.dp,
                     end = 18.dp,
@@ -425,139 +459,126 @@ private fun DetalleComunidad(
                 color = AzulMarino
             )
         }
-        items(items = comentarios) { item ->
-            Row(
-                modifier = Modifier.padding(
-                    horizontal = 18.dp,
-                    vertical = 8.dp
+        item {
+            if (cargandoComentarios) {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp),
+                    color = AzulMarino
                 )
+            }
+
+            errorComentarios?.let {
+                Text(text = it,
+                    modifier = Modifier.padding(18.dp),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        }
+
+        items(items = comentarios) { item ->
+            Row(modifier = Modifier.padding(horizontal = 18.dp, vertical = 8.dp)
             ) {
-                Surface(
-                    modifier = Modifier.size(38.dp),
-                    shape = CircleShape,
-                    color = AmbarClaro
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Outlined.Person,
-                            contentDescription = null,
-                            tint = AzulMarino
-                        )
-                    }
-                }
+                FotoPerfil(
+                    fotoUrl = item.autorFotoUrl,
+                    nombre = item.autor,
+                    tamano = 38.dp
+                )
                 Spacer(modifier = Modifier.width(10.dp))
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = item.autor,
+                        Text(text = item.autor,
                             style = MaterialTheme.typography.titleSmall,
                             color = AzulMarino
                         )
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = item.tiempo,
+                        Text(text = item.tiempo,
                             style = MaterialTheme.typography.labelSmall,
                             color = GrisTexto
                         )
                     }
-                    Text(
-                        text = item.comentario,
+                    Text(text = item.comentario,
                         style = MaterialTheme.typography.bodyMedium,
                         color = AzulMarino
                     )
                 }
             }
         }
-
         item {
             if (sesionIniciada) {
-                OutlinedTextField(
-                    value = comentario,
+                OutlinedTextField( value = comentario,
                     onValueChange = { comentario = it },
                     placeholder = {
-                        Text(
-                            text = "Escribe un comentario...",
+                        Text(text = "Escribe un comentario...",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
-                    trailingIcon = {
-                        IconButton(
-                            onClick = {
-                                if (comentario.isNotBlank()) {
-                                    comentarios.add(
-                                        ComentarioUi(
-                                            autor = "Mariana",
-                                            tiempo = "Ahora",
-                                            comentario = comentario.trim(),
-                                            likes = 0
-                                        )
-                                    )
+                    trailingIcon = { IconButton(onClick = { val texto = comentario.trim()
+                        if (texto.isNotEmpty() && !enviandoComentario) {
+                            enviandoComentario = true
+                            errorEnvioComentario = null
+                            scope.launch {
+                                val resultado = repository.publicarComentario(
+                                    publicacionId = publicacion.id,
+                                    contenido = texto
+                                )
+                                resultado.onSuccess { comentarioGuardado ->
+                                    comentarios.add(comentarioGuardado)
                                     comentario = ""
-                                }
-                            },
-                            enabled = comentario.isNotBlank()
-                        ) {
-
-                            Icon(
-                                imageVector = Icons.Outlined.Send,
-                                contentDescription = "Enviar",
-                                tint =
-                                    if (comentario.isNotBlank())
-                                        AzulMarino
-                                    else
-                                        GrisTexto
-                            )
+                                }.onFailure { errorEnvioComentario = "No se pudo publicar el comentario. Inténtalo nuevamente." }
+                                enviandoComentario = false
+                            }
                         }
                     },
-                    modifier = Modifier
-                        .padding(
-                            horizontal = 18.dp,
-                            vertical = 12.dp
+                        enabled = comentario.isNotBlank() && !enviandoComentario
+                    ) {
+                        Icon(imageVector = Icons.Outlined.Send,
+                            contentDescription = "Enviar",
+                            tint = if (comentario.isNotBlank() && !enviandoComentario) {
+                                AzulMarino
+                            } else {
+                                GrisTexto
+                            }
                         )
+                    }
+                    },
+                    modifier = Modifier
+                        .padding(horizontal = 18.dp, vertical = 12.dp)
                         .fillMaxWidth(),
                     shape = RoundedCornerShape(24.dp)
                 )
+                errorEnvioComentario?.let { mensaje ->
+                    Text(text = mensaje,
+                        modifier = Modifier.padding(horizontal = 18.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
             } else {
-                Card(
-                    modifier = Modifier
-                        .padding(
-                            horizontal = 18.dp,
-                            vertical = 12.dp
-                        )
-                        .fillMaxWidth(),
+                Card(modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp)
+                    .fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = Blanco),
                     shape = RoundedCornerShape(18.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
+                    Column(modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
-                        Icon(
-                            imageVector = Icons.Outlined.ChatBubbleOutline,
+                        Icon(imageVector = Icons.Outlined.ChatBubbleOutline,
                             contentDescription = null,
                             tint = AzulMarino,
                             modifier = Modifier.size(28.dp)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "¿Quieres participar en la conversación?",
-                            style = MaterialTheme
-                                .typography
-                                .titleSmall,
+                        Text(text = "¿Quieres participar en la conversación?",
+                            style = MaterialTheme.typography.titleSmall,
                             color = AzulMarino
                         )
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Inicia sesión para dejar un comentario.",
-                            style = MaterialTheme
-                                .typography
-                                .bodySmall,
+                        Text(text = "Inicia sesión para dejar un comentario.",
+                            style = MaterialTheme.typography.bodySmall,
                             color = GrisTexto
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        OutlinedButton(
-                            onClick = { navController.navigate(Rutas.Login.ruta) },
+                        OutlinedButton(onClick = { navController.navigate(Rutas.Login.ruta) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
@@ -566,11 +587,8 @@ private fun DetalleComunidad(
                         ) {
                             Icon(imageVector = Icons.Outlined.Login, contentDescription = null)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "Iniciar sesión",
-                                style = MaterialTheme
-                                    .typography
-                                    .titleSmall
+                            Text(text = "Iniciar sesión",
+                                style = MaterialTheme.typography.titleSmall
                             )
                         }
                     }
@@ -581,17 +599,13 @@ private fun DetalleComunidad(
 }
 
 @Composable
-private fun DatoDetalle(
-    icono: androidx.compose.ui.graphics.vector.ImageVector,
-    texto: String
-) {
-    Row(modifier = Modifier.padding(vertical = 6.dp),
+private fun DatoDetalle(icono: androidx.compose.ui.graphics.vector.ImageVector, texto: String)
+{ Row(modifier = Modifier.padding(vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(imageVector = icono, contentDescription = null,
-            tint = AzulMarino,
-            modifier = Modifier.size(20.dp)
-        )
+    ) { Icon(imageVector = icono, contentDescription = null,
+        tint = AzulMarino,
+        modifier = Modifier.size(20.dp)
+    )
         Spacer(modifier = Modifier.width(10.dp))
         Text(text = texto,
             style = MaterialTheme.typography.bodyMedium,

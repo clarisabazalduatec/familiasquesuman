@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -29,23 +30,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.familiasquesuman.data.actividadesMockData
+import com.example.familiasquesuman.data.remote.dto.AsistenciaItemDto
+import com.example.familiasquesuman.data.remote.dto.InscripcionAdminDto
+import com.example.familiasquesuman.data.repository.ActividadRepository
+import com.example.familiasquesuman.data.repository.InscripcionRepository
 import com.example.familiasquesuman.ui.components.BarraBusqueda
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.theme.*
+import kotlinx.coroutines.launch
 
 enum class EstadoAsistencia {
     PENDIENTE,
     ASISTIO,
-    NO_ASISTIO
+    FALTO
 }
 
-data class ParticipanteAsistencia(
-    val id: String,
+data class ParticipanteAsistenciaUi(
+    val participanteId: Int,
+    val inscripcionId: String,
     val nombre: String,
-    val tipoUsuario: String,
-    val telefono: String? = null,
+    val tipo: String,
+    val familiaNombre: String,
+    val inscritoPorEmail: String?,
     val estado: EstadoAsistencia = EstadoAsistencia.PENDIENTE
 )
 
@@ -53,45 +60,92 @@ data class ParticipanteAsistencia(
 @Composable
 fun AdminAsistenciaActividadesScreen(
     navController: NavHostController,
-    actividadId: String = "1"
+    actividadId: String = "1",
+    actividadRepo: ActividadRepository = remember { ActividadRepository() },
+    inscripcionRepo: InscripcionRepository = remember { InscripcionRepository() }
 ) {
+    val scope = rememberCoroutineScope()
     var tabSeleccionada by remember { mutableIntStateOf(0) } // 0 = Pase de Lista, 1 = Asistentes, 2 = Faltantes
     var textoBusqueda by remember { mutableStateOf("") }
-    var mostrarExitoDialog by remember { mutableStateOf(value = false) }
+    var mostrarExitoDialog by remember { mutableStateOf(false) }
+    var inscripcionAEliminar by remember { mutableStateOf<InscripcionAdminDto?>(null) }
 
-    val actividadActual = remember(actividadId) {
-        actividadesMockData.find { it.id.toString() == actividadId } ?: actividadesMockData.first()
+    var cargando by remember { mutableStateOf(true) }
+    var guardando by remember { mutableStateOf(false) }
+    var errorMsg by remember { mutableStateOf<String?>(null) }
+    var actividad by remember { mutableStateOf<com.example.familiasquesuman.domain.Actividad?>(null) }
+
+    val participantes = remember { mutableStateListOf<ParticipanteAsistenciaUi>() }
+    var inscripcionesAdmin by remember { mutableStateOf<List<InscripcionAdminDto>>(emptyList()) }
+
+    fun cargarDatos() {
+        scope.launch {
+            cargando = true
+            errorMsg = null
+            
+            try {
+                actividadRepo.obtenerActividadPorId(actividadId).onSuccess {
+                    actividad = it
+                }
+            } catch (_: Exception) {}
+
+            val resInsc = inscripcionRepo.listarInscripcionesAdmin(actividadId)
+            resInsc.onSuccess { list ->
+                inscripcionesAdmin = list
+                participantes.clear()
+                list.forEach { insc ->
+                    val familia = insc.familia?.nombre ?: "Familia sin nombre"
+                    val email = insc.inscritoPor?.email
+                    insc.participantes.forEach { part ->
+                        val est = when (part.asistencia?.uppercase()) {
+                            "ASISTIO" -> EstadoAsistencia.ASISTIO
+                            "FALTO" -> EstadoAsistencia.FALTO
+                            else -> EstadoAsistencia.PENDIENTE
+                        }
+                        participantes.add(
+                            ParticipanteAsistenciaUi(
+                                participanteId = part.id,
+                                inscripcionId = insc.id,
+                                nombre = part.nombre ?: "",
+                                tipo = if (part.tipo == "ADULTO") "Adulto" else "Menor",
+                                familiaNombre = familia,
+                                inscritoPorEmail = email,
+                                estado = est
+                            )
+                        )
+                    }
+                }
+                cargando = false
+            }.onFailure { e ->
+                errorMsg = e.message
+                cargando = false
+            }
+        }
     }
 
-    // Lista mutable de personas/familias registradas
-    val participantes = remember(actividadId) {
-        mutableStateListOf(
-            ParticipanteAsistencia("1", "Familia González Ramírez", "Familia (4 integrantes)", "8112345678", EstadoAsistencia.PENDIENTE),
-            ParticipanteAsistencia("2", "Familia Hernández López", "Familia (3 integrantes)", "8119876543", EstadoAsistencia.PENDIENTE),
-            ParticipanteAsistencia("3", "Mariana Pérez Treviño", "Voluntaria Individual", "8115554433", EstadoAsistencia.PENDIENTE),
-            ParticipanteAsistencia("4", "Carlos Rodríguez Garza", "Voluntario Individual", "8116667788", EstadoAsistencia.PENDIENTE),
-            ParticipanteAsistencia("5", "Familia Martínez Cavazos", "Familia (5 integrantes)", "8113332211", EstadoAsistencia.PENDIENTE),
-            ParticipanteAsistencia("6", "Familia Morales Cantú", "Familia (2 integrantes)", "8118889900", EstadoAsistencia.PENDIENTE),
-            ParticipanteAsistencia("7", "Sofia Villarreal Fernández", "Voluntaria Individual", "8114445566", EstadoAsistencia.PENDIENTE),
-            ParticipanteAsistencia("8", "Familia Garza Benítez", "Familia (3 integrantes)", "8117778899", EstadoAsistencia.PENDIENTE)
-        )
+    LaunchedEffect(actividadId) {
+        cargarDatos()
     }
 
     val countPendientes = participantes.count { it.estado == EstadoAsistencia.PENDIENTE }
     val countAsistieron = participantes.count { it.estado == EstadoAsistencia.ASISTIO }
-    val countNoAsistieron = participantes.count { it.estado == EstadoAsistencia.NO_ASISTIO }
+    val countFaltantes = participantes.count { it.estado == EstadoAsistencia.FALTO }
 
     val personasFiltradas = remember(tabSeleccionada, textoBusqueda, participantes.map { it.estado }) {
         participantes.filter { p ->
             val coincideTab = when (tabSeleccionada) {
                 0 -> p.estado == EstadoAsistencia.PENDIENTE
                 1 -> p.estado == EstadoAsistencia.ASISTIO
-                else -> p.estado == EstadoAsistencia.NO_ASISTIO
+                else -> p.estado == EstadoAsistencia.FALTO
             }
-            val coincideBusqueda = textoBusqueda.isBlank() || p.nombre.contains(textoBusqueda, ignoreCase = true)
+            val coincideBusqueda = textoBusqueda.isBlank() ||
+                    p.nombre.contains(textoBusqueda, ignoreCase = true) ||
+                    p.familiaNombre.contains(textoBusqueda, ignoreCase = true)
             coincideTab && coincideBusqueda
         }
     }
+
+
 
     PantallaPrincipalConMenu(
         navController = navController,
@@ -112,43 +166,43 @@ fun AdminAsistenciaActividadesScreen(
                     .fillMaxSize()
                     .background(CremaFondo)
             ) {
-                // Header de la Actividad Seleccionada
-
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "Control de Asistencia",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = AzulMarino
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding( vertical = 8.dp),
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        ){
-                        Text(
-                            text = "Actividad: ${actividadActual.titulo}",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-                        )
+                // Header de la Actividad
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = "Control de Asistencia",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AzulMarino
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    ) {
+                        Column(modifier = Modifier.padding(12.dp)) {
+                            Text(
+                                text = "Actividad: ${actividad?.titulo ?: "Cargando..."}",
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            if (actividad != null) {
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "${actividad!!.fecha} • ${actividad!!.horario} • ${actividad!!.ubicacion}",
+                                    fontSize = 12.sp,
+                                    color = GrisTexto
+                                )
+                            }
                         }
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = "${actividadActual.fecha} • ${actividadActual.horario} • ${actividadActual.ubicacion}",
-                            fontSize = 12.sp,
-                            color = GrisTexto
-                        )
                     }
+                }
 
-
-               // Spacer(modifier = Modifier.height(12.dp))
-
-                // Selector de Pestañas (Pase de Lista / Asistentes / Faltantes)
+                // Selector de Pestañas
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -158,24 +212,48 @@ fun AdminAsistenciaActividadesScreen(
                 ) {
                     TabPill("Pase de Lista ($countPendientes)", tabSeleccionada == 0) { tabSeleccionada = 0 }
                     TabPill("Asistentes ($countAsistieron)", tabSeleccionada == 1) { tabSeleccionada = 1 }
-                    TabPill("Faltantes ($countNoAsistieron)", tabSeleccionada == 2) { tabSeleccionada = 2 }
+                    TabPill("Faltantes ($countFaltantes)", tabSeleccionada == 2) { tabSeleccionada = 2 }
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Buscador de Persona / Familia
+                // Buscador
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     BarraBusqueda(
                         texto = textoBusqueda,
                         onTextoChange = { textoBusqueda = it },
-                        placeholder = "Buscar en la lista..."
+                        placeholder = "Buscar persona o familia..."
                     )
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Lista de Personas por Pestaña
-                if (personasFiltradas.isEmpty()) {
+                // Lista
+                if (cargando) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Ambar)
+                    }
+                } else if (errorMsg != null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text(text = errorMsg ?: "", color = MaterialTheme.colorScheme.error)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(onClick = { cargarDatos() }) {
+                                Text("Reintentar")
+                            }
+                        }
+                    }
+                } else if (personasFiltradas.isEmpty()) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -195,20 +273,26 @@ fun AdminAsistenciaActividadesScreen(
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 80.dp),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 90.dp),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(
                             items = personasFiltradas,
-                            key = { it.id }
+                            key = { "${it.inscripcionId}_${it.participanteId}" }
                         ) { persona ->
                             TarjetaPaseListaPersona(
                                 participante = persona,
                                 tabActual = tabSeleccionada,
                                 onMarcarAsistencia = { nuevoEstado ->
-                                    val index = participantes.indexOfFirst { it.id == persona.id }
+                                    val index = participantes.indexOfFirst { it.participanteId == persona.participanteId }
                                     if (index != -1) {
                                         participantes[index] = participantes[index].copy(estado = nuevoEstado)
+                                    }
+                                },
+                                onDeleteInscripcion = {
+                                    val insc = inscripcionesAdmin.find { it.id == persona.inscripcionId }
+                                    if (insc != null) {
+                                        inscripcionAEliminar = insc
                                     }
                                 }
                             )
@@ -218,9 +302,30 @@ fun AdminAsistenciaActividadesScreen(
             }
 
             // Botón flotante para guardar cambios
-            if (participantes.any { it.estado != EstadoAsistencia.PENDIENTE }) {
+            if (!cargando && participantes.isNotEmpty()) {
                 Button(
-                    onClick = { mostrarExitoDialog = true },
+                    onClick = {
+                        scope.launch {
+                            guardando = true
+                            val items = participantes.map {
+                                AsistenciaItemDto(
+                                    participanteId = it.participanteId,
+                                    asistencia = it.estado.name
+                                )
+                            }
+                            inscripcionRepo.guardarAsistenciaAdmin(actividadId, items)
+                                .onSuccess { updatedList ->
+                                    inscripcionesAdmin = updatedList
+                                    guardando = false
+                                    mostrarExitoDialog = true
+                                }
+                                .onFailure { e ->
+                                    guardando = false
+                                    errorMsg = e.message
+                                }
+                        }
+                    },
+                    enabled = !guardando,
                     colors = ButtonDefaults.buttonColors(containerColor = Ambar, contentColor = AzulMarino),
                     shape = RoundedCornerShape(16.dp),
                     elevation = ButtonDefaults.buttonElevation(4.dp),
@@ -230,13 +335,17 @@ fun AdminAsistenciaActividadesScreen(
                         .fillMaxWidth()
                         .height(52.dp)
                 ) {
-                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = AzulMarino)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Guardar Registro de Asistencia",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
-                    )
+                    if (guardando) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = AzulMarino)
+                    } else {
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = AzulMarino)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Guardar Registro de Asistencia",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp
+                        )
+                    }
                 }
             }
         }
@@ -262,7 +371,7 @@ fun AdminAsistenciaActividadesScreen(
             },
             text = {
                 Text(
-                    text = "Se han registrado los resultados para '${actividadActual.titulo}':\n\n• Asistieron: $countAsistieron personas/familias\n• No asistieron / Faltantes: $countNoAsistieron\n• Por confirmar: $countPendientes",
+                    text = "Se han registrado los resultados para '${actividad?.titulo ?: ""}':\n\n• Asistieron: $countAsistieron participantes\n• No asistieron / Faltantes: $countFaltantes\n• Por confirmar: $countPendientes",
                     color = GrisTexto,
                     fontSize = 13.sp
                 )
@@ -281,13 +390,51 @@ fun AdminAsistenciaActividadesScreen(
             }
         )
     }
+
+    inscripcionAEliminar?.let { insc ->
+        AlertDialog(
+            onDismissRequest = { inscripcionAEliminar = null },
+            title = {
+                Text("Eliminar inscripción", fontWeight = FontWeight.Bold, color = AzulMarino)
+            },
+            text = {
+                Text("¿Estás seguro de que deseas eliminar la inscripción de '${insc.familia?.nombre ?: "la familia"}'? Esta acción no se puede deshacer.")
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val toDelete = insc
+                        inscripcionAEliminar = null
+                        scope.launch {
+                            inscripcionRepo.borrarInscripcionAdmin(actividadId, toDelete.id)
+                                .onSuccess {
+                                    cargarDatos()
+                                }
+                                .onFailure { e ->
+                                    errorMsg = e.message
+                                }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red, contentColor = Color.White)
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { inscripcionAEliminar = null }) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 }
 
 @Composable
 fun TarjetaPaseListaPersona(
-    participante: ParticipanteAsistencia,
+    participante: ParticipanteAsistenciaUi,
     tabActual: Int,
-    onMarcarAsistencia: (EstadoAsistencia) -> Unit
+    onMarcarAsistencia: (EstadoAsistencia) -> Unit,
+    onDeleteInscripcion: () -> Unit
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -336,11 +483,32 @@ fun TarjetaPaseListaPersona(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = participante.tipoUsuario,
+                            text = "${participante.familiaNombre} • ${participante.tipo}",
                             fontSize = 12.sp,
-                            color = GrisTexto
+                            color = GrisTexto,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
+                    if (!participante.inscritoPorEmail.isNullOrBlank()) {
+                        Text(
+                            text = "Inscrito por: ${participante.inscritoPorEmail}",
+                            fontSize = 11.sp,
+                            color = GrisTexto.copy(alpha = 0.8f)
+                        )
+                    }
+                }
+
+                IconButton(
+                    onClick = onDeleteInscripcion,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Eliminar inscripción",
+                        tint = Color.Gray.copy(alpha = 0.6f),
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
 
                 // Badge en pestañas 1 (Asistieron) y 2 (Faltantes)
@@ -364,13 +532,12 @@ fun TarjetaPaseListaPersona(
 
             // Acciones por Pestaña
             if (tabActual == 0) {
-                // Tab 0 (Pase de Lista): Dos botones claros [ No asistió ]  [ Asistió ]
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     OutlinedButton(
-                        onClick = { onMarcarAsistencia(EstadoAsistencia.NO_ASISTIO) },
+                        onClick = { onMarcarAsistencia(EstadoAsistencia.FALTO) },
                         colors = ButtonDefaults.outlinedButtonColors(contentColor = ColorError),
                         border = BorderStroke(1.dp, ColorError),
                         shape = RoundedCornerShape(12.dp),
@@ -417,7 +584,6 @@ fun TarjetaPaseListaPersona(
                     }
                 }
             } else {
-                // Tabs 1 (Asistieron) y 2 (Faltantes): Botón para Deshacer / Reclasificar persona
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End

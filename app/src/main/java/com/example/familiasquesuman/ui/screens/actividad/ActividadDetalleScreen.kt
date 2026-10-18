@@ -17,18 +17,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import androidx.compose.ui.layout.ContentScale
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
+import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
-import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.actividad.components.CategoriaChip
@@ -45,18 +48,52 @@ import com.example.familiasquesuman.ui.theme.*
 fun ActividadDetalleScreen(
     navController: NavHostController,
     actividadId: String,
-    viewModel: ActividadViewModel = viewModel()
+    viewModel: ActividadViewModel = viewModel(),
+    inscripcionViewModel: InscripcionViewModel = viewModel()
 ) {
-    LaunchedEffect(actividadId) {
-        viewModel.cargarDetalle(actividadId)
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner, actividadId) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.cargarDetalle(actividadId)
+                if (SesionManager.tipoSesion != TipoSesion.INVITADO) {
+                    inscripcionViewModel.cargar(actividadId, forzar = true)
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     val detalleState by viewModel.detalleUiState.collectAsState()
+    val inscripcionState by inscripcionViewModel.uiState.collectAsState()
+    var mostrarDialogoCancelar by remember { mutableStateOf(false) }
+    val irAActividades = {
+        if (navController.currentDestination?.route != Rutas.Actividades.ruta) {
+            navController.navigate(Rutas.Actividades.ruta) {
+                popUpTo(Rutas.Actividades.ruta) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
+    }
+    LaunchedEffect(inscripcionState.listo) {
+        if (inscripcionState.listo) {
+            viewModel.cargarDetalle(actividadId)
+            inscripcionViewModel.cargar(actividadId, forzar = true)
+            inscripcionViewModel.consumirListo()
+        }
+    }
 
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
-        backButton = true
+        backButton = true,
+        onBackClick = irAActividades
     ) { paddingValues ->
         when (val state = detalleState) {
             is ActividadDetalleUiState.Cargando -> {
@@ -85,7 +122,12 @@ fun ActividadDetalleScreen(
                             fontSize = 16.sp
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(onClick = { viewModel.cargarDetalle(actividadId) }) {
+                        Button(onClick = {
+                            viewModel.cargarDetalle(actividadId)
+                            if (SesionManager.tipoSesion != TipoSesion.INVITADO) {
+                                inscripcionViewModel.cargar(actividadId, forzar = true)
+                            }
+                        }) {
                             Text("Reintentar")
                         }
                     }
@@ -289,7 +331,7 @@ fun ActividadDetalleScreen(
                                 totales = actividad.lugaresTotales
                             )
 
-                            Spacer(modifier = Modifier.height(100.dp))
+                            Spacer(modifier = Modifier.height(140.dp))
                         }
                     }
 
@@ -312,39 +354,140 @@ fun ActividadDetalleScreen(
                                 modifier = Modifier.fillMaxWidth(),
                                 shadowElevation = 16.dp
                             ) {
-                                Button(
-                                    onClick = {
-                                        if (SesionManager.tipoSesion == TipoSesion.INVITADO) {
-                                            navController.navigate(Rutas.Login.ruta) {
-                                                launchSingleTop = true
-                                            }
-                                        } else {
-                                            navController.navigate(
-                                                Rutas.ActividadSeleccionParticipantes.crearRuta(
-                                                    actividadId
-                                                )
-                                            )
-                                        }
-                                    },
-                                    colors = ButtonDefaults.buttonColors(containerColor = Ambar),
-                                    shape = RoundedCornerShape(24.dp),
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(16.dp)
-                                        .height(56.dp)
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.VolunteerActivism,
-                                        contentDescription = null,
-                                        tint = AzulOscuro
-                                    )
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text(
-                                        text = "Quiero participar",
-                                        color = AzulOscuro,
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                                    val esInvitado = SesionManager.tipoSesion == TipoSesion.INVITADO
+                                    val estaInscrito = !esInvitado && inscripcionState.inscripcionActual != null
+                                    val sinLugares = actividad.lugaresDisponibles <= 0
+
+                                    if (esInvitado) {
+                                        Button(
+                                            onClick = {
+                                                navController.navigate(Rutas.Login.ruta) {
+                                                    launchSingleTop = true
+                                                }
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = Ambar),
+                                            shape = RoundedCornerShape(24.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(56.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.VolunteerActivism,
+                                                contentDescription = null,
+                                                tint = AzulOscuro
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = "Inscribirse",
+                                                color = AzulOscuro,
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    } else if (estaInscrito) {
+                                        Button(
+                                            onClick = {
+                                                navController.navigate(
+                                                    Rutas.ActividadSeleccionParticipantes.crearRuta(
+                                                        actividadId
+                                                    )
+                                                )
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = Ambar),
+                                            shape = RoundedCornerShape(24.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(52.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = null,
+                                                tint = AzulOscuro
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = "Modificar inscripción",
+                                                color = AzulOscuro,
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.height(8.dp))
+
+                                        OutlinedButton(
+                                            onClick = { mostrarDialogoCancelar = true },
+                                            shape = RoundedCornerShape(24.dp),
+                                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(48.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = null,
+                                                tint = Color.Red
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = "Cancelar inscripción",
+                                                fontSize = 15.sp,
+                                                fontWeight = FontWeight.SemiBold
+                                            )
+                                        }
+                                    } else if (sinLugares) {
+                                        Button(
+                                            onClick = {},
+                                            enabled = false,
+                                            colors = ButtonDefaults.buttonColors(
+                                                disabledContainerColor = Color.LightGray,
+                                                disabledContentColor = Color.DarkGray
+                                            ),
+                                            shape = RoundedCornerShape(24.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(56.dp)
+                                        ) {
+                                            Text(
+                                                text = "Sin lugares disponibles",
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    } else {
+                                        Button(
+                                            onClick = {
+                                                navController.navigate(
+                                                    Rutas.ActividadSeleccionParticipantes.crearRuta(
+                                                        actividadId
+                                                    )
+                                                )
+                                            },
+                                            colors = ButtonDefaults.buttonColors(containerColor = Ambar),
+                                            shape = RoundedCornerShape(24.dp),
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(56.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.VolunteerActivism,
+                                                contentDescription = null,
+                                                tint = AzulOscuro
+                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text(
+                                                text = "Inscribirse",
+                                                color = AzulOscuro,
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -352,6 +495,41 @@ fun ActividadDetalleScreen(
                 }
             }
         }
+    }
+
+    if (mostrarDialogoCancelar) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoCancelar = false },
+            title = {
+                Text(
+                    text = "Cancelar inscripción",
+                    fontWeight = FontWeight.Bold,
+                    color = AzulOscuro
+                )
+            },
+            text = {
+                Text(
+                    text = "¿Estás seguro de que deseas cancelar la inscripción de tu familia a esta actividad?",
+                    fontSize = 14.sp
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        mostrarDialogoCancelar = false
+                        inscripcionViewModel.cancelar(actividadId)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red, contentColor = Color.White)
+                ) {
+                    Text("Sí, cancelar", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                OutlinedButton(onClick = { mostrarDialogoCancelar = false }) {
+                    Text("No")
+                }
+            }
+        )
     }
 }
 

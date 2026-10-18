@@ -99,12 +99,32 @@ fun InicioScreen(
     val navegarASeccionPrincipal: (String) -> Unit = { ruta ->
         if (navController.currentDestination?.route != ruta) {
             try {
-                navController.navigate(ruta) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        saveState = true
+                when (ruta) {
+                    Rutas.Inicio.ruta -> {
+                        navController.navigate(Rutas.Inicio.ruta) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     }
-                    launchSingleTop = true
-                    restoreState = true
+                    Rutas.Chatbot.ruta -> {
+                        navController.navigate(ruta) {
+                            popUpTo(Rutas.Chatbot.ruta) {
+                                inclusive = false
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                    else -> {
+                        navController.navigate(ruta) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 }
             } catch (_: Exception) {
                 navController.navigate(ruta)

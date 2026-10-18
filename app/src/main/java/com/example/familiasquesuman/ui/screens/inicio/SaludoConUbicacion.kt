@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
+
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -31,8 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
@@ -40,15 +39,18 @@ import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.Blanco
 import com.example.familiasquesuman.ui.theme.GrisBorde
 import com.example.familiasquesuman.ui.theme.GrisTexto
-import com.example.familiasquesuman.R
-import androidx.compose.foundation.Image
+
+import com.example.familiasquesuman.data.SesionManager
+import com.example.familiasquesuman.ui.components.FotoPerfil
 
 
 @Composable
 fun SaludoConUbicacion(
     nombreUsuario: String,
     ciudad: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClickFoto: (() -> Unit)? = null, // solo en Perfil: tocar la foto permite cambiarla
+    subiendoFoto: Boolean = false
 ) {
 
     // tiene como determinado MTY
@@ -66,16 +68,13 @@ fun SaludoConUbicacion(
 
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically)
     {
-        //foto de perfil
-        Image(
-            painter = painterResource(
-                id = R.drawable.mariana
-            ),
-            contentDescription = "Foto de Mariana",
-            modifier = Modifier
-                .size(68.dp)
-                .clip(CircleShape),
-            contentScale = ContentScale.Crop
+        // foto de perfil (la de la sesión; sin foto muestra las iniciales)
+        FotoPerfil(
+            fotoUrl = SesionManager.usuario?.fotoUrl,
+            nombre = SesionManager.usuario?.nombre,
+            tamano = 68.dp,
+            onClick = onClickFoto,
+            cargando = subiendoFoto
         )
         Spacer(modifier = Modifier.width(14.dp))
 

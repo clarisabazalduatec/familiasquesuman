@@ -11,13 +11,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.data.actividadesMockData
+import com.example.familiasquesuman.ui.components.EstadoErrorServidor
 import com.example.familiasquesuman.ui.components.EstadoVacio
 import com.example.familiasquesuman.ui.components.FiltrosChips
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
@@ -37,6 +37,10 @@ fun ActividadScreen(
     viewModel: ActividadViewModel = viewModel(),
 ) {
     var mostrarCalendario by remember { mutableStateOf(value = false) }
+
+    LaunchedEffect(Unit) {
+        viewModel.cargarActividades()
+    }
 
     val uiState by viewModel.uiState.collectAsState()
     val categoriaSeleccionada by viewModel.categoriaSeleccionada.collectAsState()
@@ -94,96 +98,92 @@ fun ActividadScreen(
                     onVolver = { mostrarCalendario = false },
                 )
             } else {
-                when (val state = uiState) {
-                    is ActividadUiState.Cargando -> {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                val actividadesFiltradas = remember(categoriaSeleccionada, uiState) {
+                    val exitoState = uiState as? ActividadUiState.Exito
+                    if (exitoState != null) {
+                        if (categoriaSeleccionada == null) {
+                            exitoState.actividades
+                        } else {
+                            exitoState.actividades.filter {
+                                it.categoria.equals(categoriaSeleccionada, ignoreCase = true)
+                            }
                         }
+                    } else {
+                        emptyList()
                     }
-                    is ActividadUiState.Error -> {
-                        Box(
+                }
+
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 80.dp),
+                ) {
+                    item {
+                        Column(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(24.dp),
-                            contentAlignment = Alignment.Center,
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
                         ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = state.mensaje,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.error,
-                                    textAlign = TextAlign.Center,
-                                )
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Button(onClick = { viewModel.reintentar() }) {
-                                    Text("Reintentar")
-                                }
-                            }
+                            Text(
+                                text = "Actividades en Familia",
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Actividades en familia para ayudar durante el año.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
-                    is ActividadUiState.Exito -> {
-                        val actividadesFiltradas = remember(categoriaSeleccionada, state.actividades) {
-                            if (categoriaSeleccionada == null) {
-                                state.actividades
-                            } else {
-                                state.actividades.filter {
-                                    it.categoria.equals(categoriaSeleccionada, ignoreCase = true)
+                    item {
+                        FiltrosChips(
+                            opciones = categorias,
+                            seleccionado = categoriaSeleccionada,
+                            etiquetaPara = { it },
+                            onSeleccionado = { viewModel.seleccionarCategoria(it) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .horizontalScroll(rememberScrollState())
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                        )
+                    }
+                    item {
+                        HorizontalDivider(
+                            color = GrisBordeClaro,
+                            thickness = 1.dp,
+                            modifier = Modifier.padding(vertical = 4.dp),
+                        )
+                    }
+                    item {
+                        HeaderDiaActividades {
+                            mostrarCalendario = true
+                        }
+                    }
+
+                    when (val state = uiState) {
+                        is ActividadUiState.Cargando -> {
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(32.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                                 }
                             }
                         }
-
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(bottom = 80.dp),
-                        ) {
+                        is ActividadUiState.Error -> {
                             item {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                                ) {
-                                    Text(
-                                        text = "Actividades en Familia",
-                                        style = MaterialTheme.typography.headlineLarge,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary,
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = "Actividades en familia para ayudar durante el año.",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                            item {
-                                FiltrosChips(
-                                    opciones = categorias,
-                                    seleccionado = categoriaSeleccionada,
-                                    etiquetaPara = { it },
-                                    onSeleccionado = { viewModel.seleccionarCategoria(it) },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .horizontalScroll(rememberScrollState())
-                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                EstadoErrorServidor(
+                                    mensaje = state.mensaje.ifBlank { "No se pudo conectar con el servidor." },
+                                    onReintentar = { viewModel.reintentar() }
                                 )
                             }
-                            item {
-                                HorizontalDivider(
-                                    color = GrisBordeClaro,
-                                    thickness = 1.dp,
-                                    modifier = Modifier.padding(vertical = 4.dp),
-                                )
-                            }
-                            item {
-                                HeaderDiaActividades {
-                                    mostrarCalendario = true
-                                }
-                            }
-
+                        }
+                        is ActividadUiState.Exito -> {
                             if (actividadesFiltradas.isEmpty()) {
                                 item {
                                     EstadoVacio(
@@ -201,9 +201,10 @@ fun ActividadScreen(
                                     )
                                 }
                             }
-                            item { BannerSincronizarCalendario() }
                         }
                     }
+
+                    item { BannerSincronizarCalendario() }
                 }
             }
         }

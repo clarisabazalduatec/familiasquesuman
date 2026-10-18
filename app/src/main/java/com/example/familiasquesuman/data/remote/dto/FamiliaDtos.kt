@@ -8,7 +8,8 @@ data class MiembroDto(
     val id: String,
     val nombre: String,
     val email: String,
-    val parentesco: String? // MAMA, PAPA, TUTOR, ABUELO, OTRO
+    val parentesco: String?, // MAMA, PAPA, TUTOR, ABUELO, OTRO
+    @SerializedName("foto_url") val fotoUrl: String? = null // "/imagenes/abc.jpg" o null
 )
 
 data class MenorDto(

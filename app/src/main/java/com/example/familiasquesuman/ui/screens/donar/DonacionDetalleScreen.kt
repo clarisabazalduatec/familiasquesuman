@@ -40,6 +40,7 @@ import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.GrisBorde
+import com.example.familiasquesuman.ui.navigation.Rutas
 
 fun abrirEnlaceWeb(context: Context, url: String) {
     val intent = Intent(Intent.ACTION_VIEW, url.toUri())
@@ -93,6 +94,16 @@ fun DonacionDetalleScreen(
     val donacion = viewModel.donacionSeleccionada.collectAsState().value
     val isLoading by viewModel.isLoading.collectAsState()
     val context = LocalContext.current
+    val iraDonacion = {
+        if (navController.currentDestination?.route != Rutas.Donar.ruta) {
+            navController.navigate(Rutas.Donar.ruta) {
+                popUpTo(Rutas.Donar.ruta) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
+    }
 
     if (isLoading && donacion == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -111,7 +122,9 @@ fun DonacionDetalleScreen(
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.DONAR,
-        backButton = true
+        backButton = true,
+        onBackClick = iraDonacion
+
     ) { paddingValues ->
         Column(
             modifier = Modifier

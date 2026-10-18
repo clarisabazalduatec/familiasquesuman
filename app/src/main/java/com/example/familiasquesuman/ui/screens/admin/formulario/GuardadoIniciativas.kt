@@ -1,17 +1,7 @@
 package com.example.familiasquesuman.ui.screens.admin.formulario
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import com.example.familiasquesuman.data.ActividadMock
-import com.example.familiasquesuman.data.actividadesMockData
-import com.example.familiasquesuman.data.agregarActividadMock
 import com.example.familiasquesuman.data.remote.dto.DonacionGuardarDto
 import com.example.familiasquesuman.data.remote.dto.DonacionOpcionInDto
-import com.example.familiasquesuman.domain.CentroVisiteo
-import com.example.familiasquesuman.ui.screens.directorio.agregarCentroMock
-import com.example.familiasquesuman.ui.screens.directorio.centrosDeEjemplo
-import com.example.familiasquesuman.ui.theme.FondoAzulClaro
-import com.example.familiasquesuman.ui.theme.TextoAzul
 
 /** Convierte los campos del formulario de donación al DTO que acepta el Backend (FastAPI). */
 fun DonacionForm.toGuardarDto(comun: ComunForm, imagenes: List<String>): DonacionGuardarDto {
@@ -41,7 +31,7 @@ fun DonacionForm.toGuardarDto(comun: ComunForm, imagenes: List<String>): Donacio
                 .map { it.trim() }
                 .filter { it.isNotBlank() }
                 .map { articulo ->
-                    DonacionOpcionInDto(titulo = articulo, monto = 0.0) // 👈 0.0 en vez de null
+                    DonacionOpcionInDto(titulo = articulo, monto = 0.0)
                 }
         }
         else -> emptyList()
@@ -67,105 +57,11 @@ fun DonacionForm.toGuardarDto(comun: ComunForm, imagenes: List<String>): Donacio
     )
 }
 
-fun guardarActividad(base: ActividadMock?, comun: ComunForm, form: ActividadForm, imagenes: List<String>) {
-    val total = form.lugaresTotales.toIntOrNull() ?: 30
-    val descripcion = comun.descripcionCorta.trim()
-    val acercaDe = form.acercaDe.trim().ifBlank { descripcion }
-
-    if (base == null) {
-        agregarActividadMock(
-            ActividadMock(
-                id = (actividadesMockData.maxOfOrNull { it.id } ?: 0) + 1,
-                titulo = comun.titulo.trim(),
-                descripcion = descripcion,
-                categoria = form.categoria,
-                iconoCategoria = Icons.Default.Star,
-                colorCategoria = FondoAzulClaro,
-                textColorCategoria = TextoAzul,
-                fecha = form.fecha.trim(),
-                horario = form.horario.trim(),
-                ubicacion = comun.ubicacion.trim(),
-                distancia = "",
-                organizador = form.organizador.trim(),
-                organizadorVerificado = true,
-                acercaDe = acercaDe,
-                lugaresDisponibles = total,
-                lugaresTotales = total,
-                participantesAdicionales = 0,
-                imagenesUrl = imagenes,
-                activa = comun.activa,
-            ),
-        )
-    } else {
-        val index = actividadesMockData.indexOfFirst { it.id == base.id }
-        if (index == -1) return
-        val vieja = actividadesMockData[index]
-        val disponibles = (vieja.lugaresDisponibles + (total - vieja.lugaresTotales)).coerceIn(0, total)
-        actividadesMockData[index] = vieja.copy(
-            titulo = comun.titulo.trim(),
-            descripcion = descripcion,
-            categoria = form.categoria,
-            fecha = form.fecha.trim(),
-            horario = form.horario.trim(),
-            ubicacion = comun.ubicacion.trim(),
-            organizador = form.organizador.trim(),
-            acercaDe = acercaDe,
-            lugaresTotales = total,
-            lugaresDisponibles = disponibles,
-            imagenesUrl = imagenes,
-            activa = comun.activa,
-        )
-    }
-}
-
-fun guardarCentro(base: CentroVisiteo?, comun: ComunForm, form: CentroForm, imagenes: List<String>) {
-    val necesidades = form.necesidades.map { it.trim() }.filter { it.isNotEmpty() }
-
-    if (base == null) {
-        agregarCentroMock(
-            CentroVisiteo(
-                id = System.currentTimeMillis().toString(),
-                nombre = comun.titulo.trim(),
-                tipo = form.tipo,
-                descripcionCorta = comun.descripcionCorta.trim(),
-                informacionGeneral = form.informacionGeneral.trim(),
-                necesidades = necesidades,
-                direccion = comun.ubicacion.trim(),
-                logoUrl = imagenes.firstOrNull(),
-                comoAyudar = form.comoAyudar.trim(),
-                recomendaciones = form.recomendaciones.trim(),
-                telefono = form.telefono.trim().ifBlank { null },
-                whatsapp = form.whatsapp.trim().ifBlank { null },
-                verificado = form.verificado,
-                activo = comun.activa,
-            ),
-        )
-    } else {
-        val index = centrosDeEjemplo.indexOfFirst { it.id == base.id }
-        if (index == -1) return
-        centrosDeEjemplo[index] = centrosDeEjemplo[index].copy(
-            nombre = comun.titulo.trim(),
-            tipo = form.tipo,
-            descripcionCorta = comun.descripcionCorta.trim(),
-            informacionGeneral = form.informacionGeneral.trim(),
-            necesidades = necesidades,
-            direccion = comun.ubicacion.trim(),
-            logoUrl = imagenes.firstOrNull(),
-            comoAyudar = form.comoAyudar.trim(),
-            recomendaciones = form.recomendaciones.trim(),
-            telefono = form.telefono.trim().ifBlank { null },
-            whatsapp = form.whatsapp.trim().ifBlank { null },
-            verificado = form.verificado,
-            activo = comun.activa,
-        )
-    }
-}
-
 fun eliminarIniciativa(tipo: TipoContenidoAdmin, id: String) {
     when (tipo) {
-        TipoContenidoAdmin.ACTIVIDAD -> actividadesMockData.removeAll { it.id == id.toIntOrNull() }
-        TipoContenidoAdmin.PROYECTO -> Unit
-        TipoContenidoAdmin.DONACION -> Unit
-        TipoContenidoAdmin.DIRECTORIO -> centrosDeEjemplo.removeAll { it.id == id }
+        TipoContenidoAdmin.ACTIVIDAD -> Unit // se borra en el backend (AdminActividadViewModel)
+        TipoContenidoAdmin.PROYECTO -> Unit  // se borra en el backend (AdminProyectoViewModel)
+        TipoContenidoAdmin.DONACION -> Unit // DonacionViewModel
+        TipoContenidoAdmin.DIRECTORIO -> Unit // se borra en el backend (AdminCentroViewModel)
     }
 }

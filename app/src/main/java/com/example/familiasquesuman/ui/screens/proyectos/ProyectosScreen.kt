@@ -18,6 +18,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.domain.EstadoProyecto
 import com.example.familiasquesuman.ui.components.BarraBusqueda
+import com.example.familiasquesuman.ui.components.EstadoErrorServidor
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
@@ -120,14 +121,10 @@ fun ProyectosScreen(
                 }
             } else if (uiState.error != null && uiState.proyectos.isEmpty()) {
                 item {
-                    Column(Modifier.fillMaxWidth().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = uiState.error ?: "",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
-                        )
-                        TextButton(onClick = { viewModel.cargarLista() }) { Text("Reintentar") }
-                    }
+                    EstadoErrorServidor(
+                        mensaje = (uiState.error ?: "").ifBlank { "No se pudo conectar con el servidor." },
+                        onReintentar = { viewModel.cargarLista() }
+                    )
                 }
             } else if (proyectosFiltrados.isEmpty()) {
                 item { EstadoVacioProyectos() }

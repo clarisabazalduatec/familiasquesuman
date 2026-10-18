@@ -26,6 +26,16 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.TextButton
 import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.navigation.Rutas
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.PhotoLibrary
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Icon
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.draw.clip
 
 enum class SeccionPerfil { INFORMACION,  ACTIVIDADES}
 @Composable
@@ -46,7 +56,19 @@ fun PerfilScreen(
     }
     val usuarioId = SesionManager.usuario?.id
     LaunchedEffect(usuarioId) { viewModel.cargar() }
-    DialogosPerfil(uiState = uiState, viewModel = viewModel)
+    // Galería del teléfono (selector de fotos del sistema: no pide permisos)
+    val elegirFoto = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) viewModel.cambiarFoto(context.applicationContext.contentResolver, uri)
+    }
+
+    DialogosPerfil(
+        uiState = uiState,
+        viewModel = viewModel,
+        onElegirFoto = {
+            viewModel.cerrarDialogo()
+            elegirFoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+    )
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.PERFIL
@@ -64,10 +86,15 @@ fun PerfilScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item { SaludoConUbicacion(
-                    nombreUsuario = com.example.familiasquesuman.data.SesionManager.usuario?.nombre
+                nombreUsuario = com.example.familiasquesuman.data.SesionManager.usuario?.nombre
                     ?.substringBefore(" ") ?: "familia",
-                    ciudad = "Monterrey, NL"
-                )
+                ciudad = "Monterrey, NL",
+                // Solo con sesión se puede cambiar la foto
+                onClickFoto = if (SesionManager.estaAutenticado) {
+                    { viewModel.abrirDialogo(DialogoPerfil.Foto) }
+                } else null,
+                subiendoFoto = uiState.subiendoFoto
+            )
             }
 
             item { SelectorPerfil(
@@ -129,17 +156,28 @@ fun PerfilScreen(
                 item { MisInsigniasCard() }
             }
             if (seccionSeleccionada == SeccionPerfil.ACTIVIDADES) {
-                item {  MisActividadesPerfil() }
+                item { MisActividadesPerfil(navController = navController) }
             }
             }
         }
     }
 /** Muestra el diálogo que indique el estado (o ninguno). */
 @Composable
-private fun DialogosPerfil(uiState: PerfilUiState, viewModel: PerfilViewModel) {
+private fun DialogosPerfil(
+    uiState: PerfilUiState,
+    viewModel: PerfilViewModel,
+    onElegirFoto: () -> Unit
+) {
     val cerrar = { viewModel.cerrarDialogo() }
     when (val d = uiState.dialogo) {
         null -> Unit
+
+        DialogoPerfil.Foto -> DialogoFotoPerfil(
+            tieneFoto = SesionManager.usuario?.fotoUrl != null,
+            onElegir = onElegirFoto,
+            onQuitar = { viewModel.quitarFoto() },
+            onCerrar = cerrar
+        )
 
         DialogoPerfil.CrearFamilia -> DialogoCrearFamilia(
             guardando = uiState.guardando,
@@ -194,6 +232,47 @@ private fun DialogosPerfil(uiState: PerfilUiState, viewModel: PerfilViewModel) {
             onConfirmar = { viewModel.salirDeFamilia() },
             onCerrar = cerrar
         )
+    }
+}
+
+/** Opciones al tocar la foto: elegir una de la galería o quitar la actual. */
+@Composable
+private fun DialogoFotoPerfil(
+    tieneFoto: Boolean,
+    onElegir: () -> Unit,
+    onQuitar: () -> Unit,
+    onCerrar: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onCerrar,
+        containerColor = Blanco,
+        title = { Text("Foto de perfil", color = AzulMarino, fontWeight = FontWeight.Bold) },
+        text = {
+            Column {
+                OpcionFoto(Icons.Outlined.PhotoLibrary, "Elegir de la galería", AzulMarino, onElegir)
+                if (tieneFoto) {
+                    OpcionFoto(Icons.Outlined.Delete, "Quitar foto", ColorError, onQuitar)
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onCerrar) { Text("Cancelar", color = GrisTexto) } }
+    )
+}
+
+@Composable
+private fun OpcionFoto(icono: ImageVector, texto: String, color: androidx.compose.ui.graphics.Color, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(imageVector = icono, contentDescription = null, tint = color)
+        Spacer(Modifier.width(14.dp))
+        Text(text = texto, color = color, fontSize = 16.sp)
     }
 }
 @Composable

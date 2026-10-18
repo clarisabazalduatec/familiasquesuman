@@ -1,6 +1,15 @@
 package com.example.familiasquesuman.data.remote
 
+import com.example.familiasquesuman.data.remote.dto.NotificacionDto
+import com.example.familiasquesuman.data.remote.dto.ResumenNotificacionesDto
+import com.example.familiasquesuman.data.remote.dto.AsistenciaGuardarDto
+import com.example.familiasquesuman.data.remote.dto.InscripcionAdminDto
+import com.example.familiasquesuman.data.remote.dto.InscripcionDto
+import com.example.familiasquesuman.data.remote.dto.InscripcionGuardarDto
+import com.example.familiasquesuman.data.remote.dto.MiInscripcionDto
 import com.example.familiasquesuman.data.remote.dto.ActividadDto
+import com.example.familiasquesuman.data.remote.dto.ActividadGuardarDto
+import com.example.familiasquesuman.data.remote.dto.CategoriaCrearDto
 import com.example.familiasquesuman.data.remote.dto.CategoriaDto
 import com.example.familiasquesuman.data.remote.dto.ChatMensajeEntradaDto
 import com.example.familiasquesuman.data.remote.dto.ChatMensajeRespuestaDto
@@ -33,6 +42,11 @@ import retrofit2.http.Multipart
 import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Header
+import com.example.familiasquesuman.data.remote.dto.CentroDto
+import com.example.familiasquesuman.data.remote.dto.CentroGuardarDto
+import com.example.familiasquesuman.data.remote.dto.PublicacionDto
+import com.example.familiasquesuman.data.remote.dto.ComentarioDto
+import com.example.familiasquesuman.data.remote.dto.CrearComentarioRequest
 
 /** El token lo agrega AuthInterceptor (en RetrofitInstance); no se pasa a mano. */
 interface FamiliasApiService {
@@ -50,6 +64,13 @@ interface FamiliasApiService {
 
     @PATCH("usuarios/me")
     suspend fun actualizarMiPerfil(@Body datos: PerfilActualizarDto): PerfilDto
+
+    @Multipart
+    @PUT("usuarios/me/foto")
+    suspend fun cambiarMiFoto(@Part archivo: MultipartBody.Part): PerfilDto
+
+    @DELETE("usuarios/me/foto")
+    suspend fun quitarMiFoto(): PerfilDto
 
     // ---------- Familia ----------
     @GET("familias/mia")
@@ -108,6 +129,29 @@ interface FamiliasApiService {
     @POST("imagenes")
     suspend fun subirImagen(@Part archivo: MultipartBody.Part): ImagenSubidaDto
 
+    // ---------- Directorio de visiteo ----------
+    @GET("centros")
+    suspend fun listarCentros(@Query("limit") limit: Int = 100): List<CentroDto>
+
+    @GET("centros/{id}")
+    suspend fun detalleCentro(@Path("id") id: String): CentroDto
+
+    // ---------- Admin: directorio ----------
+    @GET("centros/admin")
+    suspend fun listarCentrosAdmin(): List<CentroDto>
+
+    @GET("centros/admin/{id}")
+    suspend fun detalleCentroAdmin(@Path("id") id: String): CentroDto
+
+    @POST("centros")
+    suspend fun crearCentro(@Body datos: CentroGuardarDto): CentroDto
+
+    @PUT("centros/{id}")
+    suspend fun editarCentro(@Path("id") id: String, @Body datos: CentroGuardarDto): CentroDto
+
+    @DELETE("centros/{id}")
+    suspend fun borrarCentro(@Path("id") id: String)
+
     // ---------- Chat ----------
     @POST("chat")
     suspend fun enviarMensajeChat(@Body entrada: ChatMensajeEntradaDto): ChatMensajeRespuestaDto
@@ -141,4 +185,81 @@ interface FamiliasApiService {
 
     @DELETE("donaciones/{id}")
     suspend fun borrarDonacion(@Path("id") id: String)
+
+    // ---- COMUNIDAD -----
+    @GET("comunidad") suspend fun listarPublicacionesComunidad(@Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<PublicacionDto>
+    @GET("comunidad/{id}") suspend fun detallePublicacionComunidad(@Path("id") id: String): PublicacionDto
+    @GET("comunidad/avisos") suspend fun listarAvisosOficiales(@Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<PublicacionDto>
+
+        // ---------- LIKES ----------
+    @POST("comunidad/{id}/like")  suspend fun darLikePublicacion(@Path("id") id: String)
+    @DELETE("comunidad/{id}/like") suspend fun quitarLikePublicacion(@Path("id") id: String)
+        // ---------- COMENTARIOS ----------
+    @GET("comunidad/{id}/comentarios") suspend fun obtenerComentariosPublicacion(@Path("id") id: String, @Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<ComentarioDto>
+    @POST("comunidad/{id}/comentarios") suspend fun publicarComentario(@Path("id") id: String, @Body comentario: CrearComentarioRequest): ComentarioDto
+
+
+    // ---------- Admin: actividades ----------
+    @GET("actividades/admin")
+    suspend fun listarActividadesAdmin(@Query("limit") limit: Int = 100): List<ActividadDto>
+
+    @GET("actividades/admin/{id}")
+    suspend fun detalleActividadAdmin(@Path("id") id: String): ActividadDto
+
+    @POST("actividades")
+    suspend fun crearActividad(@Body datos: ActividadGuardarDto): ActividadDto
+
+    @PUT("actividades/{id}")
+    suspend fun editarActividad(@Path("id") id: String, @Body datos: ActividadGuardarDto): ActividadDto
+
+    @DELETE("actividades/{id}")
+    suspend fun borrarActividad(@Path("id") id: String)
+
+    @POST("categorias")
+    suspend fun crearCategoria(@Body datos: CategoriaCrearDto): CategoriaDto
+
+    // ---------- Inscripciones ----------
+    // Familia:
+    @POST("actividades/{id}/inscripcion")
+    suspend fun inscribirActividad(@Path("id") id: String, @Body datos: InscripcionGuardarDto): InscripcionDto
+
+    @PUT("actividades/{id}/inscripcion")
+    suspend fun modificarInscripcionActividad(@Path("id") id: String, @Body datos: InscripcionGuardarDto): InscripcionDto
+
+    @GET("actividades/{id}/inscripcion")
+    suspend fun miInscripcionActividad(@Path("id") id: String): InscripcionDto
+
+    @DELETE("actividades/{id}/inscripcion")
+    suspend fun cancelarInscripcionActividad(@Path("id") id: String)
+
+    @GET("familias/mia/inscripciones")
+    suspend fun misInscripcionesFamilia(): List<MiInscripcionDto>
+
+    // Admin:
+    @GET("actividades/{id}/inscripciones")
+    suspend fun listarInscripcionesAdmin(@Path("id") id: String): List<InscripcionAdminDto>
+
+    @PUT("actividades/{id}/asistencia")
+    suspend fun guardarAsistenciaAdmin(@Path("id") id: String, @Body datos: AsistenciaGuardarDto): List<InscripcionAdminDto>
+
+    @DELETE("actividades/{id}/inscripciones/{inscripcionId}")
+    suspend fun borrarInscripcionAdmin(@Path("id") id: String, @Path("inscripcionId") inscripcionId: Any)
+
+    // ---------- Notificaciones ----------
+    /** Sin despues_de: las más recientes primero. Con despues_de: solo las nuevas, de la más vieja a la más nueva. */
+    @GET("notificaciones")
+    suspend fun misNotificaciones(
+        @Query("despues_de") despuesDe: Long? = null,
+        @Query("limit") limit: Int = 50
+    ): List<NotificacionDto>
+
+    @GET("notificaciones/resumen")
+    suspend fun resumenNotificaciones(): ResumenNotificacionesDto
+
+    @POST("notificaciones/{id}/leida")
+    suspend fun marcarNotificacionLeida(@Path("id") id: Long)
+
+    @POST("notificaciones/leidas")
+    suspend fun marcarTodasLeidas()
+
 }

@@ -34,7 +34,8 @@ import com.example.familiasquesuman.ui.screens.perfil.PerfilScreen
 import com.example.familiasquesuman.ui.screens.perfil.PerfilViewModel
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectoDetalleScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectosScreen
-
+import androidx.compose.runtime.LaunchedEffect
+import com.example.familiasquesuman.notificaciones.EstadoNotificaciones
 @Composable
 fun NavGraphFamilias(
     navController: NavHostController = rememberNavController(),
@@ -296,4 +297,13 @@ fun NavGraphFamilias(
         }
 
     }
+    // Se tocó una notificación del celular: ir a su pantalla (lo pone MainActivity)
+    val rutaPendiente = EstadoNotificaciones.rutaPendiente
+    LaunchedEffect(rutaPendiente) {
+        if (rutaPendiente != null) {
+            EstadoNotificaciones.rutaPendiente = null
+            navController.navigate(rutaPendiente) { launchSingleTop = true }
+        }
+    }
+
 }

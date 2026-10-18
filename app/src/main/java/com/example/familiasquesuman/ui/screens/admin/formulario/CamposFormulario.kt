@@ -3,6 +3,7 @@ package com.example.familiasquesuman.ui.screens.admin.formulario
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Row
@@ -21,7 +22,12 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Domain
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,7 +37,14 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,10 +52,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.familiasquesuman.data.remote.dto.CategoriaDto
 import com.example.familiasquesuman.domain.EstadoProyecto
 import com.example.familiasquesuman.domain.TipoCentro
 import com.example.familiasquesuman.domain.TipoDonacion
 import com.example.familiasquesuman.ui.components.SelectorCategoria
+import com.example.familiasquesuman.ui.components.SelectorCategoriaDto
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.ColorError
 import com.example.familiasquesuman.ui.theme.FondoVerde
@@ -228,25 +243,76 @@ fun CamposComunes(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CamposActividad(
     form: ActividadForm,
-    categorias: List<String>,
+    categorias: List<CategoriaDto>,
     onNuevaCategoria: (String) -> Unit,
     onCambio: (ActividadForm) -> Unit,
 ) {
-    SelectorCategoria(
+    var mostrarDatePicker by remember { mutableStateOf(false) }
+    var mostrarTimePickerInicio by remember { mutableStateOf(false) }
+    var mostrarTimePickerFin by remember { mutableStateOf(false) }
+
+    SelectorCategoriaDto(
         categorias = categorias,
-        seleccionada = form.categoria,
-        onSeleccionar = { onCambio(form.copy(categoria = it)) },
+        seleccionadaId = form.categoriaId,
+        onSeleccionar = { cat -> onCambio(form.copy(categoriaId = cat.id, categoriaNombre = cat.nombre)) },
         onNuevaCategoria = onNuevaCategoria,
         titulo = "Categoría de Actividad",
     )
 
+    OutlinedTextField(
+        value = formatearFechaDisplay(form.fechaMillis),
+        onValueChange = {},
+        readOnly = true,
+        label = { Text("Fecha") },
+        placeholder = { Text("Selecciona la fecha") },
+        trailingIcon = {
+            IconButton(onClick = { mostrarDatePicker = true }) {
+                Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
+            }
+        },
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier.fillMaxWidth(),
+    )
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-        CampoTexto(form.fecha, { onCambio(form.copy(fecha = it)) }, "Fecha", Modifier.weight(1f), placeholder = "Sáb, 15 de Nov")
-        CampoTexto(form.horario, { onCambio(form.copy(horario = it)) }, "Horario", Modifier.weight(1f), placeholder = "09:00 - 12:00")
+        Box(modifier = Modifier.weight(1f)) {
+            OutlinedTextField(
+                value = formatearHoraDisplay(form.horaInicio),
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Hora inicio") },
+                placeholder = { Text("09:00 AM") },
+                trailingIcon = {
+                    IconButton(onClick = { mostrarTimePickerInicio = true }) {
+                        Icon(Icons.Default.Schedule, contentDescription = "Hora inicio")
+                    }
+                },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
+        Box(modifier = Modifier.weight(1f)) {
+            OutlinedTextField(
+                value = formatearHoraDisplay(form.horaFin),
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Hora fin") },
+                placeholder = { Text("12:00 PM") },
+                trailingIcon = {
+                    IconButton(onClick = { mostrarTimePickerFin = true }) {
+                        Icon(Icons.Default.Schedule, contentDescription = "Hora fin")
+                    }
+                },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+            )
+        }
     }
+
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
         CampoTexto(form.organizador, { onCambio(form.copy(organizador = it)) }, "Organizador", Modifier.weight(1f))
         CampoTexto(
@@ -264,6 +330,78 @@ fun CamposActividad(
         minLineas = 3,
         maxLineas = Int.MAX_VALUE,
     )
+
+    if (mostrarDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = form.fechaMillis ?: System.currentTimeMillis()
+        )
+        DatePickerDialog(
+            onDismissRequest = { mostrarDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        onCambio(form.copy(fechaMillis = millis))
+                    }
+                    mostrarDatePicker = false
+                }) { Text("Aceptar") }
+            },
+            dismissButton = {
+                TextButton(onClick = { mostrarDatePicker = false }) { Text("Cancelar") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
+    if (mostrarTimePickerInicio) {
+        val timePickerState = rememberTimePickerState(
+            initialHour = form.horaInicio?.first ?: 9,
+            initialMinute = form.horaInicio?.second ?: 0,
+            is24Hour = false
+        )
+        AlertDialog(
+            onDismissRequest = { mostrarTimePickerInicio = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    onCambio(form.copy(horaInicio = timePickerState.hour to timePickerState.minute))
+                    mostrarTimePickerInicio = false
+                }) { Text("Aceptar") }
+            },
+            dismissButton = {
+                TextButton(onClick = { mostrarTimePickerInicio = false }) { Text("Cancelar") }
+            },
+            text = {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    TimePicker(state = timePickerState)
+                }
+            }
+        )
+    }
+
+    if (mostrarTimePickerFin) {
+        val timePickerState = rememberTimePickerState(
+            initialHour = form.horaFin?.first ?: 12,
+            initialMinute = form.horaFin?.second ?: 0,
+            is24Hour = false
+        )
+        AlertDialog(
+            onDismissRequest = { mostrarTimePickerFin = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    onCambio(form.copy(horaFin = timePickerState.hour to timePickerState.minute))
+                    mostrarTimePickerFin = false
+                }) { Text("Aceptar") }
+            },
+            dismissButton = {
+                TextButton(onClick = { mostrarTimePickerFin = false }) { Text("Cancelar") }
+            },
+            text = {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    TimePicker(state = timePickerState)
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -654,6 +792,14 @@ fun CamposCentro(form: CentroForm, onCambio: (CentroForm) -> Unit) {
             placeholder = "528112345678", teclado = KeyboardType.Phone,
         )
     }
-
+    CampoTexto(
+        valor = form.mapaUrl,
+        onCambio = { onCambio(form.copy(mapaUrl = it)) },
+        etiqueta = "Link de cómo llegar (opcional)",
+        placeholder = "https://maps.app.goo.gl/...",
+        ayuda = "En Google Maps: busca el lugar → Compartir → Copiar vínculo. " +
+                "Si lo dejas vacío, \"Cómo llegar\" busca la dirección.",
+        teclado = KeyboardType.Uri,
+    )
     OpcionConCheck("Centro verificado por Familias que Suman", form.verificado) { onCambio(form.copy(verificado = it)) }
 }

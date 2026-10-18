@@ -82,7 +82,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
-
+import com.example.familiasquesuman.ui.components.FotoPerfil
 // =====================================================================
 // TARJETAS
 // =====================================================================
@@ -234,6 +234,7 @@ fun FamiliaCard(
                 val soyYo = adulto.id == miId
                 FilaMiembro(
                     icono = Icons.Outlined.Person,
+                    foto = { FotoPerfil(fotoUrl = adulto.fotoUrl, nombre = adulto.nombre, tamano = 36.dp) },
                     titulo = if (soyYo) "${adulto.nombre} (tú)" else adulto.nombre,
                     subtitulo = Parentescos.etiqueta(adulto.parentesco)
                         ?: if (soyYo) "Toca el lápiz para indicar tu parentesco" else "Adulto"
@@ -624,6 +625,7 @@ private fun FilaMiembro(
     titulo: String,
     subtitulo: String,
     atenuado: Boolean = false,
+    foto: (@Composable () -> Unit)? = null, // si se pasa, va en lugar del ícono (adultos con foto de perfil)
     acciones: @Composable RowScope.() -> Unit = {}
 ) {
     Row(
@@ -636,13 +638,17 @@ private fun FilaMiembro(
             )
             .padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .background(if (atenuado) GrisTexto else Ambar, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(icono, contentDescription = null, tint = Blanco, modifier = Modifier.size(20.dp))
+        if (foto != null) {
+            foto()
+        } else {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(if (atenuado) GrisTexto else Ambar, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icono, contentDescription = null, tint = Blanco, modifier = Modifier.size(20.dp))
+            }
         }
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
