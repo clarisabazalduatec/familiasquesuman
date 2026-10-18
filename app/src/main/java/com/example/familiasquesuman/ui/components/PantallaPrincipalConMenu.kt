@@ -245,6 +245,7 @@ fun PantallaPrincipalConMenu(
                                 when (pantalla) {
                                     PantallaPrincipal.INICIO -> Rutas.Inicio.ruta
                                     PantallaPrincipal.ACTIVIDADES -> Rutas.Actividades.ruta
+                                    PantallaPrincipal.COMUNIDAD -> Rutas.Comunidad.ruta
                                     PantallaPrincipal.PROYECTOS -> Rutas.Proyectos.ruta
                                     PantallaPrincipal.DONAR -> Rutas.Donar.ruta
                                     PantallaPrincipal.DIRECTORIO -> Rutas.Directorio.ruta

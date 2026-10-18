@@ -2,34 +2,36 @@ package com.example.familiasquesuman.ui.screens.admin
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import com.example.familiasquesuman.data.remote.dto.PublicacionDto
+import com.example.familiasquesuman.data.remote.dto.toDomain
+import com.example.familiasquesuman.data.repository.ComunidadRepository
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
-import com.example.familiasquesuman.ui.theme.*
-import com.example.familiasquesuman.data.repository.ComunidadRepository
-import com.example.familiasquesuman.data.remote.dto.PublicacionDto
+import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.comunidad.PublicacionComunidadUi
+import com.example.familiasquesuman.ui.theme.*
 import kotlinx.coroutines.launch
-import coil.compose.AsyncImage
-import androidx.compose.ui.layout.ContentScale
-import com.example.familiasquesuman.data.remote.dto.toDomain
-import androidx.compose.foundation.clickable
 
 @Composable
 fun AdminModeracionComunidadScreen(navController: NavHostController) {
@@ -46,6 +48,7 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
     var actualizacion by remember { mutableIntStateOf(0) }
     var idParaAprobar by remember { mutableStateOf<String?>(null) }
     var idParaRechazar by remember { mutableStateOf<String?>(null) }
+    var idParaEliminar by remember { mutableStateOf<String?>(null) }
     var motivoRechazo by remember { mutableStateOf("") }
     var idProcesando by remember { mutableStateOf<String?>(null) }
     var errorAccion by remember { mutableStateOf<String?>(null) }
@@ -68,127 +71,179 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
                 .onFailure { error = "No se pudieron cargar las publicaciones rechazadas." }
         }
         cargando = false
-        }
+    }
 
-        idParaAprobar?.let { id ->
-            AlertDialog(
-                onDismissRequest = {
-                    if (idProcesando == null) idParaAprobar = null
-                },
-                title = {
-                    Text("Aprobar publicación")
-                },
-                text = {
-                    Text("¿Estás seguro de que quieres aprobar esta publicación? Será visible en Comunidad.")
-                },
-                confirmButton = {
-                    Button(
-                        enabled = idProcesando == null,
-                        onClick = {
-                            idProcesando = id
-                            errorAccion = null
+    idParaAprobar?.let { id ->
+        AlertDialog(
+            onDismissRequest = {
+                if (idProcesando == null) idParaAprobar = null
+            },
+            title = {
+                Text("Aprobar publicación")
+            },
+            text = {
+                Text("¿Estás seguro de que quieres aprobar esta publicación? Será visible en Comunidad.")
+            },
+            confirmButton = {
+                Button(
+                    enabled = idProcesando == null,
+                    onClick = {
+                        idProcesando = id
+                        errorAccion = null
 
-                            scope.launch {
-                                repository.aprobarPublicacion(id)
-                                    .onSuccess {
-                                        idParaAprobar = null
-                                        pendientes = pendientes.filterNot { it.id == id }
-                                        actualizacion++
-                                    }
-                                    .onFailure {
-                                        errorAccion = "No se pudo aprobar la publicación."
-                                        idParaAprobar = null
-                                    }
+                        scope.launch {
+                            repository.aprobarPublicacion(id)
+                                .onSuccess {
+                                    idParaAprobar = null
+                                    pendientes = pendientes.filterNot { it.id == id }
+                                    actualizacion++
+                                }
+                                .onFailure {
+                                    errorAccion = "No se pudo aprobar la publicación."
+                                    idParaAprobar = null
+                                }
 
-                                idProcesando = null
-                            }
+                            idProcesando = null
                         }
-                    ) {
-                        Text("Aprobar")
                     }
-                },
-                dismissButton = {
-                    TextButton(
-                        enabled = idProcesando == null,
-                        onClick = { idParaAprobar = null }
-                    ) {
-                        Text("Cancelar")
-                    }
+                ) {
+                    Text("Aprobar")
                 }
-            )
-        }
-        idParaRechazar?.let { id ->
-            AlertDialog(
-                onDismissRequest = {
-                    if (idProcesando == null) idParaRechazar = null
-                },
-                title = {
-                    Text("Rechazar publicación")
-                },
-                text = {
-                    Column {
-                        Text("Escribe el motivo del rechazo.")
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = idProcesando == null,
+                    onClick = { idParaAprobar = null }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 
-                        Spacer(modifier = Modifier.height(12.dp))
+    idParaRechazar?.let { id ->
+        AlertDialog(
+            onDismissRequest = {
+                if (idProcesando == null) idParaRechazar = null
+            },
+            title = {
+                Text("Rechazar publicación")
+            },
+            text = {
+                Column {
+                    Text("Escribe el motivo del rechazo.")
 
-                        OutlinedTextField(
-                            value = motivoRechazo,
-                            onValueChange = {
-                                if (it.length <= 2000) motivoRechazo = it
-                            },
-                            label = { Text("Motivo del rechazo") },
-                            modifier = Modifier.fillMaxWidth(),
-                            minLines = 3,
-                            maxLines = 5
-                        )
-                    }
-                },
-                confirmButton = {
-                    Button(
-                        enabled = motivoRechazo.isNotBlank() && idProcesando == null,
-                        onClick = {
-                            val motivo = motivoRechazo.trim()
-                            idProcesando = id
-                            errorAccion = null
+                    Spacer(modifier = Modifier.height(12.dp))
 
-                            scope.launch {
-                                repository.rechazarPublicacion(id, motivo)
-                                    .onSuccess {
-                                        idParaRechazar = null
-                                        motivoRechazo = ""
-                                        pendientes = pendientes.filterNot { it.id == id }
-                                        actualizacion++
-                                    }
-                                    .onFailure {
-                                        errorAccion = "No se pudo rechazar la publicación."
-                                        idParaRechazar = null
-                                    }
-
-                                idProcesando = null
-                            }
+                    OutlinedTextField(
+                        value = motivoRechazo,
+                        onValueChange = {
+                            if (it.length <= 2000) motivoRechazo = it
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = ColorError
-                        )
-                    ) {
-                        Text("Rechazar")
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        enabled = idProcesando == null,
-                        onClick = {
-                            idParaRechazar = null
-                            motivoRechazo = ""
-                        }
-                    ) {
-                        Text("Cancelar")
-                    }
+                        label = { Text("Motivo del rechazo") },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 3,
+                        maxLines = 5
+                    )
                 }
-            )
+            },
+            confirmButton = {
+                Button(
+                    enabled = motivoRechazo.isNotBlank() && idProcesando == null,
+                    onClick = {
+                        val motivo = motivoRechazo.trim()
+                        idProcesando = id
+                        errorAccion = null
 
-        }
+                        scope.launch {
+                            repository.rechazarPublicacion(id, motivo)
+                                .onSuccess {
+                                    idParaRechazar = null
+                                    motivoRechazo = ""
+                                    pendientes = pendientes.filterNot { it.id == id }
+                                    actualizacion++
+                                }
+                                .onFailure {
+                                    errorAccion = "No se pudo rechazar la publicación."
+                                    idParaRechazar = null
+                                }
 
+                            idProcesando = null
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ColorError
+                    )
+                ) {
+                    Text("Rechazar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = idProcesando == null,
+                    onClick = {
+                        idParaRechazar = null
+                        motivoRechazo = ""
+                    }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
+
+    idParaEliminar?.let { id ->
+        AlertDialog(
+            onDismissRequest = {
+                if (idProcesando == null) idParaEliminar = null
+            },
+            title = {
+                Text("Eliminar publicación")
+            },
+            text = {
+                Text("¿Estás seguro de que deseas eliminar permanentemente esta publicación? Esta acción no se puede deshacer.")
+            },
+            confirmButton = {
+                Button(
+                    enabled = idProcesando == null,
+                    onClick = {
+                        idProcesando = id
+                        errorAccion = null
+
+                        scope.launch {
+                            repository.eliminarPublicacion(id)
+                                .onSuccess {
+                                    idParaEliminar = null
+                                    pendientes = pendientes.filterNot { it.id == id }
+                                    aprobadas = aprobadas.filterNot { it.id == id }
+                                    rechazadas = rechazadas.filterNot { it.id == id }
+                                    actualizacion++
+                                }
+                                .onFailure {
+                                    errorAccion = "No se pudo eliminar la publicación."
+                                    idParaEliminar = null
+                                }
+
+                            idProcesando = null
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ColorError
+                    )
+                ) {
+                    Text("Eliminar")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    enabled = idProcesando == null,
+                    onClick = { idParaEliminar = null }
+                ) {
+                    Text("Cancelar")
+                }
+            }
+        )
+    }
 
     PantallaPrincipalConMenu(
         navController = navController,
@@ -239,7 +294,8 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
                 TabPill("Rechazados", pestañaSeleccionada == 2) {
                     errorAccion = null
                     pestañaSeleccionada = 2
-                }            }
+                }
+            }
             errorAccion?.let { mensaje ->
                 Text(
                     text = mensaje,
@@ -302,6 +358,9 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
                                     },
                                     onAprobar = {
                                         idParaAprobar = publicacion.id
+                                    },
+                                    onEliminar = {
+                                        idParaEliminar = publicacion.id
                                     }
                                 )
                             }
@@ -331,15 +390,16 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
                                     contenido = publicacion.contenido,
                                     imagenUrl = publicacion.imagenUrl,
                                     titulo = publicacion.titulo,
-                                    mostrarAcciones = false,
-                                    onRechazar = {},
-                                    onAprobar = {},
+                                    mostrarAcciones = true,
+                                    habilitado = idProcesando == null,
+                                    onEliminar = {
+                                        idParaEliminar = publicacion.id
+                                    },
                                     onAbrir = {
                                         navController.navigate(
-                                            com.example.familiasquesuman.ui.navigation.Rutas.DetallePublicacion.crearRuta(publicacion.id)
+                                            Rutas.DetallePublicacion.crearRuta(publicacion.id)
                                         )
-                                    },
-
+                                    }
                                 )
                             }
                         }
@@ -370,9 +430,11 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
                                     imagenUrl = publicacion.imagenUrl,
                                     titulo = publicacion.titulo,
                                     motivo = dto.motivoRechazo,
-                                    mostrarAcciones = false,
-                                    onRechazar = {},
-                                    onAprobar = {}
+                                    mostrarAcciones = true,
+                                    habilitado = idProcesando == null,
+                                    onEliminar = {
+                                        idParaEliminar = publicacion.id
+                                    }
                                 )
                             }
                         }
@@ -380,10 +442,8 @@ fun AdminModeracionComunidadScreen(navController: NavHostController) {
                 }
             }
         }
-
     }
 }
-
 
 @Composable
 fun TabPill(texto: String, seleccionado: Boolean, onClick: () -> Unit) {
@@ -403,129 +463,130 @@ fun TabPill(texto: String, seleccionado: Boolean, onClick: () -> Unit) {
     }
 }
 
-    @Composable
-    fun TarjetaModeracionComunidad(
-        nombre: String,
-        tiempo: String,
-        estado: String,
-        contenido: String,
-        onRechazar: () -> Unit,
-        onAprobar: () -> Unit,
-        imagenUrl: String? = null,
-        onAbrir: (() -> Unit)? = null,
-        titulo: String? = null,
-        motivo: String? = null,
-        mostrarAcciones: Boolean = true,
-        habilitado: Boolean = true
+@Composable
+fun TarjetaModeracionComunidad(
+    nombre: String,
+    tiempo: String,
+    estado: String,
+    contenido: String,
+    onRechazar: (() -> Unit)? = null,
+    onAprobar: (() -> Unit)? = null,
+    onEliminar: (() -> Unit)? = null,
+    imagenUrl: String? = null,
+    onAbrir: (() -> Unit)? = null,
+    titulo: String? = null,
+    motivo: String? = null,
+    mostrarAcciones: Boolean = true,
+    habilitado: Boolean = true
+) {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(
+                if (onAbrir != null) {
+                    Modifier.clickable { onAbrir() }
+                } else {
+                    Modifier
+                }
+            )
     ) {
-        Card(
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (onAbrir != null) {
-                        Modifier.clickable { onAbrir() }
-                    } else {
-                        Modifier
-                    }
-                )
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                // Header
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .background(GrisClaroFondo, CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(Icons.Default.Person, contentDescription = null, tint = GrisTexto)
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column {
-                            Text(
-                                text = nombre,
-                                fontWeight = FontWeight.Bold,
-                                color = AzulMarino,
-                                fontSize = 14.sp
-                            )
-                            Text(text = tiempo, color = GrisTexto, fontSize = 11.sp)
-                        }
-                    }
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = when (estado) {
-                            "Aprobada" -> Color(0xFFE5F3E8)
-                            "Rechazada" -> Color(0xFFFFE8E8)
-                            else -> AmbarClaro
-                        }
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Header
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(GrisClaroFondo, CircleShape),
+                        contentAlignment = Alignment.Center
                     ) {
+                        Icon(Icons.Default.Person, contentDescription = null, tint = GrisTexto)
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column {
                         Text(
-                            text = estado,
-                            color = when (estado) {
-                                "Aprobada" -> Color(0xFF257942)
-                                "Rechazada" -> ColorError
-                                else -> Ambar
-                            },
-                            fontSize = 11.sp,
+                            text = nombre,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                            color = AzulMarino,
+                            fontSize = 14.sp
                         )
+                        Text(text = tiempo, color = GrisTexto, fontSize = 11.sp)
                     }
                 }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                titulo?.takeIf { it.isNotBlank() }?.let {
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = when (estado) {
+                        "Aprobada" -> Color(0xFFE5F3E8)
+                        "Rechazada" -> Color(0xFFFFE8E8)
+                        else -> AmbarClaro
+                    }
+                ) {
                     Text(
-                        text = it,
-                        color = AzulMarino,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold
+                        text = estado,
+                        color = when (estado) {
+                            "Aprobada" -> Color(0xFF257942)
+                            "Rechazada" -> ColorError
+                            else -> Ambar
+                        },
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                     )
-
-                    Spacer(modifier = Modifier.height(6.dp))
                 }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            titulo?.takeIf { it.isNotBlank() }?.let {
+                Text(
+                    text = it,
+                    color = AzulMarino,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+            }
+
+            Text(
+                text = contenido,
+                color = AzulMarino,
+                fontSize = 13.sp,
+                lineHeight = 18.sp
+            )
+
+            motivo?.takeIf { it.isNotBlank() }?.let {
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = contenido,
-                    color = AzulMarino,
-                    fontSize = 13.sp,
-                    lineHeight = 18.sp
+                    text = "Motivo del rechazo: $it",
+                    color = ColorError,
+                    fontSize = 12.sp
                 )
+            }
 
-                motivo?.takeIf { it.isNotBlank() }?.let {
-                    Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-                    Text(
-                        text = "Motivo del rechazo: $it",
-                        color = ColorError,
-                        fontSize = 12.sp
-                    )
-                }
+            // Imágenes de la publicación
+            imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
+                AsyncImage(
+                    model = url,
+                    contentDescription = "Imagen de la publicación",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Imágenes de la publicación
-                imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
-                    AsyncImage(
-                        model = url,
-                        contentDescription = "Imagen de la publicación",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(160.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-
-
+            if (mostrarAcciones && (onEliminar != null || onRechazar != null || onAprobar != null)) {
                 Spacer(modifier = Modifier.height(12.dp))
                 HorizontalDivider(color = GrisBordeClaro)
 
@@ -534,53 +595,83 @@ fun TabPill(texto: String, seleccionado: Boolean, onClick: () -> Unit) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        onEliminar?.let { accion ->
+                            OutlinedButton(
+                                onClick = accion,
+                                enabled = habilitado,
+                                border = BorderStroke(1.dp, ColorError),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = ColorError),
+                                shape = RoundedCornerShape(10.dp),
+                                contentPadding = PaddingValues(
+                                    horizontal = 10.dp,
+                                    vertical = 4.dp
+                                ),
+                                modifier = Modifier.height(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Delete,
+                                    contentDescription = "Eliminar",
+                                    tint = ColorError,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    "Eliminar",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
 
-                    if (mostrarAcciones) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedButton(
-                                    onClick = onRechazar,
-                                    enabled = habilitado,
-                                    border = BorderStroke(1.dp, ColorError),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = ColorError),
-                                    shape = RoundedCornerShape(10.dp),
-                                    contentPadding = PaddingValues(
-                                        horizontal = 12.dp,
-                                        vertical = 4.dp
-                                    ),
-                                    modifier = Modifier.height(36.dp)
-                                ) {
-                                    Text(
-                                        "Rechazar",
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
+                        onRechazar?.let { accion ->
+                            OutlinedButton(
+                                onClick = accion,
+                                enabled = habilitado,
+                                border = BorderStroke(1.dp, ColorError),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = ColorError),
+                                shape = RoundedCornerShape(10.dp),
+                                contentPadding = PaddingValues(
+                                    horizontal = 12.dp,
+                                    vertical = 4.dp
+                                ),
+                                modifier = Modifier.height(36.dp)
+                            ) {
+                                Text(
+                                    "Rechazar",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
 
-                                Button(
-                                    onClick = onAprobar,
-                                    enabled = habilitado,
-                                    colors = ButtonDefaults.buttonColors(containerColor = AzulMarino),
-                                    shape = RoundedCornerShape(10.dp),
-                                    contentPadding = PaddingValues(
-                                        horizontal = 16.dp,
-                                        vertical = 4.dp
-                                    ),
-                                    modifier = Modifier.height(36.dp)
-                                ) {
-                                    Text(
-                                        "Aprobar",
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
-                                    )
-                                }
+                        onAprobar?.let { accion ->
+                            Button(
+                                onClick = accion,
+                                enabled = habilitado,
+                                colors = ButtonDefaults.buttonColors(containerColor = AzulMarino),
+                                shape = RoundedCornerShape(10.dp),
+                                contentPadding = PaddingValues(
+                                    horizontal = 16.dp,
+                                    vertical = 4.dp
+                                ),
+                                modifier = Modifier.height(36.dp)
+                            ) {
+                                Text(
+                                    "Aprobar",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
                             }
                         }
                     }
                 }
             }
         }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

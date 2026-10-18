@@ -101,7 +101,7 @@ fun NuevaPublicacionScreen(
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.INICIO,
+        pantallaActual = PantallaPrincipal.COMUNIDAD,
     ) { paddingInterno ->
         val scrollState = androidx.compose.foundation.rememberScrollState()
         Column(

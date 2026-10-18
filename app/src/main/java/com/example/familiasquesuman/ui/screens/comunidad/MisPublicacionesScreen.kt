@@ -97,7 +97,7 @@ fun MisPublicacionesScreen(navController: NavHostController) {
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.INICIO,
+        pantallaActual = PantallaPrincipal.COMUNIDAD,
     ) { paddingInterno -> LazyColumn(
             modifier = Modifier
                 .padding(paddingInterno)

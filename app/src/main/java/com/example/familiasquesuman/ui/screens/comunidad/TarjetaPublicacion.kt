@@ -1,9 +1,6 @@
-
 package com.example.familiasquesuman.ui.screens.comunidad
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -13,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.familiasquesuman.ui.theme.*
@@ -24,90 +20,26 @@ import com.example.familiasquesuman.ui.components.FotoPerfil
 import coil.compose.AsyncImage
 
 @Composable
-fun TarjetaPublicacion(publicacion: PublicacionComunidadUi, onClick: () -> Unit, modifier: Modifier = Modifier, onRequiereLogin: () -> Unit = {}) {
-    if (publicacion.tipo == TipoPublicacion.OFICIAL) {
-        TarjetaPublicacionOficial(
-            publicacion = publicacion,
-            onClick = onClick,
-            modifier = modifier
-        )
-    } else {
-        TarjetaPublicacionComunidad(
-            publicacion = publicacion,
-            onClick = onClick,
-            modifier = modifier,
-            onRequiereLogin = onRequiereLogin
-        )
-    }
-}
-
-@Composable
-private fun TarjetaPublicacionOficial(publicacion: PublicacionComunidadUi, onClick: () -> Unit, modifier: Modifier) {
-    Card(onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Blanco),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column {
-            publicacion.imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
-                AsyncImage(
-                    model = url,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(165.dp),
-                    contentScale = ContentScale.Crop
-                )
-            }
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = publicacion.titulo.orEmpty(),
-                    style = MaterialTheme.typography.titleLarge,
-                    color = AzulMarino
-                )
-                Spacer(Modifier.height(5.dp))
-                Text(text = publicacion.contenido,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = GrisTexto,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(Modifier.height(12.dp))
-                publicacion.fechaEvento?.let { FilaDato(Icons.Outlined.CalendarMonth, it) }
-                publicacion.horarioEvento?.let { FilaDato(Icons.Outlined.Schedule, it) }
-                publicacion.ubicacion?.let { FilaDato(Icons.Outlined.LocationOn, it) }
-                Spacer(Modifier.height(8.dp))
-                HorizontalDivider(color = GrisBorde.copy(alpha = .7f))
-                TextButton(onClick = onClick, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = "Ver anuncio",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = AzulMarino
-                    )
-                    Spacer(Modifier.weight(1f))
-                    Icon(imageVector = Icons.Outlined.ChevronRight,
-                        contentDescription = null,
-                        tint = AzulMarino
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun TarjetaPublicacionComunidad(publicacion: PublicacionComunidadUi, onClick: () -> Unit, modifier: Modifier, onRequiereLogin: () -> Unit) {
+fun TarjetaPublicacion(
+    publicacion: PublicacionComunidadUi,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    onRequiereLogin: () -> Unit = {}
+) {
     val repository = remember { ComunidadRepository() }
     val scope = rememberCoroutineScope()
 
     var tieneLike by remember(
         publicacion.id,
         publicacion.meGusta,
-        publicacion.numeroLikes) { mutableStateOf(publicacion.meGusta) }
+        publicacion.numeroLikes
+    ) { mutableStateOf(publicacion.meGusta) }
 
     var likes by remember(
         publicacion.id,
         publicacion.meGusta,
-        publicacion.numeroLikes) { mutableIntStateOf(publicacion.numeroLikes) }
+        publicacion.numeroLikes
+    ) { mutableIntStateOf(publicacion.numeroLikes) }
 
     var guardandoLike by remember(publicacion.id) { mutableStateOf(false) }
     var errorLike by remember(publicacion.id) { mutableStateOf<String?>(null) }
@@ -119,14 +51,16 @@ private fun TarjetaPublicacionComunidad(publicacion: PublicacionComunidadUi, onC
         }
     }
 
-    Card(onClick = onClick,
+    Card(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = Blanco),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column {
-            Row(modifier = Modifier.padding(
+            Row(
+                modifier = Modifier.padding(
                     start = 14.dp,
                     end = 14.dp,
                     top = 14.dp,
@@ -141,20 +75,35 @@ private fun TarjetaPublicacionComunidad(publicacion: PublicacionComunidadUi, onC
                 )
                 Spacer(Modifier.width(9.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(text = publicacion.autor,
+                    Text(
+                        text = publicacion.autor,
                         style = MaterialTheme.typography.titleSmall,
                         color = AzulMarino
                     )
-                    Text(text = publicacion.tiempoRelativo,
+                    Text(
+                        text = publicacion.tiempoRelativo,
                         style = MaterialTheme.typography.bodySmall,
                         color = GrisTexto
                     )
                 }
-                publicacion.categoria?.let {
-                    Surface(shape = RoundedCornerShape(50),
-                        color = Ambar.copy(alpha = .28f)
+
+                val etiqueta = if (publicacion.tipo == TipoPublicacion.OFICIAL) {
+                    "Aviso Oficial"
+                } else {
+                    publicacion.categoria
+                }
+
+                etiqueta?.let { texto ->
+                    Surface(
+                        shape = RoundedCornerShape(50),
+                        color = if (publicacion.tipo == TipoPublicacion.OFICIAL) {
+                            AzulMarino.copy(alpha = .12f)
+                        } else {
+                            Ambar.copy(alpha = .28f)
+                        }
                     ) {
-                        Text(text = it,
+                        Text(
+                            text = texto,
                             modifier = Modifier.padding(
                                 horizontal = 10.dp,
                                 vertical = 5.dp
@@ -165,26 +114,49 @@ private fun TarjetaPublicacionComunidad(publicacion: PublicacionComunidadUi, onC
                     }
                 }
             }
+
             publicacion.imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
                 AsyncImage(
                     model = url,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(165.dp),
+                        .height(175.dp),
                     contentScale = ContentScale.Crop
                 )
             }
+
             Column(modifier = Modifier.padding(14.dp)) {
-                Text(text = publicacion.contenido,
+                publicacion.titulo?.takeIf { it.isNotBlank() }?.let { titulo ->
+                    Text(
+                        text = titulo,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = AzulMarino
+                    )
+                    Spacer(Modifier.height(4.dp))
+                }
+
+                Text(
+                    text = publicacion.contenido,
                     style = MaterialTheme.typography.bodyMedium,
                     color = AzulMarino,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
-                Spacer(Modifier.height(9.dp))
+
+                if (publicacion.fechaEvento != null || publicacion.horarioEvento != null || publicacion.ubicacion != null) {
+                    Spacer(Modifier.height(8.dp))
+                    publicacion.fechaEvento?.let { FilaDato(Icons.Outlined.CalendarMonth, it) }
+                    publicacion.horarioEvento?.let { FilaDato(Icons.Outlined.Schedule, it) }
+                    publicacion.ubicacion?.let { FilaDato(Icons.Outlined.LocationOn, it) }
+                }
+
+                Spacer(Modifier.height(10.dp))
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    IconButton(onClick = { if (SesionManager.token.isNullOrBlank()) {
+                    IconButton(
+                        onClick = {
+                            if (SesionManager.token.isNullOrBlank()) {
                                 onRequiereLogin()
                             } else if (!guardandoLike) {
                                 guardandoLike = true
@@ -198,7 +170,7 @@ private fun TarjetaPublicacionComunidad(publicacion: PublicacionComunidadUi, onC
                                     resultado.onSuccess {
                                         tieneLike = !tieneLike
                                         likes += if (tieneLike) 1 else -1
-                                    }.onFailure { errorLike = "No se pudo actualizar el like." }
+                                    }.onFailure { errorLike = "No se pudo actualizar el me gusta." }
                                     guardandoLike = false
                                 }
                             }
@@ -206,38 +178,39 @@ private fun TarjetaPublicacionComunidad(publicacion: PublicacionComunidadUi, onC
                         enabled = !guardandoLike,
                         modifier = Modifier.size(36.dp)
                     ) {
-                        Icon(imageVector = if (tieneLike) {
+                        Icon(
+                            imageVector = if (tieneLike) {
                                 Icons.Filled.Favorite
                             } else {
                                 Icons.Outlined.FavoriteBorder
                             },
-                            contentDescription = if (tieneLike) {
-                                "Quitar like"
-                            } else {
-                                "Dar like"
-                            },
+                            contentDescription = if (tieneLike) "Quitar me gusta" else "Dar me gusta",
                             tint = if (tieneLike) ColorError else AzulMarino
                         )
                     }
-                    Text(text = likes.toString(),
+                    Text(
+                        text = likes.toString(),
                         style = MaterialTheme.typography.bodySmall,
                         color = AzulMarino
                     )
                     Spacer(Modifier.width(14.dp))
                     IconButton(onClick = onClick, modifier = Modifier.size(36.dp)) {
-                        Icon(imageVector = Icons.Outlined.ChatBubbleOutline,
+                        Icon(
+                            imageVector = Icons.Outlined.ChatBubbleOutline,
                             contentDescription = "Comentarios",
                             tint = AzulMarino
                         )
                     }
 
-                    Text(text = publicacion.numeroComentarios.toString(),
+                    Text(
+                        text = publicacion.numeroComentarios.toString(),
                         style = MaterialTheme.typography.bodySmall,
                         color = AzulMarino
                     )
                     Spacer(Modifier.weight(1f))
                     IconButton(onClick = {}) {
-                        Icon(imageVector = Icons.Outlined.Share,
+                        Icon(
+                            imageVector = Icons.Outlined.Share,
                             contentDescription = "Compartir",
                             tint = AzulMarino
                         )
@@ -245,7 +218,8 @@ private fun TarjetaPublicacionComunidad(publicacion: PublicacionComunidadUi, onC
                 }
 
                 errorLike?.let { mensaje ->
-                    Text(text = mensaje,
+                    Text(
+                        text = mensaje,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -256,16 +230,21 @@ private fun TarjetaPublicacionComunidad(publicacion: PublicacionComunidadUi, onC
 }
 
 @Composable
-private fun FilaDato(icono: androidx.compose.ui.graphics.vector.ImageVector, texto: String
-) { Row(modifier = Modifier.padding(vertical = 3.dp),
+private fun FilaDato(icono: androidx.compose.ui.graphics.vector.ImageVector, texto: String) {
+    Row(
+        modifier = Modifier.padding(vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically
-    ) { Icon(imageVector = icono,
+    ) {
+        Icon(
+            imageVector = icono,
             contentDescription = null,
             modifier = Modifier.size(18.dp),
             tint = AzulMarino
         )
         Spacer(Modifier.width(8.dp))
-        Text(text = texto, style = MaterialTheme.typography.bodySmall,
+        Text(
+            text = texto,
+            style = MaterialTheme.typography.bodySmall,
             color = AzulMarino
         )
     }

@@ -226,7 +226,27 @@ class ComunidadRepository {
         return try {
             val comentarios = RetrofitInstance.api.obtenerComentariosPublicacion(publicacionId)
             Result.success(comentarios.map { it.toDomain() })
-        } catch (e: Exception) { Result.failure(e) }
+        } catch (e: retrofit2.HttpException) {
+            if (e.code() == 404 || e.code() == 204) {
+                Result.success(emptyList())
+            } else {
+                Result.failure(e)
+            }
+        } catch (e: Exception) {
+            Result.success(emptyList())
+        }
+    }
+
+    // Eliminar publicación (admin)
+    suspend fun eliminarPublicacion(id: String): Result<Unit> {
+        return try {
+            RetrofitInstance.api.eliminarPublicacion(id)
+            Result.success(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
 

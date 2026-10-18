@@ -199,6 +199,7 @@ interface FamiliasApiService {
     @GET("comunidad/{id}") suspend fun detallePublicacionComunidad(@Path("id") id: String): PublicacionDto
     @GET("comunidad/avisos") suspend fun listarAvisosOficiales(@Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<PublicacionDto>
     @POST("comunidad") suspend fun crearPublicacionComunidad(@Body datos: CrearPublicacionRequest): PublicacionDto
+    @DELETE("comunidad/{id}") suspend fun eliminarPublicacion(@Path("id") id: String)
 
     // ---------- Admin: Avisos Oficiales ----------
     @POST("comunidad/avisos") suspend fun crearAvisoOficial(@Body datos: CrearAvisoOficialRequest): PublicacionDto

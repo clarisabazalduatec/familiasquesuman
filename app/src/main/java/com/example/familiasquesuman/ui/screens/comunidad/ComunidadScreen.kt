@@ -121,10 +121,9 @@ fun ComunidadScreen(
 
     PantallaPrincipalConMenu(
         navController = navController,
-        pantallaActual = PantallaPrincipal.INICIO,
-        navbar = false,
-        backButton = true,
-        onBackClick = { navController.popBackStack() }
+        pantallaActual = PantallaPrincipal.COMUNIDAD,
+        navbar = true,
+        backButton = false
     ) { paddingInterno ->
 
         Box(

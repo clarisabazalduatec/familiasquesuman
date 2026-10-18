@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Home
@@ -31,6 +32,7 @@ enum class PantallaPrincipal(
 ) {
     INICIO("Inicio"),
     ACTIVIDADES("Actividades"),
+    COMUNIDAD("Comunidad"),
     PROYECTOS("Proyectos"),
     DONAR("Donar"),
     DIRECTORIO("Directorio"),
@@ -89,7 +91,7 @@ fun BarraNavegacionInferior(
                 Text(
                     text = "Inicio",
                     style = MaterialTheme.typography.labelSmall,
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
                     fontWeight =
                         if (
                             pantallaActual ==
@@ -119,7 +121,7 @@ fun BarraNavegacionInferior(
             icon = {
                 Icon(
                     imageVector =
-                        Icons.Outlined.Groups,
+                        Icons.Outlined.CalendarMonth,
                     contentDescription =
                         "Actividades",
                     modifier =
@@ -132,11 +134,54 @@ fun BarraNavegacionInferior(
                     text = "Actividades",
                     style =
                         MaterialTheme.typography.labelSmall,
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
                     fontWeight =
                         if (
                             pantallaActual ==
                             PantallaPrincipal.ACTIVIDADES
+                        ) {
+                            FontWeight.SemiBold
+                        } else {
+                            FontWeight.Normal
+                        }
+                )
+            },
+
+            colors = colores
+        )
+
+        //comunidad
+        NavigationBarItem(
+            selected =
+                pantallaActual ==
+                        PantallaPrincipal.COMUNIDAD,
+            onClick = {
+                onPantallaSeleccionada(
+                    PantallaPrincipal.COMUNIDAD
+                )
+            },
+
+            icon = {
+                Icon(
+                    imageVector =
+                        Icons.Outlined.Groups,
+                    contentDescription =
+                        "Comunidad",
+                    modifier =
+                        Modifier.size(24.dp)
+                )
+            },
+
+            label = {
+                Text(
+                    text = "Comunidad",
+                    style =
+                        MaterialTheme.typography.labelSmall,
+                    fontSize = 10.sp,
+                    fontWeight =
+                        if (
+                            pantallaActual ==
+                            PantallaPrincipal.COMUNIDAD
                         ) {
                             FontWeight.SemiBold
                         } else {
@@ -173,7 +218,7 @@ fun BarraNavegacionInferior(
                 Text(
                     text = "Proyectos",
                     style =MaterialTheme.typography.labelSmall,
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
                     fontWeight =
                         if (
                             pantallaActual ==
@@ -213,7 +258,7 @@ fun BarraNavegacionInferior(
                 Text(
                     text = "Donar",
                     style = MaterialTheme.typography.labelSmall,
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
                     fontWeight =
                         if (
                             pantallaActual ==
@@ -253,7 +298,7 @@ fun BarraNavegacionInferior(
                 Text(
                     text = "Directorio",
                     style = MaterialTheme.typography.labelSmall,
-                    fontSize = 11.sp,
+                    fontSize = 10.sp,
                     fontWeight =
                         if (
                             pantallaActual ==
