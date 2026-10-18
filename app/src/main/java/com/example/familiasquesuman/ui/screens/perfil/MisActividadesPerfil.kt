@@ -440,6 +440,21 @@ private fun TarjetaMiInscripcion(
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                                 )
                             }
+                        } else if (inscripcion.estado?.equals("EN_ESPERA", ignoreCase = true) == true) {
+                            Surface(
+                                color = Ambar.copy(alpha = 0.2f),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                val pos = inscripcion.posicionEspera
+                                val textoPos = if (pos != null) "En lista de espera · posición $pos" else "En lista de espera"
+                                Text(
+                                    text = textoPos,
+                                    color = AzulMarino,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                                )
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(6.dp))

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 data class InscripcionUiState(
     val cargando: Boolean = false,
@@ -22,7 +23,9 @@ data class InscripcionUiState(
     val menoresSeleccionados: Set<String> = emptySet(),
     val guardando: Boolean = false,
     val error: String? = null,
-    val listo: Boolean = false
+    val listo: Boolean = false,
+    val mostrarDialogoListaEspera: Boolean = false,
+    val agregadoListaEspera: Boolean = false
 )
 
 class InscripcionViewModel(
@@ -104,7 +107,7 @@ class InscripcionViewModel(
         }
     }
 
-    fun confirmar(actividadId: String) {
+    fun confirmar(actividadId: String, listaEspera: Boolean = false) {
         val state = _uiState.value
         val adultos = state.adultosSeleccionados.toList()
         val menores = state.menoresSeleccionados.toList()
@@ -115,43 +118,109 @@ class InscripcionViewModel(
         }
 
         if (state.guardando) return
-        _uiState.update { it.copy(guardando = true, error = null) }
+        _uiState.update { it.copy(guardando = true, error = null, mostrarDialogoListaEspera = false) }
 
         viewModelScope.launch {
             val resultado = if (state.inscripcionActual == null) {
-                inscripcionRepo.inscribir(actividadId, adultos, menores)
+                inscripcionRepo.inscribir(actividadId, adultos, menores, listaEspera)
             } else {
-                inscripcionRepo.modificarInscripcion(actividadId, adultos, menores)
+                inscripcionRepo.modificarInscripcion(actividadId, adultos, menores, listaEspera)
             }
 
             resultado.onSuccess { inscripcion ->
-                _uiState.update {
-                    it.copy(
-                        guardando = false,
-                        inscripcionActual = inscripcion,
-                        listo = true
-                    )
-                }
-            }.onFailure { e ->
-                // Por si el servidor ya la había creado (o dice "ya estás inscrito"):
-                val inscExistente = inscripcionRepo.miInscripcion(actividadId).getOrNull()
-                if (inscExistente != null) {
+                val esEspera = inscripcion.estado?.equals("EN_ESPERA", ignoreCase = true) == true
+                if (esEspera) {
                     _uiState.update {
                         it.copy(
                             guardando = false,
-                            inscripcionActual = inscExistente,
-                            listo = true
+                            inscripcionActual = inscripcion,
+                            agregadoListaEspera = true
                         )
                     }
                 } else {
                     _uiState.update {
                         it.copy(
                             guardando = false,
-                            error = e.message ?: "Ocurrió un error al guardar la inscripción"
+                            inscripcionActual = inscripcion,
+                            listo = true
                         )
                     }
                 }
+            }.onFailure { e ->
+                val httpEx = e as? HttpException
+                val code = httpEx?.code() ?: 0
+                val rawError = httpEx?.response()?.errorBody()?.string() ?: e.message.orEmpty()
+                val parsedDetail = extraerMensajeError(e, rawError).lowercase()
+
+                val isYaInscrito = (parsedDetail.contains("ya") || rawError.contains("ya", ignoreCase = true)) &&
+                        (parsedDetail.contains("inscrit") || parsedDetail.contains("registr") || parsedDetail.contains("exist"))
+
+                val isCupoAgotado = (!isYaInscrito && !listaEspera) && (
+                    code == 409 || code == 400 || code == 422 ||
+                    parsedDetail.contains("cupo") ||
+                    parsedDetail.contains("llen") ||
+                    parsedDetail.contains("lugares") ||
+                    parsedDetail.contains("agotado") ||
+                    parsedDetail.contains("espacios") ||
+                    rawError.contains("cupo", ignoreCase = true) ||
+                    rawError.contains("llena", ignoreCase = true) ||
+                    rawError.contains("lleno", ignoreCase = true) ||
+                    rawError.contains("lugares", ignoreCase = true) ||
+                    rawError.contains("agotado", ignoreCase = true)
+                )
+
+                if (isCupoAgotado) {
+                    _uiState.update {
+                        it.copy(
+                            guardando = false,
+                            mostrarDialogoListaEspera = true
+                        )
+                    }
+                } else {
+                    // Por si el servidor ya la había creado (o dice "ya estás inscrito"):
+                    val inscExistente = inscripcionRepo.miInscripcion(actividadId).getOrNull()
+                    if (inscExistente != null) {
+                        _uiState.update {
+                            it.copy(
+                                guardando = false,
+                                inscripcionActual = inscExistente,
+                                listo = true
+                            )
+                        }
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                guardando = false,
+                                error = extraerMensajeError(e, rawError)
+                            )
+                        }
+                    }
+                }
             }
+        }
+    }
+
+    fun aceptarListaEspera(actividadId: String) {
+        confirmar(actividadId, listaEspera = true)
+    }
+
+    fun rechazarListaEspera() {
+        _uiState.update { it.copy(mostrarDialogoListaEspera = false) }
+    }
+
+    fun consumirAgregadoListaEspera() {
+        _uiState.update { it.copy(agregadoListaEspera = false) }
+    }
+
+    private fun extraerMensajeError(e: Throwable, rawError: String): String {
+        return try {
+            if (rawError.contains("\"detail\":")) {
+                val detail = rawError.substringAfter("\"detail\":").substringBefore("}").trim().removeSurrounding("\"")
+                if (detail.isNotBlank()) return detail
+            }
+            e.message ?: "Ocurrió un error al guardar la inscripción"
+        } catch (_: Exception) {
+            e.message ?: "Ocurrió un error al guardar la inscripción"
         }
     }
 

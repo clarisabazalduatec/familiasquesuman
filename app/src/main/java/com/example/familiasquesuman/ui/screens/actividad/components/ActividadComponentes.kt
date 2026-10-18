@@ -612,14 +612,17 @@ fun TarjetaPlazasDisponibles(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            val progreso = if (totales > 0) disponibles.toFloat() / totales.toFloat() else 0f
+            val ocupados = (totales - disponibles).coerceAtLeast(0)
+            val progreso = if (totales > 0) ocupados.toFloat() / totales.toFloat() else 0f
+            val estaLlena = disponibles <= 0
+
             LinearProgressIndicator(
                 progress = { progreso },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp)
                     .clip(RoundedCornerShape(4.dp)),
-                color = AmarilloOscuro,
+                color = if (estaLlena) ColorExito else AmarilloOscuro,
                 trackColor = GrisBordeClaro
             )
 

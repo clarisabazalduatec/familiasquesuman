@@ -157,18 +157,10 @@ fun ActividadSeleccionParticipantesScreen(
                     }
                 } else {
                     val familia = inscripcionState.familia!!
-                    val lugaresDisponiblesActuales = (detalleState as? ActividadDetalleUiState.Exito)?.actividad?.lugaresDisponibles ?: 0
-                    val yaInscrito = inscripcionState.inscripcionActual != null
-                    val participantesActualesCount = inscripcionState.inscripcionActual?.participantes?.size ?: 0
-
-                    val lugaresDisponiblesCalculados = if (yaInscrito) {
-                        lugaresDisponiblesActuales + participantesActualesCount
-                    } else {
-                        lugaresDisponiblesActuales
-                    }
-
+                    val actividad = (detalleState as? ActividadDetalleUiState.Exito)?.actividad
+                    val cupoTotal = actividad?.lugaresTotales ?: 999
                     val totalSeleccionados = inscripcionState.adultosSeleccionados.size + inscripcionState.menoresSeleccionados.size
-                    val puedeGuardar = totalSeleccionados in 1..lugaresDisponiblesCalculados && !inscripcionState.guardando
+                    val puedeGuardar = totalSeleccionados in 1..cupoTotal && !inscripcionState.guardando
 
                     Column(
                         modifier = Modifier
@@ -279,10 +271,10 @@ fun ActividadSeleccionParticipantesScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                text = "Seleccionaste $totalSeleccionados · quedan $lugaresDisponiblesCalculados lugares",
+                                text = "Seleccionaste $totalSeleccionados · cupo máximo $cupoTotal",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = if (totalSeleccionados > lugaresDisponiblesCalculados) Color.Red else AzulOscuro
+                                color = if (totalSeleccionados > cupoTotal) Color.Red else AzulOscuro
                             )
                             Spacer(modifier = Modifier.height(10.dp))
                             Button(
@@ -318,6 +310,77 @@ fun ActividadSeleccionParticipantesScreen(
                                 }
                             }
                         }
+                    }
+
+                    if (inscripcionState.agregadoListaEspera) {
+                        AlertDialog(
+                            onDismissRequest = {
+                                inscripcionViewModel.consumirAgregadoListaEspera()
+                                navController.popBackStack()
+                            },
+                            title = {
+                                Text(
+                                    text = "Lista de espera",
+                                    fontWeight = FontWeight.Bold,
+                                    color = AzulOscuro
+                                )
+                            },
+                            text = {
+                                val pos = inscripcionState.inscripcionActual?.posicionEspera
+                                val mensaje = if (pos != null) {
+                                    "Fuiste añadido a la lista de espera en la posición $pos."
+                                } else {
+                                    "Fuiste añadido a la lista de espera."
+                                }
+                                Text(
+                                    text = mensaje,
+                                    fontSize = 15.sp
+                                )
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = {
+                                        inscripcionViewModel.consumirAgregadoListaEspera()
+                                        navController.popBackStack()
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = AmarilloOscuro, contentColor = AzulOscuro)
+                                ) {
+                                    Text("OK", fontWeight = FontWeight.Bold)
+                                }
+                            }
+                        )
+                    }
+
+                    if (inscripcionState.mostrarDialogoListaEspera) {
+                        AlertDialog(
+                            onDismissRequest = { inscripcionViewModel.rechazarListaEspera() },
+                            title = {
+                                Text(
+                                    text = "Actividad llena",
+                                    fontWeight = FontWeight.Bold,
+                                    color = AzulOscuro
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = "¿Quieres unirte a la lista de espera?",
+                                    fontSize = 15.sp
+                                )
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = { inscripcionViewModel.aceptarListaEspera(actividadId) },
+                                    colors = ButtonDefaults.buttonColors(containerColor = AmarilloOscuro, contentColor = AzulOscuro)
+                                ) {
+                                    Text("Sí, unirme", fontWeight = FontWeight.Bold)
+                                }
+                            },
+                            dismissButton = {
+                                OutlinedButton(onClick = { inscripcionViewModel.rechazarListaEspera() }) {
+                                    Text("Cancelar")
+                                }
+                            }
+                        )
                     }
                 }
             }

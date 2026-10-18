@@ -16,17 +16,19 @@ class InscripcionRepository {
     suspend fun inscribir(
         actividadId: String,
         usuarioIds: List<String>,
-        menorIds: List<String>
+        menorIds: List<String>,
+        listaEspera: Boolean = false
     ): Result<InscripcionDto> = llamarApi {
-        api.inscribirActividad(actividadId, InscripcionGuardarDto(usuarioIds, menorIds))
+        api.inscribirActividad(actividadId, InscripcionGuardarDto(usuarioIds, menorIds, listaEspera))
     }
 
     suspend fun modificarInscripcion(
         actividadId: String,
         usuarioIds: List<String>,
-        menorIds: List<String>
+        menorIds: List<String>,
+        listaEspera: Boolean = false
     ): Result<InscripcionDto> = llamarApi {
-        api.modificarInscripcionActividad(actividadId, InscripcionGuardarDto(usuarioIds, menorIds))
+        api.modificarInscripcionActividad(actividadId, InscripcionGuardarDto(usuarioIds, menorIds, listaEspera))
     }
 
     /** null = el usuario/familia no está inscrito en esta actividad (el backend responde 404). */

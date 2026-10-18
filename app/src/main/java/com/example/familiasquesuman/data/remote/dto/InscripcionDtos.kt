@@ -4,7 +4,8 @@ import com.google.gson.annotations.SerializedName
 
 data class InscripcionGuardarDto(
     @SerializedName("usuario_ids") val usuarioIds: List<String> = emptyList(),
-    @SerializedName("menor_ids") val menorIds: List<String> = emptyList()
+    @SerializedName("menor_ids") val menorIds: List<String> = emptyList(),
+    @SerializedName("lista_espera") val listaEspera: Boolean = false
 )
 
 data class ParticipanteDto(
@@ -21,6 +22,7 @@ data class InscripcionDto(
     @SerializedName("actividad_id") val actividadId: String? = null,
     @SerializedName("familia_id") val familiaId: String? = null,
     @SerializedName("estado") val estado: String? = null,
+    @SerializedName("posicion_espera") val posicionEspera: Int? = null,
     @SerializedName("creado_en") val creadoEn: String? = null,
     @SerializedName("cancelada_en") val canceladaEn: String? = null,
     @SerializedName("participantes") val participantes: List<ParticipanteDto> = emptyList()
@@ -31,6 +33,7 @@ data class MiInscripcionDto(
     @SerializedName("actividad_id") val actividadId: String? = null,
     @SerializedName("familia_id") val familiaId: String? = null,
     @SerializedName("estado") val estado: String? = null,
+    @SerializedName("posicion_espera") val posicionEspera: Int? = null,
     @SerializedName("creado_en") val creadoEn: String? = null,
     @SerializedName("cancelada_en") val canceladaEn: String? = null,
     @SerializedName("participantes") val participantes: List<ParticipanteDto> = emptyList(),
@@ -41,6 +44,7 @@ data class MiInscripcionDto(
         actividadId = actividadId,
         familiaId = familiaId,
         estado = estado,
+        posicionEspera = posicionEspera,
         creadoEn = creadoEn,
         canceladaEn = canceladaEn,
         participantes = participantes
@@ -52,6 +56,7 @@ data class InscripcionAdminDto(
     @SerializedName("actividad_id") val actividadId: String? = null,
     @SerializedName("familia_id") val familiaId: String? = null,
     @SerializedName("estado") val estado: String? = null,
+    @SerializedName("posicion_espera") val posicionEspera: Int? = null,
     @SerializedName("creado_en") val creadoEn: String? = null,
     @SerializedName("cancelada_en") val canceladaEn: String? = null,
     @SerializedName("participantes") val participantes: List<ParticipanteDto> = emptyList(),
@@ -63,6 +68,7 @@ data class InscripcionAdminDto(
         actividadId = actividadId,
         familiaId = familiaId,
         estado = estado,
+        posicionEspera = posicionEspera,
         creadoEn = creadoEn,
         canceladaEn = canceladaEn,
         participantes = participantes

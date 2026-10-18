@@ -360,8 +360,40 @@ fun ActividadDetalleScreen(
                                         .padding(16.dp)
                                 ) {
                                     val esInvitado = SesionManager.tipoSesion == TipoSesion.INVITADO
-                                    val estaInscrito = !esInvitado && inscripcionState.inscripcionActual != null
+                                    val inscripcion = inscripcionState.inscripcionActual
+                                    val estaInscrito = !esInvitado && inscripcion != null
+                                    val esEnEspera = estaInscrito && inscripcion?.estado?.equals("EN_ESPERA", ignoreCase = true) == true
                                     val sinLugares = actividad.lugaresDisponibles <= 0
+
+                                    if (esEnEspera) {
+                                        val pos = inscripcion?.posicionEspera
+                                        val textoPos = if (pos != null) "En lista de espera · posición $pos" else "En lista de espera"
+                                        Surface(
+                                            color = Ambar.copy(alpha = 0.2f),
+                                            shape = RoundedCornerShape(12.dp),
+                                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.Center
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Schedule,
+                                                    contentDescription = null,
+                                                    tint = AzulOscuro,
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = textoPos,
+                                                    color = AzulOscuro,
+                                                    fontSize = 13.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
+                                    }
 
                                     if (esInvitado) {
                                         Button(
@@ -440,25 +472,6 @@ fun ActividadDetalleScreen(
                                                 fontWeight = FontWeight.SemiBold
                                             )
                                         }
-                                    } else if (sinLugares) {
-                                        Button(
-                                            onClick = {},
-                                            enabled = false,
-                                            colors = ButtonDefaults.buttonColors(
-                                                disabledContainerColor = Color.LightGray,
-                                                disabledContentColor = Color.DarkGray
-                                            ),
-                                            shape = RoundedCornerShape(24.dp),
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(56.dp)
-                                        ) {
-                                            Text(
-                                                text = "Sin lugares disponibles",
-                                                fontSize = 16.sp,
-                                                fontWeight = FontWeight.Bold
-                                            )
-                                        }
                                     } else {
                                         Button(
                                             onClick = {
@@ -481,7 +494,7 @@ fun ActividadDetalleScreen(
                                             )
                                             Spacer(modifier = Modifier.width(8.dp))
                                             Text(
-                                                text = "Inscribirse",
+                                                text = if (sinLugares) "Unirse a lista de espera" else "Inscribirse",
                                                 color = AzulOscuro,
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.Bold
