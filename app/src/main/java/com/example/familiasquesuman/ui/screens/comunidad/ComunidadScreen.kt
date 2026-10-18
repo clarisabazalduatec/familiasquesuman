@@ -64,6 +64,8 @@ fun ComunidadScreen(
     var publicacionesOficiales by remember {
         mutableStateOf<List<PublicacionComunidadUi>>(emptyList())
     }
+    // Permite actualizar los avisos después de publicar uno nuevo
+    var actualizarAvisos by remember { mutableIntStateOf(0) }
 
     var cargando by remember {
         mutableStateOf(true)
@@ -76,7 +78,7 @@ fun ComunidadScreen(
     // Actualizar las publicaciones al regresar a Comunidad
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(lifecycleOwner) {
+    LaunchedEffect(lifecycleOwner, actualizarAvisos) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(
             Lifecycle.State.RESUMED
         ) {
@@ -313,6 +315,10 @@ fun ComunidadScreen(
         CrearAvisoOficialSheet(
             onCerrar = {
                 mostrarFormularioOficial = false
+            },
+            onPublicado = {
+                mostrarFormularioOficial = false
+                actualizarAvisos++
             }
         )
     }

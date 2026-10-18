@@ -1,6 +1,5 @@
 package com.example.familiasquesuman.ui.screens.comunidad
 
-import androidx.annotation.DrawableRes
 import com.example.familiasquesuman.R
 
 
@@ -29,8 +28,6 @@ data class PublicacionComunidadUi(
     val contenido: String,
     val categoria: String? = null,
 
-    @DrawableRes
-    val imagenRes: Int? = null,
     val imagenUrl: String? = null,
     val numeroLikes: Int = 0,
     val numeroComentarios: Int = 0,
@@ -38,6 +35,7 @@ data class PublicacionComunidadUi(
     val fechaEvento: String? = null,
     val horarioEvento: String? = null,
     val ubicacion: String? = null,
+    val publicoObjetivo: String? = null,
     val documentoNombre: String? = null,
     val documentoDetalle: String? = null,
     val estado: EstadoPublicacion? = null,
@@ -59,7 +57,6 @@ val publicacionesOficialesMock = listOf(
                     "Te invitamos a participar con toda tu familia. " +
                     "Compartiremos herramientas prácticas para el cuidado del medio ambiente.",
         categoria = "Oficial",
-        imagenRes = R.drawable.parque_comunidad,
         fechaEvento = "Sábado, 15 de marzo de 2025",
         horarioEvento = "9:00 a.m. – 12:00 p.m.",
         ubicacion = "Parque Los Encinos",
@@ -77,7 +74,6 @@ val publicacionesOficialesMock = listOf(
             "Informamos las fechas y requisitos para la próxima entrega de alimentos " +
                     "a las familias registradas.",
         categoria = "Aviso",
-        imagenRes = R.drawable.parque_comunidad,
         fechaEvento = "Martes, 18 de marzo de 2025",
         horarioEvento = "10:00 a.m. – 2:00 p.m.",
         ubicacion = "Centro Comunitario San Pedro"
@@ -97,7 +93,6 @@ val publicacionesComunidadMock = listOf(
                     "llena de solidaridad y comunidad. Los niños aprendieron sobre el " +
                     "valor de compartir y ver cómo, juntos, podemos hacer una gran diferencia. 🌳💚",
         categoria = "Comedor Solidario",
-        imagenRes = R.drawable.parque_comunidad,
         numeroLikes = 24,
         numeroComentarios = 5,
         comentarios = listOf(
@@ -125,7 +120,6 @@ val publicacionesComunidadMock = listOf(
             "Participamos en una actividad de reforestación con nuestros hijos. " +
                     "Fue increíble verlos aprender mientras ayudábamos a cuidar nuestro entorno.",
         categoria = "Cuidado del Medio Ambiente",
-        imagenRes = R.drawable.parque_comunidad,
         numeroLikes = 18,
         numeroComentarios = 3
     )
@@ -142,7 +136,6 @@ val misPublicacionesMock = listOf(
         contenido =
             "Este sábado nos reunimos con más de 30 familias para limpiar el Parque Central.",
         categoria = "Medio Ambiente",
-        imagenRes = R.drawable.parque_comunidad,
         estado = EstadoPublicacion.EN_REVISION
     ),
 
@@ -155,7 +148,6 @@ val misPublicacionesMock = listOf(
         contenido =
             "Compartimos una tarde increíble leyendo cuentos con niñas y niños de la comunidad.",
         categoria = "Educación",
-        imagenRes = R.drawable.parque_comunidad,
         estado = EstadoPublicacion.PUBLICADA,
         numeroLikes = 21,
         numeroComentarios = 4
@@ -170,7 +162,6 @@ val misPublicacionesMock = listOf(
         contenido =
             "Participamos en una jornada de apoyo al comedor comunitario.",
         categoria = "Comedor Solidario",
-        imagenRes = R.drawable.parque_comunidad,
         estado = EstadoPublicacion.RECHAZADA
     )
 )

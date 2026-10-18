@@ -25,27 +25,74 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
+import coil.compose.AsyncImage
+import com.example.familiasquesuman.data.repository.ComunidadRepository
+import com.example.familiasquesuman.data.remote.dto.PublicacionDto
+import com.example.familiasquesuman.data.remote.dto.toDomain
+import kotlinx.coroutines.CancellationException
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.platform.LocalLifecycleOwner
 
 private enum class FiltroEstado { TODAS, REVISION, PUBLICADAS, RECHAZADAS }
 
 @Composable
 fun MisPublicacionesScreen(navController: NavHostController) {
     var filtro by rememberSaveable { mutableStateOf(FiltroEstado.TODAS) }
-    val publicaciones = when (filtro) {
-        FiltroEstado.TODAS ->
-            misPublicacionesMock
-        FiltroEstado.REVISION ->
-            misPublicacionesMock.filter {
-                it.estado == EstadoPublicacion.EN_REVISION
+
+    val repository = remember { ComunidadRepository() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    var todasLasPublicaciones by remember {
+        mutableStateOf<List<PublicacionDto>>(emptyList())
+    }
+
+    var cargando by remember { mutableStateOf(true) }
+    var errorCarga by remember { mutableStateOf<String?>(null) }
+    var actualizacion by remember { mutableIntStateOf(0) }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, evento ->
+            if (evento == Lifecycle.Event.ON_RESUME) {
+                actualizacion++
             }
-        FiltroEstado.PUBLICADAS ->
-            misPublicacionesMock.filter {
-                it.estado == EstadoPublicacion.PUBLICADA
-            }
-        FiltroEstado.RECHAZADAS ->
-            misPublicacionesMock.filter {
-                it.estado == EstadoPublicacion.RECHAZADA
-            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    LaunchedEffect(actualizacion) {
+        cargando = true
+        errorCarga = null
+
+        try {
+            repository.obtenerMisPublicaciones()
+                .onSuccess { todasLasPublicaciones = it }
+                .onFailure {
+                    errorCarga = "No se pudieron cargar tus publicaciones."
+                }
+        } catch (e: CancellationException) {
+            throw e
+        } finally {
+            cargando = false
+        }
+    }
+
+    val publicacionesFiltradas = when (filtro) {
+        FiltroEstado.TODAS -> todasLasPublicaciones
+        FiltroEstado.REVISION -> todasLasPublicaciones.filter {
+            it.estado == "PENDIENTE"
+        }
+        FiltroEstado.PUBLICADAS -> todasLasPublicaciones.filter {
+            it.estado == "APROBADA"
+        }
+        FiltroEstado.RECHAZADAS -> todasLasPublicaciones.filter {
+            it.estado == "RECHAZADA"
+        }
     }
 
     PantallaPrincipalConMenu(
@@ -103,11 +150,14 @@ fun MisPublicacionesScreen(navController: NavHostController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    item { FiltroPublicacionesChip( texto = "Todas",
+                    item {
+                        FiltroPublicacionesChip(
+                            texto = "Todas",
                             seleccionado = filtro == FiltroEstado.TODAS,
                             onClick = { filtro = FiltroEstado.TODAS }
                         )
                     }
+
                     item {
                         FiltroPublicacionesChip(
                             texto = "En revisión",
@@ -125,34 +175,78 @@ fun MisPublicacionesScreen(navController: NavHostController) {
                     }
 
                     item {
-                        FiltroPublicacionesChip(texto = "Rechazadas",
+                        FiltroPublicacionesChip(
+                            texto = "Rechazadas",
                             seleccionado = filtro == FiltroEstado.RECHAZADAS,
                             onClick = { filtro = FiltroEstado.RECHAZADAS }
                         )
                     }
                 }
-            }
-            items(publicaciones, key = { it.id }) { publicacion ->
-                Card(onClick = { navController.navigate(Rutas.DetallePublicacion.crearRuta(publicacion.id)) },
+
+            } // Cierra el item del encabezado
+
+// Indicador de carga y mensajes
+        if (cargando) {
+            item {
+                Box(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Blanco
-                    ),
-                    shape = RoundedCornerShape(18.dp)
+                    contentAlignment = Alignment.Center
                 ) {
+                    CircularProgressIndicator(color = AzulMarino)
+                }
+            }
+        } else if (errorCarga != null) {
+            item {
+                Text(
+                    text = errorCarga.orEmpty(),
+                    color = ColorError
+                )
+            }
+        } else if (publicacionesFiltradas.isEmpty()) {
+            item {
+                Text(
+                    text = "No tienes publicaciones en esta sección.",
+                    color = GrisTexto
+                )
+            }
+        }
+
+// Publicaciones reales
+        items(
+            items = if (cargando || errorCarga != null) {
+                emptyList()
+            } else {
+                publicacionesFiltradas
+            },
+            key = { it.id }
+        )
+        { dto ->
+            val publicacion = dto.toDomain()
+            Card(
+                onClick = {
+                    navController.navigate(
+                        Rutas.DetallePublicacion.crearRuta(publicacion.id)
+                    )
+                },
+                enabled = dto.estado == "APROBADA",
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = Blanco
+                ),
+                shape = RoundedCornerShape(18.dp)
+            )
+                   {
                     Row(modifier = Modifier.padding(12.dp),
                         verticalAlignment =
                             Alignment.CenterVertically
                     ) {
-                        publicacion.imagenRes?.let {
-                            Image(painter = painterResource(it),
+                        publicacion.imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
+                            AsyncImage(
+                                model = url,
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(82.dp)
-                                    .clip(RoundedCornerShape(
-                                        12.dp
-                                        )
-                                    ),
+                                    .clip(RoundedCornerShape(12.dp)),
                                 contentScale = ContentScale.Crop
                             )
                         }
@@ -175,11 +269,27 @@ fun MisPublicacionesScreen(navController: NavHostController) {
                                         .labelSmall,
                                 color = GrisTexto
                             )
+                            if (dto.estado == "RECHAZADA") {
+                                dto.motivoRechazo
+                                    ?.takeIf { it.isNotBlank() }
+                                    ?.let { motivo ->
+                                        Spacer(modifier = Modifier.height(6.dp))
+
+                                        Text(
+                                            text = "Motivo: $motivo",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = ColorError
+                                        )
+                                    }
+                            }
                         }
-                        Icon(imageVector = Icons.Outlined.ChevronRight,
-                            contentDescription = null,
-                            tint = AzulMarino
-                        )
+                        if (dto.estado == "APROBADA") {
+                            Icon(
+                                imageVector = Icons.Outlined.ChevronRight,
+                                contentDescription = null,
+                                tint = AzulMarino
+                            )
+                        }
                     }
                 }
             }

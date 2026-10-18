@@ -45,6 +45,9 @@ import com.example.familiasquesuman.data.remote.dto.CentroGuardarDto
 import com.example.familiasquesuman.data.remote.dto.PublicacionDto
 import com.example.familiasquesuman.data.remote.dto.ComentarioDto
 import com.example.familiasquesuman.data.remote.dto.CrearComentarioRequest
+import com.example.familiasquesuman.data.remote.dto.CrearPublicacionRequest
+import com.example.familiasquesuman.data.remote.dto.CrearAvisoOficialRequest
+import com.example.familiasquesuman.data.remote.dto.RechazarPublicacionRequest
 
 /** El token lo agrega AuthInterceptor (en RetrofitInstance); no se pasa a mano. */
 interface FamiliasApiService {
@@ -127,6 +130,11 @@ interface FamiliasApiService {
     @POST("imagenes")
     suspend fun subirImagen(@Part archivo: MultipartBody.Part): ImagenSubidaDto
 
+    // ---------- Comunidad: imágenes ----------
+    @Multipart
+    @POST("comunidad/imagenes")
+    suspend fun subirImagenComunidad(@Part archivo: MultipartBody.Part): ImagenSubidaDto
+
     // ---------- Directorio de visiteo ----------
     @GET("centros")
     suspend fun listarCentros(@Query("limit") limit: Int = 100): List<CentroDto>
@@ -168,14 +176,45 @@ interface FamiliasApiService {
     @GET("comunidad") suspend fun listarPublicacionesComunidad(@Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<PublicacionDto>
     @GET("comunidad/{id}") suspend fun detallePublicacionComunidad(@Path("id") id: String): PublicacionDto
     @GET("comunidad/avisos") suspend fun listarAvisosOficiales(@Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<PublicacionDto>
+    @POST("comunidad") suspend fun crearPublicacionComunidad(@Body datos: CrearPublicacionRequest): PublicacionDto
 
-        // ---------- LIKES ----------
+    // ---------- Admin: Avisos Oficiales ----------
+    @POST("comunidad/avisos") suspend fun crearAvisoOficial(@Body datos: CrearAvisoOficialRequest): PublicacionDto
+    // ---------- LIKES ----------
     @POST("comunidad/{id}/like")  suspend fun darLikePublicacion(@Path("id") id: String)
     @DELETE("comunidad/{id}/like") suspend fun quitarLikePublicacion(@Path("id") id: String)
         // ---------- COMENTARIOS ----------
     @GET("comunidad/{id}/comentarios") suspend fun obtenerComentariosPublicacion(@Path("id") id: String, @Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<ComentarioDto>
     @POST("comunidad/{id}/comentarios") suspend fun publicarComentario(@Path("id") id: String, @Body comentario: CrearComentarioRequest): ComentarioDto
+    // ---------- Admin: Moderación de Comunidad ----------
+    @GET("comunidad/pendientes")
+    suspend fun listarPublicacionesPendientes(
+        @Query("limit") limit: Int = 50,
+        @Query("offset") offset: Int = 0
+    ): List<PublicacionDto>
 
+    @POST("comunidad/{id}/aprobar")
+    suspend fun aprobarPublicacion(
+        @Path("id") id: String
+    ): PublicacionDto
+
+    @POST("comunidad/{id}/rechazar")
+    suspend fun rechazarPublicacion(
+        @Path("id") id: String,
+        @Body datos: RechazarPublicacionRequest
+    ): PublicacionDto
+
+    @GET("comunidad/aprobadas")
+    suspend fun listarPublicacionesAprobadas(): List<PublicacionDto>
+
+    @GET("comunidad/rechazadas")
+    suspend fun listarPublicacionesRechazadas(): List<PublicacionDto>
+
+    @GET("comunidad/mias")
+    suspend fun listarMisPublicaciones(
+        @Query("limit") limit: Int = 100,
+        @Query("offset") offset: Int = 0
+    ): List<PublicacionDto>
 
     // ---------- Admin: actividades ----------
     @GET("actividades/admin")

@@ -40,6 +40,14 @@ class ImagenRepository {
         return RetrofitInstance.api.subirImagen(parte).url
     }
 
+    /** Sube fotografías de publicaciones de Comunidad.**/
+    suspend fun subirImagenComunidad(resolver: ContentResolver, url: String): String {
+        val esLocal = url.startsWith("content:") || url.startsWith("file:")
+        if (!esLocal) { return RetrofitInstance.urlParaGuardar(url) }
+        val parte = parteMultipart(resolver, Uri.parse(url))
+        return RetrofitInstance.api.subirImagenComunidad(parte).url
+    }
+
     /**
      * Lee la foto, la reduce si hace falta y la empaqueta como el campo "archivo" del multipart.
      * @param ladoMaximo si se pasa, la foto SIEMPRE se reduce a ese tamaño (lado más largo) y va en JPEG.
