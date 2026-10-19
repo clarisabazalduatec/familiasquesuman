@@ -37,6 +37,7 @@ import com.example.familiasquesuman.domain.TipoDonacion
 import com.example.familiasquesuman.ui.components.EstadoErrorServidor
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AmbarClaro
@@ -164,6 +165,13 @@ fun DonacionScreen(
                         },
                     )
                 }
+
+            }
+            // Aviso de Privacidad
+            item {
+                PieAvisoPrivacidad(
+                    navController = navController
+                )
             }
         }
     }
@@ -331,7 +339,9 @@ fun TarjetaDonacion(
                         modifier = Modifier.size(18.dp),
                     )
                 }
+
             }
+
         }
     }
 }

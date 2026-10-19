@@ -22,6 +22,7 @@ import com.example.familiasquesuman.ui.components.EstadoVacio
 import com.example.familiasquesuman.ui.components.FiltrosChips
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.actividad.components.BannerSincronizarCalendario
 import com.example.familiasquesuman.ui.screens.actividad.components.HeaderDiaActividades
@@ -205,9 +206,22 @@ fun ActividadScreen(
                     }
 
                     item { BannerSincronizarCalendario() }
+
+                    // Aviso de Privacidad
+                    item {
+                        PieAvisoPrivacidad(
+                            navController = navController,
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                    }
+
+
                 }
+
             }
+
         }
+
     }
 }
 

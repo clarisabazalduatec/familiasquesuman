@@ -23,6 +23,7 @@ import com.example.familiasquesuman.ui.components.EstadoVacio
 import com.example.familiasquesuman.ui.components.FiltrosChips
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 
@@ -142,6 +143,12 @@ fun DirectorioScreen(
                         textAlign = TextAlign.Center,
                     )
                 }
+            }
+            // Aviso de Privacidad
+            item {
+                PieAvisoPrivacidad(
+                    navController = navController
+                )
             }
         }
     }

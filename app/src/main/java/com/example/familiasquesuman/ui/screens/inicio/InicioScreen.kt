@@ -41,6 +41,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.familiasquesuman.data.repository.ComunidadRepository
 import com.example.familiasquesuman.ui.screens.comunidad.PublicacionComunidadUi
+import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 
 // Sección Tu Impacto
 @Composable
@@ -263,6 +264,12 @@ fun InicioScreen(
                     onClick = {
                         navegarASeccionPrincipal(Rutas.Chatbot.ruta)
                     }
+                )
+            }
+            // Aviso de Privacidad
+            item {
+                PieAvisoPrivacidad(
+                    navController = navController
                 )
             }
         }

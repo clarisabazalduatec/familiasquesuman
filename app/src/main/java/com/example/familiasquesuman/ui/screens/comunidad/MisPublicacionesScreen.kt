@@ -39,14 +39,9 @@ private enum class FiltroEstado { TODAS, REVISION, PUBLICADAS, RECHAZADAS }
 @Composable
 fun MisPublicacionesScreen(navController: NavHostController) {
     var filtro by rememberSaveable { mutableStateOf(FiltroEstado.TODAS) }
-
     val repository = remember { ComunidadRepository() }
     val lifecycleOwner = LocalLifecycleOwner.current
-
-    var todasLasPublicaciones by remember {
-        mutableStateOf<List<PublicacionDto>>(emptyList())
-    }
-
+    var todasLasPublicaciones by remember { mutableStateOf<List<PublicacionDto>>(emptyList()) }
     var cargando by remember { mutableStateOf(true) }
     var errorCarga by remember { mutableStateOf<String?>(null) }
     var actualizacion by remember { mutableIntStateOf(0) }
@@ -57,31 +52,23 @@ fun MisPublicacionesScreen(navController: NavHostController) {
                 actualizacion++
             }
         }
-
         lifecycleOwner.lifecycle.addObserver(observer)
-
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     LaunchedEffect(actualizacion) {
         cargando = true
         errorCarga = null
-
         try {
             repository.obtenerMisPublicaciones()
                 .onSuccess { todasLasPublicaciones = it }
-                .onFailure {
-                    errorCarga = "No se pudieron cargar tus publicaciones."
-                }
+                .onFailure { errorCarga = "No se pudieron cargar tus publicaciones." }
         } catch (e: CancellationException) {
             throw e
         } finally {
             cargando = false
         }
     }
-
     val publicacionesFiltradas = when (filtro) {
         FiltroEstado.TODAS -> todasLasPublicaciones
         FiltroEstado.REVISION -> todasLasPublicaciones.filter {
@@ -94,7 +81,6 @@ fun MisPublicacionesScreen(navController: NavHostController) {
             it.estado == "RECHAZADA"
         }
     }
-
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.COMUNIDAD,
@@ -147,35 +133,27 @@ fun MisPublicacionesScreen(navController: NavHostController) {
                         }
                     }
                 }
-
                 Spacer(modifier = Modifier.height(16.dp))
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    item {
-                        FiltroPublicacionesChip(
+                    item { FiltroPublicacionesChip(
                             texto = "Todas",
                             seleccionado = filtro == FiltroEstado.TODAS,
                             onClick = { filtro = FiltroEstado.TODAS }
                         )
                     }
-
-                    item {
-                        FiltroPublicacionesChip(
+                    item { FiltroPublicacionesChip(
                             texto = "En revisión",
                             seleccionado = filtro == FiltroEstado.REVISION,
                             onClick = { filtro = FiltroEstado.REVISION }
                         )
                     }
-
-                    item {
-                        FiltroPublicacionesChip(
+                    item { FiltroPublicacionesChip(
                             texto = "Publicadas",
                             seleccionado = filtro == FiltroEstado.PUBLICADAS,
                             onClick = { filtro = FiltroEstado.PUBLICADAS }
                         )
                     }
-
-                    item {
-                        FiltroPublicacionesChip(
+                    item { FiltroPublicacionesChip(
                             texto = "Rechazadas",
                             seleccionado = filtro == FiltroEstado.RECHAZADAS,
                             onClick = { filtro = FiltroEstado.RECHAZADAS }
@@ -183,13 +161,10 @@ fun MisPublicacionesScreen(navController: NavHostController) {
                     }
                 }
 
-            } // Cierra el item del encabezado
-
-// Indicador de carga y mensajes
+            }
         if (cargando) {
             item {
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
+                Box(modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(color = AzulMarino)
@@ -197,21 +172,17 @@ fun MisPublicacionesScreen(navController: NavHostController) {
             }
         } else if (errorCarga != null) {
             item {
-                Text(
-                    text = errorCarga.orEmpty(),
+                Text(text = errorCarga.orEmpty(),
                     color = ColorError
                 )
             }
         } else if (publicacionesFiltradas.isEmpty()) {
             item {
-                Text(
-                    text = "No tienes publicaciones en esta sección.",
+                Text(text = "No tienes publicaciones en esta sección.",
                     color = GrisTexto
                 )
             }
         }
-
-// Publicaciones reales
         items(
             items = if (cargando || errorCarga != null) {
                 emptyList()
@@ -223,26 +194,18 @@ fun MisPublicacionesScreen(navController: NavHostController) {
         { dto ->
             val publicacion = dto.toDomain()
             Card(
-                onClick = {
-                    navController.navigate(
-                        Rutas.DetallePublicacion.crearRuta(publicacion.id)
-                    )
-                },
+                onClick = { navController.navigate(Rutas.DetallePublicacion.crearRuta(publicacion.id)) },
                 enabled = dto.estado == "APROBADA",
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Blanco
-                ),
+                colors = CardDefaults.cardColors(containerColor = Blanco),
                 shape = RoundedCornerShape(18.dp)
             )
                    {
                     Row(modifier = Modifier.padding(12.dp),
-                        verticalAlignment =
-                            Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         publicacion.imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
-                            AsyncImage(
-                                model = url,
+                            AsyncImage(model = url,
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(82.dp)
@@ -253,8 +216,7 @@ fun MisPublicacionesScreen(navController: NavHostController) {
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(text = publicacion.titulo.orEmpty(),
-                                style =
-                                    MaterialTheme
+                                style = MaterialTheme
                                         .typography
                                         .titleSmall,
                                 color = AzulMarino
@@ -263,8 +225,7 @@ fun MisPublicacionesScreen(navController: NavHostController) {
                             EstadoChip(estado = publicacion.estado)
                             Spacer(modifier = Modifier.height(6.dp))
                             Text(text = publicacion.tiempoRelativo,
-                                style =
-                                    MaterialTheme
+                                style = MaterialTheme
                                         .typography
                                         .labelSmall,
                                 color = GrisTexto
@@ -274,9 +235,7 @@ fun MisPublicacionesScreen(navController: NavHostController) {
                                     ?.takeIf { it.isNotBlank() }
                                     ?.let { motivo ->
                                         Spacer(modifier = Modifier.height(6.dp))
-
-                                        Text(
-                                            text = "Motivo: $motivo",
+                                        Text(text = "Motivo: $motivo",
                                             style = MaterialTheme.typography.bodySmall,
                                             color = ColorError
                                         )
@@ -284,8 +243,7 @@ fun MisPublicacionesScreen(navController: NavHostController) {
                             }
                         }
                         if (dto.estado == "APROBADA") {
-                            Icon(
-                                imageVector = Icons.Outlined.ChevronRight,
+                            Icon(imageVector = Icons.Outlined.ChevronRight,
                                 contentDescription = null,
                                 tint = AzulMarino
                             )
@@ -296,7 +254,6 @@ fun MisPublicacionesScreen(navController: NavHostController) {
         }
     }
 }
-
 @Composable
 private fun FiltroPublicacionesChip(
     texto: String,
@@ -305,41 +262,27 @@ private fun FiltroPublicacionesChip(
 ) {
     FilterChip(selected = seleccionado,
         onClick = onClick,
-        label = {
-            Text(text = texto,
-                style = MaterialTheme.typography.labelMedium
-            )
-        },
+        label = { Text(text = texto, style = MaterialTheme.typography.labelMedium) },
         colors = FilterChipDefaults.filterChipColors(
                 selectedContainerColor = AzulMarino,
                 selectedLabelColor = Blanco
             )
     )
 }
-
 @Composable
-fun EstadoChip(
-    estado: EstadoPublicacion?
-) {
+fun EstadoChip(estado: EstadoPublicacion?) {
     if (estado == null) return
     val texto = when (estado) {
         EstadoPublicacion.EN_REVISION -> "En revisión"
         EstadoPublicacion.PUBLICADA -> "Publicada"
         EstadoPublicacion.RECHAZADA -> "Rechazada"
     }
-
     val color = when (estado) {
         EstadoPublicacion.EN_REVISION -> Ambar
         EstadoPublicacion.PUBLICADA -> ColorExito
         EstadoPublicacion.RECHAZADA -> ColorError
     }
-
-    Surface(shape = RoundedCornerShape(50),
-        color = color.copy(
-            alpha = .14f
-        )
-    ) {
-
+    Surface(shape = RoundedCornerShape(50), color = color.copy(alpha = .14f)) {
         Text(text = texto,
             modifier = Modifier.padding(
                 horizontal = 10.dp,

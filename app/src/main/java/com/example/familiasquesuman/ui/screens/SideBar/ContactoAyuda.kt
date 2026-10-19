@@ -27,6 +27,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.familiasquesuman.R
+import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AzulMarino
@@ -37,82 +38,38 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ContactoAyudaScreen(
-    navController: NavHostController
-) {
+fun ContactoAyudaScreen(navController: NavHostController) {
+    var nombre by remember { mutableStateOf("") }
+    var correo by remember { mutableStateOf("") }
+    var mensaje by remember { mutableStateOf("") }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
-    var nombre by remember {
-        mutableStateOf("")
-    }
-
-    var correo by remember {
-        mutableStateOf("")
-    }
-
-    var mensaje by remember {
-        mutableStateOf("")
-    }
-
-    val snackbarHostState =
-        remember {
-            SnackbarHostState()
-        }
-
-    val scope =
-        rememberCoroutineScope()
-
-    val scrollState =
-        rememberScrollState()
-
-    Scaffold(
-        containerColor = CremaFondo,
-
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState
-            )
-        },
-
+    Scaffold(containerColor = CremaFondo,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-
             CenterAlignedTopAppBar(
-                colors =
-                    TopAppBarDefaults
-                        .centerAlignedTopAppBarColors(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                             containerColor = CremaFondo,
                             navigationIconContentColor = AzulMarino,
                             actionIconContentColor = AzulMarino
                         ),
 
                 navigationIcon = {
-
-                    IconButton(
-                        onClick = {
-                            navController.popBackStack()
-                        }
-                    ) {
-
-                        Icon(
-                            imageVector =
-                                Icons.AutoMirrored
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.AutoMirrored
                                     .Outlined
                                     .ArrowBack,
-                            contentDescription =
-                                "Regresar",
+                            contentDescription = "Regresar",
                             tint = AzulMarino
                         )
                     }
                 },
-
                 title = {
-
                     androidx.compose.foundation.Image(
-                        painter =
-                            painterResource(
-                                id = R.drawable.logo2_onb
-                            ),
-                        contentDescription =
-                            "Familias que Suman",
+                        painter = painterResource(id = R.drawable.logo2_onb),
+                        contentDescription = "Familias que Suman",
                         modifier =
                             Modifier
                                 .width(220.dp)
@@ -121,22 +78,9 @@ fun ContactoAyudaScreen(
                             ContentScale.Fit
                     )
                 },
-
-                actions = {
-
-                    IconButton(
-                        onClick = {
-                            navController.navigate(
-                                Rutas.Notificaciones.ruta
-                            )
-                        }
-                    ) {
-
-                        Icon(
-                            imageVector =
-                                Icons.Default.Notifications,
-                            contentDescription =
-                                "Notificaciones",
+                actions = { IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
+                        Icon(imageVector = Icons.Default.Notifications,
+                            contentDescription = "Notificaciones",
                             tint = AzulMarino
                         )
                     }
@@ -144,9 +88,7 @@ fun ContactoAyudaScreen(
             )
         }
     ) { paddingInterno ->
-
-        Column(
-            modifier = Modifier
+        Column(modifier = Modifier
                 .padding(paddingInterno)
                 .fillMaxSize()
                 .background(CremaFondo)
@@ -158,45 +100,23 @@ fun ContactoAyudaScreen(
                     bottom = 28.dp
                 )
         ) {
-
-            Row(
-                modifier =
-                    Modifier.fillMaxWidth(),
-                verticalAlignment =
-                    Alignment.CenterVertically
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Column(
-                    modifier =
-                        Modifier.weight(1f)
-                ) {
-
-                    Text(
-                        text = "Contacto y ayuda",
-                        style =
-                            MaterialTheme.typography
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = "Contacto y ayuda",
+                        style = MaterialTheme.typography
                                 .headlineMedium,
                         color = AzulMarino
                     )
-
-                    Spacer(
-                        modifier =
-                            Modifier.height(4.dp)
-                    )
-
-                    Text(
-                        text =
-                            "¿Tienes dudas o sugerencias? Escríbenos.",
-                        style =
-                            MaterialTheme.typography
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(text = "¿Tienes dudas o sugerencias? Escríbenos.",
+                        style = MaterialTheme.typography
                                 .titleSmall,
                         color = AzulMarino
                     )
                 }
-
-                Icon(
-                    imageVector =
-                        Icons.Outlined.Send,
+                Icon(imageVector = Icons.Outlined.Send,
                     contentDescription = null,
                     tint = Ambar,
                     modifier = Modifier
@@ -204,290 +124,162 @@ fun ContactoAyudaScreen(
                         .rotate(-20f)
                 )
             }
-
-            Spacer(
-                modifier = Modifier.height(28.dp)
-            )
-
-            Text(
-                text =
-                    "Nos encantaría leerte. Puedes escribirnos si tienes dudas sobre la plataforma, quieres compartir una sugerencia o necesitas más información.",
-                style =
-                    MaterialTheme.typography.bodyMedium,
+            Spacer(modifier = Modifier.height(28.dp))
+            Text(text = "Nos encantaría leerte. Puedes escribirnos si tienes dudas sobre la plataforma, quieres compartir una sugerencia o necesitas más información.",
+                style = MaterialTheme.typography.bodyMedium,
                 color = GrisTexto
             )
-
-            Spacer(
-                modifier = Modifier.height(26.dp)
-            )
-
-            // NOMBRE
-            EtiquetaFormulario(
-                texto = "Nombre"
-            )
-
-            Spacer(
-                modifier = Modifier.height(7.dp)
-            )
-
-            OutlinedTextField(
-                value = nombre,
-                onValueChange = {
-                    nombre = it
-                },
-                modifier =
-                    Modifier.fillMaxWidth(),
+            Spacer(modifier = Modifier.height(26.dp))
+            EtiquetaFormulario(texto = "Nombre")
+            Spacer(modifier = Modifier.height(7.dp))
+            OutlinedTextField(value = nombre,
+                onValueChange = { nombre = it },
+                modifier = Modifier.fillMaxWidth(),
                 placeholder = {
-                    Text(
-                        text =
-                            "Escribe tu nombre",
-                        style =
-                            MaterialTheme.typography
+                    Text(text = "Escribe tu nombre",
+                        style = MaterialTheme.typography
                                 .bodyMedium
                     )
                 },
                 leadingIcon = {
-
-                    Icon(
-                        imageVector =
-                            Icons.Outlined.Person,
+                    Icon(imageVector = Icons.Outlined.Person,
                         contentDescription = null,
                         tint = AzulMarino
                     )
                 },
                 singleLine = true,
-                shape =
-                    RoundedCornerShape(14.dp),
-                colors =
-                    OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor =
-                            AzulMarino,
-                        unfocusedBorderColor =
-                            AzulMarino.copy(
+                shape = RoundedCornerShape(14.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = AzulMarino,
+                        unfocusedBorderColor = AzulMarino.copy(
                                 alpha = .20f
                             ),
-                        focusedContainerColor =
-                            Color.Transparent,
-                        unfocusedContainerColor =
-                            Color.Transparent
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent
                     )
             )
-
-            Spacer(
-                modifier = Modifier.height(20.dp)
-            )
-
-            // CORREO
-            EtiquetaFormulario(
-                texto = "Correo electrónico"
-            )
-
-            Spacer(
-                modifier = Modifier.height(7.dp)
-            )
-
+            Spacer(modifier = Modifier.height(20.dp))
+            EtiquetaFormulario(texto = "Correo electrónico")
+            Spacer(modifier = Modifier.height(7.dp))
             OutlinedTextField(
                 value = correo,
                 onValueChange = {
                     correo = it
                 },
-                modifier =
-                    Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 placeholder = {
-                    Text(
-                        text =
-                            "tu.correo@ejemplo.com"
-                    )
+                    Text(text = "tu.correo@ejemplo.com")
                 },
                 leadingIcon = {
-
-                    Icon(
-                        imageVector =
-                            Icons.Outlined.Email,
+                    Icon(imageVector = Icons.Outlined.Email,
                         contentDescription = null,
                         tint = AzulMarino
                     )
                 },
                 singleLine = true,
-                keyboardOptions =
-                    KeyboardOptions(
-                        keyboardType =
-                            KeyboardType.Email
-                    ),
-                shape =
-                    RoundedCornerShape(14.dp),
-                colors =
-                    OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor =
-                            AzulMarino,
-                        unfocusedBorderColor =
-                            AzulMarino.copy(
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                shape = RoundedCornerShape(14.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = AzulMarino,
+                        unfocusedBorderColor = AzulMarino.copy(
                                 alpha = .20f
                             )
                     )
             )
-
-            Spacer(
-                modifier = Modifier.height(20.dp)
-            )
-
-            // MENSAJE
-            EtiquetaFormulario(
-                texto = "Mensaje"
-            )
-
-            Spacer(
-                modifier = Modifier.height(7.dp)
-            )
-
-            OutlinedTextField(
-                value = mensaje,
-                onValueChange = {
-                    mensaje = it
-                },
+            Spacer(modifier = Modifier.height(20.dp))
+            EtiquetaFormulario(texto = "Mensaje")
+            Spacer(modifier = Modifier.height(7.dp))
+            OutlinedTextField(value = mensaje,
+                onValueChange = { mensaje = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(145.dp),
                 placeholder = {
-                    Text(
-                        text =
-                            "Cuéntanos en qué podemos ayudarte..."
-                    )
+                    Text(text = "Cuéntanos en qué podemos ayudarte...")
                 },
                 leadingIcon = {
-
-                    Icon(
-                        imageVector =
-                            Icons.Outlined.Sms,
+                    Icon(imageVector = Icons.Outlined.Sms,
                         contentDescription = null,
                         tint = AzulMarino
                     )
                 },
-                shape =
-                    RoundedCornerShape(14.dp),
-                colors =
-                    OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor =
-                            AzulMarino,
-                        unfocusedBorderColor =
-                            AzulMarino.copy(
-                                alpha = .20f
+                shape = RoundedCornerShape(14.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = AzulMarino,
+                        unfocusedBorderColor = AzulMarino.copy(
+                            alpha = .20f
                             )
                     )
             )
-
-            Spacer(
-                modifier = Modifier.height(26.dp)
-            )
-
-            Button(
-                onClick = {
-
+            Spacer(modifier = Modifier.height(26.dp))
+            Button(onClick = {
                     scope.launch {
-
                         snackbarHostState
                             .showSnackbar(
-                                message =
-                                    "Tu mensaje fue enviado."
+                                message = "Tu mensaje fue enviado."
                             )
                     }
-
                     nombre = ""
                     correo = ""
                     mensaje = ""
                 },
 
-                enabled =
-                    nombre.isNotBlank() &&
+                enabled = nombre.isNotBlank() &&
                             correo.isNotBlank() &&
                             mensaje.isNotBlank(),
 
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
+                shape = RoundedCornerShape(18.dp),
 
-                shape =
-                    RoundedCornerShape(18.dp),
-
-                colors =
-                    ButtonDefaults.buttonColors(
-                        containerColor =
-                            AzulMarino,
-                        contentColor =
-                            Blanco
+                colors = ButtonDefaults.buttonColors(
+                        containerColor = AzulMarino,
+                        contentColor = Blanco
                     )
             ) {
-
-                Text(
-                    text =
-                        "Enviar mensaje",
-                    style =
-                        MaterialTheme.typography
+                Text(text = "Enviar mensaje",
+                    style = MaterialTheme.typography
                             .titleSmall
                 )
+                Spacer(modifier = Modifier.weight(1f))
 
-                Spacer(
-                    modifier =
-                        Modifier.weight(1f)
-                )
-
-                Icon(
-                    imageVector =
-                        Icons.Outlined
+                Icon(imageVector = Icons.Outlined
                             .ChevronRight,
                     contentDescription = null
                 )
             }
-
-            Spacer(
-                modifier = Modifier.height(18.dp)
-            )
-
-            Row(
-                modifier =
-                    Modifier.fillMaxWidth(),
-                verticalAlignment =
-                    Alignment.Top
+            Spacer(modifier = Modifier.height(18.dp))
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
             ) {
-
-                Icon(
-                    imageVector =
-                        Icons.Outlined.Info,
+                Icon(imageVector = Icons.Outlined.Info,
                     contentDescription = null,
                     tint = GrisTexto,
                     modifier =
                         Modifier.size(20.dp)
                 )
-
-                Spacer(
-                    modifier =
-                        Modifier.width(10.dp)
-                )
-
-                Text(
-                    text =
-                        "Este formulario es para dudas o sugerencias sobre Familias que Suman+.",
-                    modifier =
-                        Modifier.weight(1f),
-                    style =
-                        MaterialTheme.typography
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(text = "Este formulario es para dudas o sugerencias sobre Familias que Suman+.",
+                    modifier = Modifier.weight(1f),
+                    style = MaterialTheme.typography
                             .bodySmall,
                     color = GrisTexto
                 )
             }
+            // Aviso de Privacidad
+            PieAvisoPrivacidad(
+                navController = navController
+            )
         }
     }
 }
 
-@Composable
-private fun EtiquetaFormulario(
-    texto: String
-) {
 
-    Text(
-        text = texto,
-        style =
-            MaterialTheme.typography
+@Composable
+private fun EtiquetaFormulario(texto: String) {
+    Text(text = texto,
+        style = MaterialTheme.typography
                 .titleSmall,
         color = AzulMarino
     )

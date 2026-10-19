@@ -36,6 +36,8 @@ import com.example.familiasquesuman.ui.screens.proyectos.ProyectoDetalleScreen
 import com.example.familiasquesuman.ui.screens.proyectos.ProyectosScreen
 import androidx.compose.runtime.LaunchedEffect
 import com.example.familiasquesuman.notificaciones.EstadoNotificaciones
+import com.example.familiasquesuman.ui.screens.inicio.AvisoPrivacidadScreen
+
 @Composable
 fun NavGraphFamilias(
     navController: NavHostController = rememberNavController(),
@@ -147,6 +149,9 @@ fun NavGraphFamilias(
             )
         }
 
+        composable("aviso_privacidad") {
+            AvisoPrivacidadScreen(navController = navController)
+        }
 
         composable(
             route = "${Rutas.AdminCrearContenido.ruta}?tipo={tipo}",

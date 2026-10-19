@@ -37,61 +37,29 @@ import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
 import com.example.familiasquesuman.ui.components.FotoPerfil
+import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 
 private enum class SeccionComunidad { OFICIAL, COMUNIDAD }
 
 @Composable
-fun ComunidadScreen(
-    navController: NavHostController,
-    esAdministrador: Boolean = false
-) {
-    var seccionSeleccionada by rememberSaveable {
-        mutableStateOf(SeccionComunidad.OFICIAL)
-    }
-
+fun ComunidadScreen(navController: NavHostController, esAdministrador: Boolean = false) {
+    var seccionSeleccionada by rememberSaveable { mutableStateOf(SeccionComunidad.OFICIAL) }
     val sesionIniciada = SesionManager.tipoSesion != TipoSesion.INVITADO
-
-    var mostrarFormularioOficial by rememberSaveable {
-        mutableStateOf(false)
-    }
-
+    var mostrarFormularioOficial by rememberSaveable { mutableStateOf(false) }
     val comunidadRepository = remember { ComunidadRepository() }
-
-    var publicacionesComunidad by remember {
-        mutableStateOf<List<PublicacionComunidadUi>>(emptyList())
-    }
-
-    var publicacionesOficiales by remember {
-        mutableStateOf<List<PublicacionComunidadUi>>(emptyList())
-    }
-    // Permite actualizar los avisos después de publicar uno nuevo
+    var publicacionesComunidad by remember { mutableStateOf<List<PublicacionComunidadUi>>(emptyList()) }
+    var publicacionesOficiales by remember { mutableStateOf<List<PublicacionComunidadUi>>(emptyList()) }
     var actualizarAvisos by remember { mutableIntStateOf(0) }
-
-    var cargando by remember {
-        mutableStateOf(true)
-    }
-
-    var errorCarga by remember {
-        mutableStateOf<String?>(null)
-    }
-
-    // Actualizar las publicaciones al regresar a Comunidad
+    var cargando by remember { mutableStateOf(true) }
+    var errorCarga by remember { mutableStateOf<String?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
-
     LaunchedEffect(lifecycleOwner, actualizarAvisos) {
-        lifecycleOwner.lifecycle.repeatOnLifecycle(
-            Lifecycle.State.RESUMED
-        ) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             cargando = true
             errorCarga = null
-
             try {
-                val resultadoComunidad =
-                    comunidadRepository.obtenerPublicaciones()
-
-                resultadoComunidad.onSuccess {
-                    publicacionesComunidad = it
-                }.onFailure { error ->
+                val resultadoComunidad = comunidadRepository.obtenerPublicaciones()
+                resultadoComunidad.onSuccess { publicacionesComunidad = it }.onFailure { error ->
                     android.util.Log.e(
                         "COMUNIDAD",
                         "Error al cargar publicaciones",
@@ -99,13 +67,8 @@ fun ComunidadScreen(
                     )
                     errorCarga = "Error Comunidad: ${error.message}"
                 }
-
-                val resultadoOficiales =
-                    comunidadRepository.obtenerAvisosOficiales()
-
-                resultadoOficiales.onSuccess {
-                    publicacionesOficiales = it
-                }.onFailure { error ->
+                val resultadoOficiales = comunidadRepository.obtenerAvisosOficiales()
+                resultadoOficiales.onSuccess { publicacionesOficiales = it }.onFailure { error ->
                     android.util.Log.e(
                         "COMUNIDAD",
                         "Error al cargar avisos oficiales",
@@ -125,9 +88,7 @@ fun ComunidadScreen(
         navbar = true,
         backButton = false
     ) { paddingInterno ->
-
-        Box(
-            modifier = Modifier
+        Box(modifier = Modifier
                 .fillMaxSize()
                 .background(CremaFondo)
         ) {
@@ -144,113 +105,73 @@ fun ComunidadScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-
-                item {
-                    Spacer(Modifier.height(14.dp))
-
+                item { Spacer(Modifier.height(14.dp))
                     SelectorComunidad(
                         seleccionada = seccionSeleccionada,
-                        onSeleccionar = {
-                            seccionSeleccionada = it
-                        }
+                        onSeleccionar = { seccionSeleccionada = it }
                     )
                 }
-
                 if (seccionSeleccionada == SeccionComunidad.OFICIAL) {
-
-                    items(
-                        publicacionesOficiales,
-                        key = { it.id }
+                    items(publicacionesOficiales, key = { it.id }
                     ) { publicacion ->
-
                         TarjetaPublicacion(
                             publicacion = publicacion,
-                            onClick = {
-                                navController.navigate(
+                            onClick = { navController.navigate(
                                     Rutas.DetallePublicacion.crearRuta(
                                         publicacion.id
                                     )
                                 )
                             },
-                            onRequiereLogin = {
-                                navController.navigate(Rutas.Login.ruta)
-                            }
+                            onRequiereLogin = { navController.navigate(Rutas.Login.ruta) }
                         )
                     }
 
                 } else {
-
-                    item {
-                        AvisoRevision()
-                    }
-
-                    item {
-                        CajaCrearPublicacion(
+                    item { AvisoRevision() }
+                    item { CajaCrearPublicacion(
                             texto = "¿Qué quieres compartir hoy?",
                             textoSecundario = "Tu publicación se enviará para revisión.",
                             onClick = {
                                 if (sesionIniciada) {
-                                    navController.navigate(
-                                        Rutas.NuevaPublicacion.ruta
-                                    )
+                                    navController.navigate(Rutas.NuevaPublicacion.ruta)
                                 } else {
-                                    navController.navigate(
-                                        Rutas.Login.ruta
+                                    navController.navigate(Rutas.Login.ruta
                                     )
                                 }
                             }
                         )
                     }
 
-                    item {
-                        TextButton(
-                            onClick = {
-                                navController.navigate(
-                                    Rutas.MisPublicaciones.ruta
-                                )
-                            },
+                    item { TextButton(
+                            onClick = { navController.navigate(Rutas.MisPublicaciones.ruta)},
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Article,
+                            Icon(imageVector = Icons.Outlined.Article,
                                 contentDescription = null,
                                 tint = AzulMarino
                             )
-
                             Spacer(Modifier.width(8.dp))
-
-                            Text(
-                                text = "Ver mis publicaciones",
+                            Text(text = "Ver mis publicaciones",
                                 style = MaterialTheme.typography.titleSmall,
                                 color = AzulMarino
                             )
-
                             Spacer(Modifier.weight(1f))
-
-                            Icon(
-                                imageVector = Icons.Outlined.ChevronRight,
+                            Icon(imageVector = Icons.Outlined.ChevronRight,
                                 contentDescription = null,
                                 tint = AzulMarino
                             )
                         }
                     }
-
-                    items(
-                        publicacionesComunidad,
-                        key = { it.id }
-                    ) { publicacion ->
-
+                    items(publicacionesComunidad, key = { it.id }) { publicacion ->
                         TarjetaPublicacion(
                             publicacion = publicacion,
-                            onClick = {
-                                navController.navigate(
+                            onClick = { navController.navigate(
                                     Rutas.DetallePublicacion.crearRuta(
                                         publicacion.id
                                     )
                                 )
                             },
-                            onRequiereLogin = {
-                                navController.navigate(Rutas.Login.ruta)
+                            onRequiereLogin = { navController.navigate(Rutas.Login.ruta)
                             }
                         )
                     }
@@ -258,11 +179,9 @@ fun ComunidadScreen(
 
                 if (cargando) {
                     item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(),
+                        Box(modifier = Modifier.fillMaxWidth(),
                             contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
+                        ) { CircularProgressIndicator(
                                 color = AzulMarino,
                                 modifier = Modifier.padding(16.dp)
                             )
@@ -272,23 +191,24 @@ fun ComunidadScreen(
 
                 if (errorCarga != null) {
                     item {
-                        Text(
-                            text = errorCarga.orEmpty(),
+                        Text(text = errorCarga.orEmpty(),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(16.dp)
                         )
                     }
                 }
+                // Aviso de Privacidad
+                item {
+                    PieAvisoPrivacidad(
+                        navController = navController
+                    )
+                }
             }
 
-            if (
-                SesionManager.esAdmin &&
-                seccionSeleccionada == SeccionComunidad.OFICIAL
-            ) {
+
+            if (SesionManager.esAdmin && seccionSeleccionada == SeccionComunidad.OFICIAL) {
                 FloatingActionButton(
-                    onClick = {
-                        mostrarFormularioOficial = true
-                    },
+                    onClick = { mostrarFormularioOficial = true },
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(paddingInterno)
@@ -300,8 +220,7 @@ fun ComunidadScreen(
                     contentColor = AzulMarino,
                     shape = CircleShape
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Add,
+                    Icon(imageVector = Icons.Outlined.Add,
                         contentDescription = "Crear aviso oficial",
                         modifier = Modifier.size(30.dp)
                     )
@@ -312,30 +231,27 @@ fun ComunidadScreen(
 
     if (mostrarFormularioOficial && SesionManager.esAdmin) {
         CrearAvisoOficialSheet(
-            onCerrar = {
-                mostrarFormularioOficial = false
-            },
-            onPublicado = {
-                mostrarFormularioOficial = false
+            onCerrar = { mostrarFormularioOficial = false },
+            onPublicado = { mostrarFormularioOficial = false
                 actualizarAvisos++
             }
         )
     }
+
 }
+
 
 @Composable
 private fun SelectorComunidad(
     seleccionada: SeccionComunidad,
     onSeleccionar: (SeccionComunidad) -> Unit
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
+    Surface(modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
         color = Blanco,
         tonalElevation = 1.dp
     ) {
-        Row(
-            modifier = Modifier
+        Row(modifier = Modifier
                 .fillMaxWidth()
                 .padding(3.dp)
         ) {
@@ -347,7 +263,6 @@ private fun SelectorComunidad(
                     onSeleccionar(SeccionComunidad.OFICIAL)
                 }
             )
-
             SegmentoSelector(
                 texto = "Comunidad",
                 seleccionado = seleccionada == SeccionComunidad.COMUNIDAD,
@@ -378,11 +293,8 @@ private fun SegmentoSelector(
             Blanco
         }
     ) {
-        Box(
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = texto,
+        Box(contentAlignment = Alignment.Center) {
+            Text(text = texto,
                 style = MaterialTheme.typography.titleSmall,
                 color = if (seleccionado) {
                     Blanco
@@ -402,24 +314,21 @@ private fun AvisoRevision() {
         shape = RoundedCornerShape(14.dp),
         color = AzulMarino.copy(alpha = 0.07f)
     ) {
-        Row(
-            modifier = Modifier.padding(12.dp),
+        Row(modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Info,
+            Icon(imageVector = Icons.Outlined.Info,
                 contentDescription = null,
                 tint = AzulMarino
             )
-
             Spacer(Modifier.width(9.dp))
-
-            Text(
-                text = "Las publicaciones se revisan antes de publicarse.",
+            Text(text = "Las publicaciones se revisan antes de publicarse.",
                 style = MaterialTheme.typography.bodySmall,
                 color = AzulMarino
             )
+
         }
+
     }
 }
 
@@ -429,8 +338,7 @@ private fun CajaCrearPublicacion(
     textoSecundario: String,
     onClick: () -> Unit
 ) {
-    Card(
-        onClick = onClick,
+    Card(onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = Blanco
@@ -440,52 +348,37 @@ private fun CajaCrearPublicacion(
             defaultElevation = 2.dp
         )
     ) {
-        Column(
-            modifier = Modifier.padding(14.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                FotoPerfil(
-                    fotoUrl = SesionManager.usuario?.fotoUrl,
+        Column(modifier = Modifier.padding(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                FotoPerfil(fotoUrl = SesionManager.usuario?.fotoUrl,
                     nombre = SesionManager.usuario?.nombre,
                     tamano = 44.dp
                 )
-
                 Spacer(Modifier.width(10.dp))
-
-                Text(
-                    text = texto,
+                Text(text = texto,
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.bodyMedium,
                     color = GrisTexto
                 )
-
-                Surface(
-                    modifier = Modifier.size(42.dp),
+                Surface(modifier = Modifier.size(42.dp),
                     shape = CircleShape,
                     color = Ambar
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Add,
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(imageVector = Icons.Outlined.Add,
                             contentDescription = "Nueva publicación",
                             tint = AzulMarino
                         )
                     }
                 }
             }
-
             Spacer(Modifier.height(5.dp))
-
-            Text(
-                text = textoSecundario,
+            Text(text = textoSecundario,
                 modifier = Modifier.padding(start = 54.dp),
                 style = MaterialTheme.typography.labelSmall,
                 color = GrisTexto
             )
         }
+
     }
 }

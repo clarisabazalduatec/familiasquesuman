@@ -27,8 +27,7 @@ fun ResultadoPublicacionScreen(
     navController: NavHostController,
     fueExitoso: Boolean
 ) {
-    PantallaPrincipalConMenu(
-        navController = navController,
+    PantallaPrincipalConMenu(navController = navController,
         pantallaActual = PantallaPrincipal.INICIO,
         chatbot = false
     ) { paddingInterno ->
@@ -87,25 +86,21 @@ fun ResultadoPublicacionScreen(
                 {
                     Column(modifier = Modifier.padding(18.dp)
                     ) { Text(text = "¿Qué sigue?",
-                            style =
-                                MaterialTheme
+                            style = MaterialTheme
                                     .typography
                                     .titleMedium,
                             color = AzulMarino
                         )
                         Spacer(modifier = Modifier.height(14.dp))
-                        PasoRevision(
-                            icono = Icons.Outlined.Schedule,
+                        PasoRevision(icono = Icons.Outlined.Schedule,
                             titulo = "En revisión",
                             descripcion = "Nuestro equipo revisará que tu publicación cumpla con las políticas de la comunidad."
                         )
-                        PasoRevision(
-                            icono = Icons.Outlined.MailOutline,
+                        PasoRevision(icono = Icons.Outlined.MailOutline,
                             titulo = "Te avisaremos",
                             descripcion = "Recibirás una notificación cuando sea aprobada o si requiere cambios."
                         )
-                        PasoRevision(
-                            icono = Icons.Outlined.Groups,
+                        PasoRevision(icono = Icons.Outlined.Groups,
                             titulo = "Publicación",
                             descripcion = "Una vez aprobada, aparecerá en la sección de Comunidad."
                         )

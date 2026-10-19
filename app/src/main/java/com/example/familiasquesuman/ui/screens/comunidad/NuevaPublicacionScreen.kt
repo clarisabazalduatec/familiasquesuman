@@ -63,7 +63,6 @@ fun NuevaPublicacionScreen(
     var categoria by rememberSaveable { mutableStateOf("") }
     var categoriaId by rememberSaveable { mutableStateOf<Int?>(null) }
     var menuCategoriasAbierto by remember { mutableStateOf(false) }
-
     val categorias = remember { mutableStateListOf<CategoriaDto>() }
     var cargandoCategorias by remember { mutableStateOf(true) }
     var errorCategorias by remember { mutableStateOf<String?>(null) }
@@ -74,7 +73,6 @@ fun NuevaPublicacionScreen(
     val scope = rememberCoroutineScope()
     val imagenRepository = remember { ImagenRepository() }
     val comunidadRepository = remember { ComunidadRepository() }
-
     suspend fun subirFotosComunidad(): List<String> {
         return imagenes.map { imagen ->
             imagenRepository.subirImagenComunidad(
@@ -104,22 +102,19 @@ fun NuevaPublicacionScreen(
         pantallaActual = PantallaPrincipal.COMUNIDAD,
     ) { paddingInterno ->
         val scrollState = androidx.compose.foundation.rememberScrollState()
-        Column(
-            modifier = Modifier
+        Column(modifier = Modifier
                 .padding(paddingInterno)
                 .fillMaxSize()
                 .background(CremaFondo)
                 .verticalScroll(scrollState)
                 .padding(18.dp)
         ) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
+            Surface(modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(18.dp),
                 color = Blanco,
                 tonalElevation = 1.dp
             ) {
-                Row(
-                    modifier = Modifier.padding(
+                Row(modifier = Modifier.padding(
                         horizontal = 6.dp,
                         vertical = 10.dp
                     ),
@@ -127,16 +122,14 @@ fun NuevaPublicacionScreen(
                 ) {
                     IconButton(onClick = { navController.popBackStack() }
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        Icon(imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             contentDescription = "Regresar",
                             tint = AzulMarino
                         )
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                     Column {
-                        Text(
-                            text =
+                        Text(text =
                                 if (esOficial)
                                     "Nueva publicación oficial"
                                 else
@@ -144,9 +137,7 @@ fun NuevaPublicacionScreen(
                             style = MaterialTheme.typography.titleLarge,
                             color = AzulMarino
                         )
-
-                        Text(
-                            text =
+                        Text(text =
                                 if (esOficial)
                                     "Crea un anuncio para las familias."
                                 else
@@ -157,35 +148,28 @@ fun NuevaPublicacionScreen(
                     }
                 }
             }
-
             Spacer(modifier = Modifier.height(20.dp))
-            Text(
-                text = "Título *",
+            Text(text = "Título *",
                 style = MaterialTheme.typography.titleSmall,
                 color = AzulMarino
             )
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = titulo,
-                onValueChange = {
-                    titulo = it
-                },
+                onValueChange = { titulo = it },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("Escribe un título breve...") },
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(18.dp))
-            Text(
-                text = "Descripción *",
+            Text(text = "Descripción *",
                 style = MaterialTheme.typography.titleSmall,
                 color = AzulMarino
             )
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = descripcion,
-                onValueChange = {
-                    descripcion = it
-                },
+                onValueChange = { descripcion = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(130.dp),
@@ -193,22 +177,18 @@ fun NuevaPublicacionScreen(
                 shape = RoundedCornerShape(12.dp)
             )
             Spacer(modifier = Modifier.height(18.dp))
-
             Spacer(modifier = Modifier.height(8.dp))
-            SeleccionadorImagenes(
-                listaImagenes = imagenes,
+            SeleccionadorImagenes(listaImagenes = imagenes,
                 maxImagenes = 5,
                 titulo = "Fotografías de tu experiencia",
                 subtitulo = "Selecciona hasta 5 fotografías"
             )
 
             Spacer(modifier = Modifier.height(18.dp))
-            Text(
-                text = "Categoría *",
+            Text(text = "Categoría *",
                 style = MaterialTheme.typography.titleSmall,
                 color = AzulMarino
             )
-
             Spacer(modifier = Modifier.height(6.dp))
             ExposedDropdownMenuBox(
                 expanded = menuCategoriasAbierto,
@@ -224,21 +204,14 @@ fun NuevaPublicacionScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor(),
-                    placeholder = {
-                        Text("Selecciona una categoría")
-                    },
+                    placeholder = { Text("Selecciona una categoría") },
                     leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Outlined.Eco,
+                        Icon(imageVector = Icons.Outlined.Eco,
                             contentDescription = null,
                             tint = AzulMarino
                         )
                     },
-
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults
-                            .TrailingIcon(expanded = menuCategoriasAbierto)
-                    },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = menuCategoriasAbierto) },
                     shape = RoundedCornerShape(12.dp)
                 )
                 ExposedDropdownMenu(
@@ -247,11 +220,8 @@ fun NuevaPublicacionScreen(
                 ) {
                     categorias.forEach { opcion ->
                         DropdownMenuItem(
-                            text = {
-                                Text(opcion.nombre)
-                            },
-                            onClick = {
-                                categoria = opcion.nombre
+                            text = { Text(opcion.nombre) },
+                            onClick = { categoria = opcion.nombre
                                 categoriaId = opcion.id
                                 menuCategoriasAbierto = false
                             }
@@ -260,14 +230,10 @@ fun NuevaPublicacionScreen(
                 }
             }
             if (cargandoCategorias) {
-                LinearProgressIndicator(
-                    modifier = Modifier.fillMaxWidth()
-                )
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
-
             errorCategorias?.let { mensaje ->
-                Text(
-                    text = mensaje,
+                Text(text = mensaje,
                     color = MaterialTheme.colorScheme.error
                 )
             }
@@ -279,22 +245,16 @@ fun NuevaPublicacionScreen(
                     } else {
                         estaEnviando = true
                         errorEnvio = null
-
                         scope.launch {
                             try {
                                 val urlsImagenes = subirFotosComunidad()
-
                                 comunidadRepository.crearPublicacion(
                                     titulo = titulo.trim(),
                                     contenido = descripcion.trim(),
                                     categoriaId = categoriaId,
                                     imagenes = urlsImagenes
                                 ).getOrThrow()
-
-                                navController.navigate(
-                                    Rutas.ResultadoPublicacion.crearRuta(true)
-                                )
-
+                                navController.navigate(Rutas.ResultadoPublicacion.crearRuta(true))
                             } catch (e: CancellationException) {
                                 throw e
                             } catch (e: Exception) {
@@ -325,8 +285,7 @@ fun NuevaPublicacionScreen(
                         color = AzulMarino
                     )
                 } else {
-                    Text(
-                        text =
+                    Text(text =
                             if (esOficial)
                                 "Publicar anuncio"
                             else
@@ -337,14 +296,11 @@ fun NuevaPublicacionScreen(
             }
             errorEnvio?.let { mensaje ->
                 Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = mensaje,
+                Text(text = mensaje,
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall
                 )
             }
-
             Spacer(modifier = Modifier.height(30.dp))
         }
     }
