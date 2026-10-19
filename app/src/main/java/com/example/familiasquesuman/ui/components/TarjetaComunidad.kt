@@ -207,91 +207,17 @@ fun TarjetaComunidad(
 //avisios oficiales
 @Composable
 private fun ContenidoAvisoOficial(publicacion: PublicacionComunidadUi, onClick: () -> Unit) {
-    Row(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                onClick()
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        AsyncImage(model = publicacion.imagenUrl,
-            contentDescription = "Aviso oficial",
+    val imageUrl = publicacion.imagenUrl
+    if (!imageUrl.isNullOrBlank()) {
+        Row(
             modifier = Modifier
-                .width(120.dp)
-                .height(92.dp)
-                .clip(RoundedCornerShape(14.dp)),
-            contentScale = ContentScale.Crop
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(imageVector = Icons.Outlined.Campaign,
-                    contentDescription = null,
-                    tint = AzulMarino,
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(text = "Aviso oficial",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = AzulMarino
-                )
-            }
-            Spacer(modifier = Modifier.height(5.dp))
-            Text(text = publicacion.titulo.orEmpty(),
-                style = MaterialTheme.typography.titleSmall,
-                color = AzulMarino
-            )
-            Text(text = publicacion.contenido,
-                style = MaterialTheme.typography.bodySmall,
-                color = GrisTexto,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
-}
-
-
-//comunidad
-@Composable
-private fun ContenidoComunidad(publicacion: PublicacionComunidadUi, onClick: () -> Unit) {
-    Column(modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                onClick()
-            }
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Surface(modifier = Modifier.size(36.dp),
-                shape = CircleShape,
-                color = AmbarClaro
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(imageVector = Icons.Default.Groups,
-                        contentDescription = null,
-                        tint = AzulMarino,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(9.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(text = publicacion.autor,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = AzulMarino
-                )
-                Text(text = publicacion.tiempoRelativo,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = GrisTexto
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(10.dp))
-        Row(modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically)
-        {
-            AsyncImage(model = publicacion.imagenUrl,
-                contentDescription = "Publicación de comunidad",
+                .fillMaxWidth()
+                .clickable { onClick() },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = "Aviso oficial",
                 modifier = Modifier
                     .width(120.dp)
                     .height(92.dp)
@@ -300,45 +226,166 @@ private fun ContenidoComunidad(publicacion: PublicacionComunidadUi, onClick: () 
             )
             Spacer(modifier = Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = publicacion.contenido,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = GrisTexto,
-                    maxLines = 4,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically)
-                {
-                    Icon(imageVector = if (publicacion.meGusta) { Icons.Filled.Favorite
-                        } else {
-                            Icons.Outlined.FavoriteBorder
-                        },
-                        contentDescription = null,
-                        tint = if (publicacion.meGusta) {
-                            Color.Red
-                        } else {
-                            AzulMarino
-                        },
-                        modifier = Modifier.size(17.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "${publicacion.numeroLikes}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = AzulMarino
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Icon(imageVector = Icons.Outlined.ChatBubbleOutline,
+                AvisoOficialTextContent(publicacion)
+            }
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(4.dp)
+                .clickable { onClick() }
+        ) {
+            AvisoOficialTextContent(publicacion)
+        }
+    }
+}
+
+@Composable
+private fun AvisoOficialTextContent(publicacion: PublicacionComunidadUi) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Outlined.Campaign,
+                contentDescription = null,
+                tint = AzulMarino,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+            Text(
+                text = "Aviso oficial",
+                style = MaterialTheme.typography.labelSmall,
+                color = AzulMarino
+            )
+        }
+        Spacer(modifier = Modifier.height(5.dp))
+        Text(
+            text = publicacion.titulo.orEmpty(),
+            style = MaterialTheme.typography.titleSmall,
+            color = AzulMarino
+        )
+        Text(
+            text = publicacion.contenido,
+            style = MaterialTheme.typography.bodySmall,
+            color = GrisTexto,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+
+//comunidad
+@Composable
+private fun ContenidoComunidad(publicacion: PublicacionComunidadUi, onClick: () -> Unit) {
+    val imageUrl = publicacion.imagenUrl
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Surface(
+                modifier = Modifier.size(36.dp),
+                shape = CircleShape,
+                color = AmbarClaro
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Groups,
                         contentDescription = null,
                         tint = AzulMarino,
-                        modifier = Modifier.size(17.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "${publicacion.numeroComentarios}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = AzulMarino
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
+            Spacer(modifier = Modifier.width(9.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = publicacion.autor,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = AzulMarino
+                )
+                Text(
+                    text = publicacion.tiempoRelativo,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = GrisTexto
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(10.dp))
+        if (!imageUrl.isNullOrBlank()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = "Publicación de comunidad",
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(92.dp)
+                        .clip(RoundedCornerShape(14.dp)),
+                    contentScale = ContentScale.Crop
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    ComunidadTextAndStats(publicacion)
+                }
+            }
+        } else {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                ComunidadTextAndStats(publicacion)
+            }
+        }
+    }
+}
+
+@Composable
+private fun ComunidadTextAndStats(publicacion: PublicacionComunidadUi) {
+    Column {
+        Text(
+            text = publicacion.contenido,
+            style = MaterialTheme.typography.bodySmall,
+            color = GrisTexto,
+            maxLines = 4,
+            overflow = TextOverflow.Ellipsis
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = if (publicacion.meGusta) {
+                    Icons.Filled.Favorite
+                } else {
+                    Icons.Outlined.FavoriteBorder
+                },
+                contentDescription = null,
+                tint = if (publicacion.meGusta) {
+                    Color.Red
+                } else {
+                    AzulMarino
+                },
+                modifier = Modifier.size(17.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "${publicacion.numeroLikes}",
+                style = MaterialTheme.typography.labelSmall,
+                color = AzulMarino
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Icon(
+                imageVector = Icons.Outlined.ChatBubbleOutline,
+                contentDescription = null,
+                tint = AzulMarino,
+                modifier = Modifier.size(17.dp)
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "${publicacion.numeroComentarios}",
+                style = MaterialTheme.typography.labelSmall,
+                color = AzulMarino
+            )
         }
     }
 }
