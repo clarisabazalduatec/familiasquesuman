@@ -195,16 +195,11 @@ fun RegistroScreen(
                 )
             )
 
-            CampoRegistro(
-                valor = uiState.ubicacion,
-                onValueChange = registroViewModel::onUbicacion,
-                placeholder = "Ciudad (opcional)",
-                icono = Icons.Outlined.Place,
-                error = null,
-                keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Words,
-                    imeAction = ImeAction.Next
-                )
+            com.example.familiasquesuman.ui.components.SelectorCiudad(
+                valorSeleccionado = uiState.ubicacion.ifBlank { "Monterrey, Nuevo León" },
+                onCiudadSeleccionada = registroViewModel::onUbicacion,
+                etiqueta = "Ciudad",
+                modifier = Modifier.padding(bottom = 12.dp)
             )
 
             val iconoOjo: @Composable () -> Unit = {

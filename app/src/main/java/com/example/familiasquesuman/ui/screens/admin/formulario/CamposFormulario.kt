@@ -233,14 +233,12 @@ fun CamposComunes(
         placeholder = "Breve resumen visible en la tarjeta",
         maxLineas = 2,
     )
-    CampoTexto(
-        valor = form.ubicacion,
-        onCambio = { onCambio(form.copy(ubicacion = it)) },
-        etiqueta = if (tipo == TipoContenidoAdmin.DIRECTORIO) "Dirección" else "Ubicación / Ciudad",
-        placeholder = if (tipo == TipoContenidoAdmin.DIRECTORIO) "Ej. Blvd. José María González #1000, Cadereyta"
-        else "Ej. Parque Central, Monterrey",
-        ayuda = ayudaUbicacion,
+    com.example.familiasquesuman.ui.components.SelectorCiudad(
+        valorSeleccionado = form.ubicacion.ifBlank { "Monterrey, Nuevo León" },
+        onCiudadSeleccionada = { onCambio(form.copy(ubicacion = it)) },
+        etiqueta = if (tipo == TipoContenidoAdmin.DIRECTORIO) "Ciudad" else "Ubicación / Ciudad"
     )
+    Spacer(modifier = Modifier.height(12.dp))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

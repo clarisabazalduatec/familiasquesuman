@@ -60,6 +60,7 @@ fun NuevaPublicacionScreen(
 
     var titulo by rememberSaveable { mutableStateOf("") }
     var descripcion by rememberSaveable { mutableStateOf("") }
+    var ubicacion by rememberSaveable { mutableStateOf("Monterrey, Nuevo León") }
     var categoria by rememberSaveable { mutableStateOf("") }
     var categoriaId by rememberSaveable { mutableStateOf<Int?>(null) }
     var menuCategoriasAbierto by remember { mutableStateOf(false) }
@@ -185,6 +186,13 @@ fun NuevaPublicacionScreen(
             )
 
             Spacer(modifier = Modifier.height(18.dp))
+            com.example.familiasquesuman.ui.components.SelectorCiudad(
+                valorSeleccionado = ubicacion,
+                onCiudadSeleccionada = { ubicacion = it },
+                etiqueta = "Ubicación / Ciudad"
+            )
+
+            Spacer(modifier = Modifier.height(18.dp))
             Text(text = "Categoría *",
                 style = MaterialTheme.typography.titleSmall,
                 color = AzulMarino
@@ -252,7 +260,8 @@ fun NuevaPublicacionScreen(
                                     titulo = titulo.trim(),
                                     contenido = descripcion.trim(),
                                     categoriaId = categoriaId,
-                                    imagenes = urlsImagenes
+                                    imagenes = urlsImagenes,
+                                    ubicacion = ubicacion
                                 ).getOrThrow()
                                 navController.navigate(Rutas.ResultadoPublicacion.crearRuta(true))
                             } catch (e: CancellationException) {

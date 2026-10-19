@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class CrearAvisoOficialRequest(
     val titulo: String?,
     val contenido: String,
+    val ubicacion: String? = null,
     val imagenes: List<String> = emptyList(),
 
     @SerializedName("evento_inicia_en")

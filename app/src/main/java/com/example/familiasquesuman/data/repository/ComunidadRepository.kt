@@ -64,12 +64,14 @@ class ComunidadRepository {
         titulo: String,
         contenido: String,
         categoriaId: Int?,
-        imagenes: List<String>
+        imagenes: List<String>,
+        ubicacion: String? = null
     ): Result<PublicacionComunidadUi> {
         return try {
             val datos = CrearPublicacionRequest(
                 titulo = titulo,
                 contenido = contenido,
+                ubicacion = ubicacion,
                 categoriaId = categoriaId,
                 imagenes = imagenes
             )
@@ -90,11 +92,13 @@ class ComunidadRepository {
         eventoIniciaEn: String? = null,
         eventoTerminaEn: String? = null,
         publicoObjetivo: String? = null,
+        ubicacion: String? = null
     ): Result<Unit> {
         return try {
             val datos = CrearAvisoOficialRequest(
-                    titulo = titulo,
+                titulo = titulo,
                 contenido = contenido,
+                ubicacion = ubicacion,
                 imagenes = imagenes,
                 eventoIniciaEn = eventoIniciaEn,
                 eventoTerminaEn = eventoTerminaEn,

@@ -90,7 +90,7 @@ fun PerfilScreen(
                 SaludoConUbicacion(
                     nombreUsuario = SesionManager.usuario?.nombre
                         ?.substringBefore(" ") ?: "familia",
-                    ciudad = "Monterrey, NL",
+                    ciudad = SesionManager.usuario?.ubicacion.orEmpty(),
                     onClickFoto = if (SesionManager.estaAutenticado) {
                         { viewModel.abrirDialogo(DialogoPerfil.Foto) }
                     } else null,

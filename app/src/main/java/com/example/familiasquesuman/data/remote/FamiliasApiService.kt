@@ -8,6 +8,7 @@ import com.example.familiasquesuman.data.remote.dto.InscripcionDto
 import com.example.familiasquesuman.data.remote.dto.InscripcionGuardarDto
 import com.example.familiasquesuman.data.remote.dto.MiInscripcionDto
 import com.example.familiasquesuman.data.remote.dto.ActividadDto
+import com.example.familiasquesuman.data.remote.dto.CiudadDto
 import com.example.familiasquesuman.data.remote.dto.ActividadGuardarDto
 import com.example.familiasquesuman.data.remote.dto.CategoriaCrearDto
 import com.example.familiasquesuman.data.remote.dto.CategoriaDto
@@ -176,6 +177,10 @@ interface FamiliasApiService {
 
     @GET("categorias")
     suspend fun getCategorias(@Query("ambito") ambito: String? = "ACTIVIDAD"): List<CategoriaDto>
+
+    // ---------- Ciudades ----------
+    @GET("ciudades")
+    suspend fun listarCiudades(): List<CiudadDto>
 
     // ---------- Donaciones ----------
     @GET("donaciones")

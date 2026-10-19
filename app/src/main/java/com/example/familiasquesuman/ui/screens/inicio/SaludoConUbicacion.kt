@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,18 +54,24 @@ fun SaludoConUbicacion(
     subiendoFoto: Boolean = false
 ) {
 
-    // tiene como determinado MTY
-    val ciudadInicial = when {
-        ciudad.contains("Monterrey", ignoreCase = true) ->
-            "Monterrey, N.L."
-        ciudad.contains("Hermosillo", ignoreCase = true) ->
-            "Hermosillo, Son."
-        else -> ciudad
-    }
-
-    var ciudadSeleccionada by rememberSaveable { mutableStateOf(ciudadInicial) }
+    var ciudadSeleccionada by rememberSaveable { mutableStateOf(ciudad) }
     var menuExpandido by rememberSaveable { mutableStateOf(false) }
-    val ciudades = listOf("Monterrey, N.L.", "Hermosillo, Son.")
+    var ciudades by remember { mutableStateOf(listOf("Monterrey, Nuevo León", "Hermosillo, Sonora")) }
+
+    LaunchedEffect(Unit) {
+        try {
+            val lista = com.example.familiasquesuman.data.remote.RetrofitInstance.api.listarCiudades()
+            if (lista.isNotEmpty()) {
+                val formateadas = lista.map { if (!it.estado.isNullOrBlank()) "${it.nombre}, ${it.estado}" else it.nombre }
+                ciudades = formateadas
+                val perfil = SesionManager.usuario?.ubicacion
+                val match = formateadas.find { perfil != null && it.contains(perfil, ignoreCase = true) }
+                    ?: formateadas.find { it.contains(ciudad, ignoreCase = true) }
+                    ?: formateadas.first()
+                ciudadSeleccionada = match
+            }
+        } catch (_: Exception) {}
+    }
 
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically)
     {
