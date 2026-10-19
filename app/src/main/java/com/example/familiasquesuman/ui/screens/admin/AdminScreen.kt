@@ -1,5 +1,7 @@
 package com.example.familiasquesuman.ui.screens.admin
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,18 +11,20 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewWrapper
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -29,7 +33,9 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
+import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun AdminScreen(navController: NavHostController) {
     PantallaPrincipalConMenu(
@@ -108,6 +114,7 @@ fun AdminScreen(navController: NavHostController) {
                     onClick = { navController.navigate(Rutas.AdminActualizacionDonaciones.ruta) }
                 )
             }
+
             item {
                 AdminCardOption(
                     titulo = "Gestión de directorio",
@@ -127,6 +134,24 @@ fun AdminScreen(navController: NavHostController) {
                     fondoIcono = AmbarClaro,
                     colorIcono = Ambar,
                     onClick = { navController.navigate(Rutas.AdminModeracionComunidad.ruta) }
+                )
+            }
+
+            item {
+                val context = LocalContext.current
+                val scope = rememberCoroutineScope()
+
+                AdminCardOption(
+                    titulo = "Exportar encuestas (CSV)",
+                    descripcion = "Descarga los resultados de las encuestas de satisfacción registradas.",
+                    icono = Icons.Default.FileDownload,
+                    fondoIcono = FondoVerde,
+                    colorIcono = TextoVerde,
+                    onClick = {
+                        scope.launch {
+                            descargarCsv(context)
+                        }
+                    }
                 )
             }
         }
@@ -197,9 +222,11 @@ fun AdminCardOption(
         }
     }
 }
+
+@RequiresApi(Build.VERSION_CODES.Q)
 @Preview(showBackground = true)
 @Composable
-private fun AdminScreenPreview(){
+private fun AdminScreenPreview() {
     FamiliasQueSumanTheme {
         AdminScreen(rememberNavController())
     }

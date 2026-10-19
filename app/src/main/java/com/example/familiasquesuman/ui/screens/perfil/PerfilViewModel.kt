@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.content.ContentResolver
 import android.net.Uri
+import com.example.familiasquesuman.data.remote.RetrofitInstance
+import com.example.familiasquesuman.domain.EncuestaActividadRequest
 
 /**
  * Perfil = datos de mi familia real (backend). Cada acción se guarda al momento
@@ -207,4 +209,39 @@ class PerfilViewModel(
 
     fun rechazarInvitacion(id: String) =
         accionDirecta("Invitación rechazada") { repo.rechazarInvitacion(id) }
+
+
+    // ---------- encuestas ----------
+    fun enviarEncuesta(actividadId: String, request: EncuestaActividadRequest) {
+        if (_uiState.value.guardando) return
+        _uiState.update { it.copy(guardando = true, errorDialogo = null) }
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.enviarEncuestaActividad(actividadId, request)
+                if (response.isSuccessful) {
+                    _uiState.update {
+                        it.copy(
+                            guardando = false,
+                            dialogo = null,
+                            mensaje = "Encuesta enviada exitosamente"
+                        )
+                    }
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            guardando = false,
+                            errorDialogo = "Error al enviar la encuesta (${response.code()})"
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        guardando = false,
+                        errorDialogo = "Error de conexión: ${e.localizedMessage}"
+                    )
+                }
+            }
+        }
+    }
 }

@@ -5,9 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Place
+import androidx.compose.material.icons.outlined.RateReview
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -30,6 +32,7 @@ import coil.compose.AsyncImage
 import com.example.familiasquesuman.data.remote.dto.MiInscripcionDto
 import com.example.familiasquesuman.data.remote.dto.toDomain
 import com.example.familiasquesuman.data.repository.InscripcionRepository
+import com.example.familiasquesuman.ui.components.EncuestaActividadDialog
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AzulMarino
@@ -45,6 +48,14 @@ class MisActividadesViewModel(
         private set
     var inscripciones by mutableStateOf<List<MiInscripcionDto>>(emptyList())
         private set
+
+    // Guardar IDs de actividades cuyas encuestas ya fueron respondidas en esta sesión
+    var encuestasRespondidas by mutableStateOf<Set<String>>(emptySet())
+        private set
+
+    fun marcarEncuestaRespondida(actividadId: String) {
+        encuestasRespondidas = encuestasRespondidas + actividadId
+    }
 
     fun cargar() {
         viewModelScope.launch {
@@ -76,7 +87,8 @@ private fun MiInscripcionDto.esCancelada(): Boolean {
 @Composable
 fun MisActividadesPerfil(
     navController: NavHostController,
-    viewModel: MisActividadesViewModel = viewModel()
+    viewModel: MisActividadesViewModel = viewModel(),
+    perfilViewModel: PerfilViewModel = viewModel()
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -94,6 +106,10 @@ fun MisActividadesPerfil(
 
     var tabSeleccionada by remember { mutableIntStateOf(0) } // 0 = Próximas, 1 = Historial
     var mostrarPopUpConcluida by remember { mutableStateOf(false) }
+
+    // Estado para controlar qué encuesta se está respondiendo
+    var actividadParaEncuestaId by remember { mutableStateOf<String?>(null) }
+    val perfilUiState by perfilViewModel.uiState.collectAsState()
 
     val ahora = remember { Date() }
 
@@ -248,21 +264,49 @@ fun MisActividadesPerfil(
                 }
             } else {
                 listaActual.forEach { item ->
+                    val actId = item.actividad?.id ?: item.actividadId ?: ""
+                    val yaRespondio = viewModel.encuestasRespondidas.contains(actId)
+
                     TarjetaMiInscripcion(
                         inscripcion = item,
                         ahora = ahora,
+                        encuestaRespondida = yaRespondio,
                         onClick = {
-                            val actId = item.actividad?.id ?: item.actividadId ?: ""
                             if (!item.esCancelada() && !item.yaPaso(ahora)) {
                                 navController.navigate(Rutas.ActividadDetalle.crearRuta(actId))
                             } else {
                                 mostrarPopUpConcluida = true
+                            }
+                        },
+                        onResponderEncuestaClick = {
+                            if (!yaRespondio) {
+                                actividadParaEncuestaId = actId
                             }
                         }
                     )
                 }
             }
         }
+    }
+
+    // Diálogo para responder la encuesta
+    actividadParaEncuestaId?.let { actId ->
+        val inscripcionSel = viewModel.inscripciones.find {
+            (it.actividad?.id ?: it.actividadId) == actId
+        }
+        val titulo = inscripcionSel?.actividad?.titulo ?: "Actividad comunitaria"
+
+        EncuestaActividadDialog(
+            actividadId = actId,
+            tituloActividad = titulo,
+            isLoading = perfilUiState.guardando,
+            onDismissRequest = { actividadParaEncuestaId = null },
+            onSubmit = { request ->
+                perfilViewModel.enviarEncuesta(actId, request)
+                viewModel.marcarEncuestaRespondida(actId)
+                actividadParaEncuestaId = null
+            }
+        )
     }
 
     if (mostrarPopUpConcluida) {
@@ -349,7 +393,9 @@ private fun ResumenHistorialCard(
 private fun TarjetaMiInscripcion(
     inscripcion: MiInscripcionDto,
     ahora: Date,
-    onClick: () -> Unit
+    encuestaRespondida: Boolean = false,
+    onClick: () -> Unit,
+    onResponderEncuestaClick: () -> Unit
 ) {
     val actividad = remember(inscripcion.actividad) { inscripcion.actividad?.toDomain() }
     val esCancelada = remember(inscripcion.estado) { inscripcion.esCancelada() }
@@ -388,7 +434,7 @@ private fun TarjetaMiInscripcion(
                     if (imagen != null) {
                         AsyncImage(
                             model = imagen,
-                            contentDescription = actividad?.titulo,
+                            contentDescription = actividad.titulo,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
@@ -482,7 +528,7 @@ private fun TarjetaMiInscripcion(
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = actividad?.horario ?: "",
+                                text = actividad.horario,
                                 color = AzulMarino.copy(alpha = 0.65f),
                                 fontSize = 12.sp
                             )
@@ -559,6 +605,35 @@ private fun TarjetaMiInscripcion(
                                     fontWeight = FontWeight.Medium
                                 )
                             }
+                        }
+                    }
+
+                    // BOTÓN DINÁMICO PARA ENCUESTA
+                    if (!esCancelada) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Button(
+                            onClick = onResponderEncuestaClick,
+                            enabled = !encuestaRespondida,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Ambar,
+                                contentColor = Color.White,
+                                disabledContainerColor = Color(0xFFE2E8F0),
+                                disabledContentColor = AzulMarino.copy(alpha = 0.4f)
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                imageVector = if (encuestaRespondida) Icons.Outlined.CheckCircle else Icons.Outlined.RateReview,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = if (encuestaRespondida) "Encuesta respondida" else "Responder encuesta",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 13.sp
+                            )
                         }
                     }
                 }
