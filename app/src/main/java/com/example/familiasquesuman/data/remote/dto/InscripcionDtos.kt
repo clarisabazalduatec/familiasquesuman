@@ -37,7 +37,8 @@ data class MiInscripcionDto(
     @SerializedName("creado_en") val creadoEn: String? = null,
     @SerializedName("cancelada_en") val canceladaEn: String? = null,
     @SerializedName("participantes") val participantes: List<ParticipanteDto> = emptyList(),
-    @SerializedName("actividad") val actividad: ActividadDto? = null
+    @SerializedName("actividad") val actividad: ActividadDto? = null,
+    @SerializedName("encuesta_respondida") val encuestaRespondida: Boolean = false
 ) {
     fun toInscripcionDto(): InscripcionDto = InscripcionDto(
         id = id,
@@ -82,4 +83,23 @@ data class AsistenciaItemDto(
 
 data class AsistenciaGuardarDto(
     @SerializedName("items") val items: List<AsistenciaItemDto> = emptyList()
+)
+
+data class EncuestaInicialRequest(
+    @SerializedName("motivos")
+    val motivos: List<String>,
+
+    @SerializedName("otro_motivo")
+    val otroMotivo: String? = null,
+
+    @SerializedName("expectativas")
+    val expectativas: List<String>,
+
+    @SerializedName("otra_expectativa")
+    val otraExpectativa: String? = null
+)
+
+data class EstadoEncuestasResponse(
+    @SerializedName("encuesta_inicial_respondida") val encuestaInicialRespondida: Boolean,
+    @SerializedName("encuesta_final_respondida") val encuestaFinalRespondida: Boolean
 )

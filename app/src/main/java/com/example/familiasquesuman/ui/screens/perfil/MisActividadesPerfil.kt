@@ -265,7 +265,9 @@ fun MisActividadesPerfil(
             } else {
                 listaActual.forEach { item ->
                     val actId = item.actividad?.id ?: item.actividadId ?: ""
-                    val yaRespondio = viewModel.encuestasRespondidas.contains(actId)
+
+                    // Aquí se evalúa si ya respondió (desde Backend o en la Sesión actual)
+                    val yaRespondio = item.encuestaRespondida || viewModel.encuestasRespondidas.contains(actId)
 
                     TarjetaMiInscripcion(
                         inscripcion = item,

@@ -34,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.familiasquesuman.domain.Donacion
 import com.example.familiasquesuman.domain.TipoDonacion
+import com.example.familiasquesuman.ui.components.EstadoErrorServidor
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
@@ -50,6 +51,7 @@ fun DonacionScreen(
 ) {
     val donaciones by viewModel.donaciones.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
     val tabSeleccionada by viewModel.tabSeleccionada.collectAsState()
     val categoriaSeleccionada by viewModel.categoriaSeleccionada.collectAsState()
     val listaFiltros = listOf("Todos", "Juguetes", "Ropa", "Alimentos", "Higiene", "Electrónicos", "Salud", "Útiles")
@@ -97,7 +99,7 @@ fun DonacionScreen(
                 }
             }
 
-            if (tabSeleccionada == 1) {
+            if (tabSeleccionada == 1 && error == null) {
                 item {
                     LazyRow(
                         modifier = Modifier
@@ -121,7 +123,7 @@ fun DonacionScreen(
                 }
             }
 
-            // --- Lógica de Carga y Estado Vacío ---
+            // --- Lógica de Carga, Error y Estado Vacío ---
             if (isLoading) {
                 item {
                     Box(
@@ -132,6 +134,17 @@ fun DonacionScreen(
                     ) {
                         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                     }
+                }
+            } else if (error != null) {
+                item {
+                    EstadoErrorServidor(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 24.dp),
+                        onReintentar = {
+                            viewModel.cargarDonaciones()
+                        }
+                    )
                 }
             } else if (donacionesAMostrar.isEmpty()) {
                 item {

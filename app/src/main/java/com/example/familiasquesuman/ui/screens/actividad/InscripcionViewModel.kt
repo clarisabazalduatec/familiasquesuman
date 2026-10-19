@@ -3,6 +3,7 @@ package com.example.familiasquesuman.ui.screens.actividad
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.familiasquesuman.data.SesionManager
+import com.example.familiasquesuman.data.remote.dto.EncuestaInicialRequest
 import com.example.familiasquesuman.data.remote.dto.FamiliaDto
 import com.example.familiasquesuman.data.remote.dto.InscripcionDto
 import com.example.familiasquesuman.data.repository.FamiliaRepository
@@ -25,7 +26,9 @@ data class InscripcionUiState(
     val error: String? = null,
     val listo: Boolean = false,
     val mostrarDialogoListaEspera: Boolean = false,
-    val agregadoListaEspera: Boolean = false
+    val agregadoListaEspera: Boolean = false,
+    val mostrarEncuestaInicial: Boolean = false,
+    val enviandoEncuesta: Boolean = false
 )
 
 class InscripcionViewModel(
@@ -118,10 +121,11 @@ class InscripcionViewModel(
         }
 
         if (state.guardando) return
+        val esNuevaInscripcion = state.inscripcionActual == null
         _uiState.update { it.copy(guardando = true, error = null, mostrarDialogoListaEspera = false) }
 
         viewModelScope.launch {
-            val resultado = if (state.inscripcionActual == null) {
+            val resultado = if (esNuevaInscripcion) {
                 inscripcionRepo.inscribir(actividadId, adultos, menores, listaEspera)
             } else {
                 inscripcionRepo.modificarInscripcion(actividadId, adultos, menores, listaEspera)
@@ -137,7 +141,17 @@ class InscripcionViewModel(
                             agregadoListaEspera = true
                         )
                     }
+                } else if (esNuevaInscripcion) {
+                    // Si es una inscripción nueva y exitosa, activamos el diálogo de la encuesta inicial
+                    _uiState.update {
+                        it.copy(
+                            guardando = false,
+                            inscripcionActual = inscripcion,
+                            mostrarEncuestaInicial = true
+                        )
+                    }
                 } else {
+                    // Modo edición
                     _uiState.update {
                         it.copy(
                             guardando = false,
@@ -156,18 +170,18 @@ class InscripcionViewModel(
                         (parsedDetail.contains("inscrit") || parsedDetail.contains("registr") || parsedDetail.contains("exist"))
 
                 val isCupoAgotado = (!isYaInscrito && !listaEspera) && (
-                    code == 409 || code == 400 || code == 422 ||
-                    parsedDetail.contains("cupo") ||
-                    parsedDetail.contains("llen") ||
-                    parsedDetail.contains("lugares") ||
-                    parsedDetail.contains("agotado") ||
-                    parsedDetail.contains("espacios") ||
-                    rawError.contains("cupo", ignoreCase = true) ||
-                    rawError.contains("llena", ignoreCase = true) ||
-                    rawError.contains("lleno", ignoreCase = true) ||
-                    rawError.contains("lugares", ignoreCase = true) ||
-                    rawError.contains("agotado", ignoreCase = true)
-                )
+                        code == 409 || code == 400 || code == 422 ||
+                                parsedDetail.contains("cupo") ||
+                                parsedDetail.contains("llen") ||
+                                parsedDetail.contains("lugares") ||
+                                parsedDetail.contains("agotado") ||
+                                parsedDetail.contains("espacios") ||
+                                rawError.contains("cupo", ignoreCase = true) ||
+                                rawError.contains("llena", ignoreCase = true) ||
+                                rawError.contains("lleno", ignoreCase = true) ||
+                                rawError.contains("lugares", ignoreCase = true) ||
+                                rawError.contains("agotado", ignoreCase = true)
+                        )
 
                 if (isCupoAgotado) {
                     _uiState.update {
@@ -177,7 +191,6 @@ class InscripcionViewModel(
                         )
                     }
                 } else {
-                    // Por si el servidor ya la había creado (o dice "ya estás inscrito"):
                     val inscExistente = inscripcionRepo.miInscripcion(actividadId).getOrNull()
                     if (inscExistente != null) {
                         _uiState.update {
@@ -197,6 +210,42 @@ class InscripcionViewModel(
                     }
                 }
             }
+        }
+    }
+
+    fun enviarEncuestaInicial(actividadId: String, request: EncuestaInicialRequest) {
+        if (_uiState.value.enviandoEncuesta) return
+        _uiState.update { it.copy(enviandoEncuesta = true, error = null) }
+
+        viewModelScope.launch {
+            inscripcionRepo.enviarEncuestaInicial(actividadId, request)
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            enviandoEncuesta = false,
+                            mostrarEncuestaInicial = false,
+                            listo = true
+                        )
+                    }
+                }
+                .onFailure {
+                    _uiState.update {
+                        it.copy(
+                            enviandoEncuesta = false,
+                            mostrarEncuestaInicial = false,
+                            listo = true
+                        )
+                    }
+                }
+        }
+    }
+
+    fun omitirEncuestaInicial() {
+        _uiState.update {
+            it.copy(
+                mostrarEncuestaInicial = false,
+                listo = true
+            )
         }
     }
 

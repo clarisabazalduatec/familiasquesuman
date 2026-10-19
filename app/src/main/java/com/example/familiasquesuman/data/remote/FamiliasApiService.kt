@@ -49,6 +49,7 @@ import com.example.familiasquesuman.data.remote.dto.ComentarioDto
 import com.example.familiasquesuman.data.remote.dto.CrearComentarioRequest
 import com.example.familiasquesuman.data.remote.dto.CrearPublicacionRequest
 import com.example.familiasquesuman.data.remote.dto.CrearAvisoOficialRequest
+import com.example.familiasquesuman.data.remote.dto.EncuestaInicialRequest
 import com.example.familiasquesuman.data.remote.dto.InsigniaDto
 import com.example.familiasquesuman.data.remote.dto.RechazarPublicacionRequest
 import com.example.familiasquesuman.domain.EncuestaActividadRequest
@@ -318,4 +319,11 @@ interface FamiliasApiService {
     // --- Insignias de actividades ---
     @GET("usuarios/me/insignias")
     suspend fun getMisInsignias(): List<InsigniaDto>
+
+    // --- Encuesta inicial ---
+    @POST("actividades/{actividad_id}/encuesta-inicial")
+    suspend fun enviarEncuestaInicial(
+        @Path("actividad_id") actividadId: String,
+        @Body request: EncuestaInicialRequest
+    ): Response<ResponseBody>
 }

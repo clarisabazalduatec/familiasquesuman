@@ -28,6 +28,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.data.remote.dto.Parentescos
+import com.example.familiasquesuman.ui.screens.actividad.components.EncuestaInicialDialog
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
@@ -55,7 +56,7 @@ fun ActividadSeleccionParticipantesScreen(
     val detalleState by actividadViewModel.detalleUiState.collectAsState()
     val inscripcionState by inscripcionViewModel.uiState.collectAsState()
 
-    // Manejar navegación al confirmar con éxito
+    // Manejar navegación al confirmar con éxito (después de enviar u omitir la encuesta inicial)
     LaunchedEffect(inscripcionState.listo) {
         if (inscripcionState.listo) {
             inscripcionViewModel.consumirListo()
@@ -73,6 +74,16 @@ fun ActividadSeleccionParticipantesScreen(
     }
 
     val miUsuarioId = SesionManager.usuario?.id
+
+    // ENCUESTA INICIAL TRAS INSCRIBIRSE
+    if (inscripcionState.mostrarEncuestaInicial) {
+        EncuestaInicialDialog(
+            isLoading = inscripcionState.enviandoEncuesta,
+            onSubmit = { request ->
+                inscripcionViewModel.enviarEncuestaInicial(actividadId, request)
+            }
+        )
+    }
 
     PantallaPrincipalConMenu(
         navController = navController,
