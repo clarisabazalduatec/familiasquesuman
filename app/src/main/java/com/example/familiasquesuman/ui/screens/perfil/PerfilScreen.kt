@@ -1,43 +1,41 @@
 package com.example.familiasquesuman.ui.screens.perfil
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import com.example.familiasquesuman.ui.components.PantallaPrincipal
-import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
-import com.example.familiasquesuman.ui.screens.inicio.SaludoConUbicacion
-import com.example.familiasquesuman.ui.theme.*
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.TextButton
-import com.example.familiasquesuman.data.SesionManager
-import com.example.familiasquesuman.ui.navigation.Rutas
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.PhotoLibrary
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Icon
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.example.familiasquesuman.data.SesionManager
+import com.example.familiasquesuman.ui.components.PantallaPrincipal
+import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.screens.inicio.SaludoConUbicacion
+import com.example.familiasquesuman.ui.theme.*
 
-enum class SeccionPerfil { INFORMACION,  ACTIVIDADES}
+enum class SeccionPerfil { INFORMACION, ACTIVIDADES }
+
 @Composable
 fun PerfilScreen(
     navController: NavHostController,
@@ -47,7 +45,7 @@ fun PerfilScreen(
     var seccionSeleccionada by remember { mutableStateOf(SeccionPerfil.INFORMACION) }
     val context = LocalContext.current
 
-    // Avisos cortos después de una acción ("Invitación enviada", errores de botones sueltos...)
+    // Avisos cortos después de una acción
     LaunchedEffect(uiState.mensaje) {
         uiState.mensaje?.let {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -56,7 +54,8 @@ fun PerfilScreen(
     }
     val usuarioId = SesionManager.usuario?.id
     LaunchedEffect(usuarioId) { viewModel.cargar() }
-    // Galería del teléfono (selector de fotos del sistema: no pide permisos)
+
+    // Galería del teléfono
     val elegirFoto = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) viewModel.cambiarFoto(context.applicationContext.contentResolver, uri)
     }
@@ -69,11 +68,13 @@ fun PerfilScreen(
             elegirFoto.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
     )
+
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.PERFIL
     ) { paddingInterno ->
-        LazyColumn( modifier = Modifier
+        LazyColumn(
+            modifier = Modifier
                 .padding(paddingInterno)
                 .fillMaxSize()
                 .background(CremaFondo),
@@ -85,23 +86,22 @@ fun PerfilScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item { SaludoConUbicacion(
-                nombreUsuario = com.example.familiasquesuman.data.SesionManager.usuario?.nombre
-                    ?.substringBefore(" ") ?: "familia",
-                ciudad = "Monterrey, NL",
-                // Solo con sesión se puede cambiar la foto
-                onClickFoto = if (SesionManager.estaAutenticado) {
-                    { viewModel.abrirDialogo(DialogoPerfil.Foto) }
-                } else null,
-                subiendoFoto = uiState.subiendoFoto
-            )
+            item {
+                SaludoConUbicacion(
+                    nombreUsuario = SesionManager.usuario?.nombre
+                        ?.substringBefore(" ") ?: "familia",
+                    ciudad = "Monterrey, NL",
+                    onClickFoto = if (SesionManager.estaAutenticado) {
+                        { viewModel.abrirDialogo(DialogoPerfil.Foto) }
+                    } else null,
+                    subiendoFoto = uiState.subiendoFoto
+                )
             }
 
-            item { SelectorPerfil(
+            item {
+                SelectorPerfil(
                     seleccion = seccionSeleccionada,
-                    onSeleccionChange = {
-                        seccionSeleccionada = it
-                    }
+                    onSeleccionChange = { seccionSeleccionada = it }
                 )
             }
 
@@ -153,14 +153,18 @@ fun PerfilScreen(
                         }
                     }
                 }
-                item { MisInsigniasCard() }
+
+                // Conexión corregida pasando las insignias del estado
+                item { MisInsigniasCard(insignias = uiState.insignias) }
             }
+
             if (seccionSeleccionada == SeccionPerfil.ACTIVIDADES) {
                 item { MisActividadesPerfil(navController = navController) }
             }
-            }
         }
     }
+}
+
 /** Muestra el diálogo que indique el estado (o ninguno). */
 @Composable
 private fun DialogosPerfil(
@@ -261,7 +265,7 @@ private fun DialogoFotoPerfil(
 }
 
 @Composable
-private fun OpcionFoto(icono: ImageVector, texto: String, color: androidx.compose.ui.graphics.Color, onClick: () -> Unit) {
+private fun OpcionFoto(icono: ImageVector, texto: String, color: Color, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -275,76 +279,55 @@ private fun OpcionFoto(icono: ImageVector, texto: String, color: androidx.compos
         Text(text = texto, color = color, fontSize = 16.sp)
     }
 }
+
 @Composable
-fun SelectorPerfil(seleccion: SeccionPerfil, onSeleccionChange: (SeccionPerfil) -> Unit)
-{
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .height(52.dp)
-        .background(
-            color = CremaFondo,
-            shape = RoundedCornerShape(30.dp)
-        ),
+fun SelectorPerfil(seleccion: SeccionPerfil, onSeleccionChange: (SeccionPerfil) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp)
+            .background(
+                color = CremaFondo,
+                shape = RoundedCornerShape(30.dp)
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-
-        Box(modifier = Modifier
-            .weight(1f)
-            .fillMaxHeight()
-            .padding(3.dp)
-            .background(
-                color = if (seleccion == SeccionPerfil.INFORMACION) {
-                    Ambar
-                } else {
-                    CremaFondo
-                },
-                shape = RoundedCornerShape(28.dp)
-            )
-            .clickable { onSeleccionChange(SeccionPerfil.INFORMACION)
-            },
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(3.dp)
+                .background(
+                    color = if (seleccion == SeccionPerfil.INFORMACION) Ambar else CremaFondo,
+                    shape = RoundedCornerShape(28.dp)
+                )
+                .clickable { onSeleccionChange(SeccionPerfil.INFORMACION) },
             contentAlignment = Alignment.Center
         ) {
-
-            Text( text = "Mi información",
-                color = if (seleccion == SeccionPerfil.INFORMACION) { androidx.compose.ui.graphics.Color.White
-                } else {
-                    AzulMarino.copy(alpha = 0.65f)
-                },
-                fontWeight = if (seleccion == SeccionPerfil.INFORMACION) { FontWeight.SemiBold
-                } else {
-                    FontWeight.Normal
-                },
+            Text(
+                text = "Mi información",
+                color = if (seleccion == SeccionPerfil.INFORMACION) Color.White else AzulMarino.copy(alpha = 0.65f),
+                fontWeight = if (seleccion == SeccionPerfil.INFORMACION) FontWeight.SemiBold else FontWeight.Normal,
                 fontSize = 15.sp
             )
         }
 
-        Box( modifier = Modifier
-            .weight(1f)
-            .fillMaxHeight()
-            .padding(3.dp)
-            .background(
-                color = if (seleccion == SeccionPerfil.ACTIVIDADES) {
-                    Ambar
-                } else {
-                    CremaFondo
-                },
-                shape = RoundedCornerShape(28.dp)
-            )
-            .clickable { onSeleccionChange(SeccionPerfil.ACTIVIDADES)
-            },
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(3.dp)
+                .background(
+                    color = if (seleccion == SeccionPerfil.ACTIVIDADES) Ambar else CremaFondo,
+                    shape = RoundedCornerShape(28.dp)
+                )
+                .clickable { onSeleccionChange(SeccionPerfil.ACTIVIDADES) },
             contentAlignment = Alignment.Center
         ) {
-
-            Text( text = "Mis actividades",
-                color = if (seleccion == SeccionPerfil.ACTIVIDADES) {
-                    androidx.compose.ui.graphics.Color.White
-                } else {
-                    AzulMarino.copy(alpha = 0.65f)
-                },
-                fontWeight = if (seleccion == SeccionPerfil.ACTIVIDADES) { FontWeight.SemiBold
-                } else {
-                    FontWeight.Normal
-                },
+            Text(
+                text = "Mis actividades",
+                color = if (seleccion == SeccionPerfil.ACTIVIDADES) Color.White else AzulMarino.copy(alpha = 0.65f),
+                fontWeight = if (seleccion == SeccionPerfil.ACTIVIDADES) FontWeight.SemiBold else FontWeight.Normal,
                 fontSize = 15.sp
             )
         }
@@ -354,7 +337,8 @@ fun SelectorPerfil(seleccion: SeccionPerfil, onSeleccionChange: (SeccionPerfil) 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PerfilScreenPreview() {
-    FamiliasQueSumanTheme {  val navController = rememberNavController()
-        PerfilScreen(  navController = navController )
+    FamiliasQueSumanTheme {
+        val navController = rememberNavController()
+        PerfilScreen(navController = navController)
     }
 }
