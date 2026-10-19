@@ -32,6 +32,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.screens.actividad.components.EncuestaInicialDialog
 import com.example.familiasquesuman.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +63,16 @@ fun ActividadConfirmacionScreen(
 
     BackHandler {
         regresarAlDetalle()
+    }
+
+    // ENCUESTA INICIAL AL CONFIRMAR LA INSCRIPCIÓN
+    if (inscripcionState.mostrarEncuestaInicial) {
+        EncuestaInicialDialog(
+            isLoading = inscripcionState.enviandoEncuesta,
+            onSubmit = { request ->
+                inscripcionViewModel.enviarEncuestaInicial(actividadId, request)
+            }
+        )
     }
 
     PantallaPrincipalConMenu(

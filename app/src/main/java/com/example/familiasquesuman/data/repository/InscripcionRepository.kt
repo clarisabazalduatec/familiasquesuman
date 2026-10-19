@@ -3,6 +3,7 @@ package com.example.familiasquesuman.data.repository
 import com.example.familiasquesuman.data.remote.RetrofitInstance
 import com.example.familiasquesuman.data.remote.dto.AsistenciaGuardarDto
 import com.example.familiasquesuman.data.remote.dto.AsistenciaItemDto
+import com.example.familiasquesuman.data.remote.dto.EncuestaInicialRequest
 import com.example.familiasquesuman.data.remote.dto.InscripcionAdminDto
 import com.example.familiasquesuman.data.remote.dto.InscripcionDto
 import com.example.familiasquesuman.data.remote.dto.InscripcionGuardarDto
@@ -69,5 +70,15 @@ class InscripcionRepository {
         inscripcionId: Any
     ): Result<Unit> = llamarApi {
         api.borrarInscripcionAdmin(actividadId, inscripcionId)
+    }
+
+    suspend fun enviarEncuestaInicial(
+        actividadId: String,
+        request: EncuestaInicialRequest
+    ): Result<Unit> = runCatching {
+        val res = api.enviarEncuestaInicial(actividadId, request)
+        if (!res.isSuccessful) {
+            error("Error al enviar la encuesta inicial")
+        }
     }
 }
