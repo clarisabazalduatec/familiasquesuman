@@ -43,12 +43,8 @@ fun TarjetaComunidad(
 ) {
 
 
-    var pestanaSeleccionada by rememberSaveable {
-        mutableStateOf("Oficial")
-    }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
+    var pestanaSeleccionada by rememberSaveable { mutableStateOf("Oficial") }
+    Card(modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(
             containerColor = Blanco
@@ -58,64 +54,38 @@ fun TarjetaComunidad(
         )
     ) {
 
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-
-                Surface(
-                    modifier = Modifier.size(54.dp),
+                Surface(modifier = Modifier.size(54.dp),
                     shape = CircleShape,
                     color = AmbarClaro
                 ) {
-
-                    Box(
-                        contentAlignment = Alignment.Center
-                    ) {
-
-                        Icon(
-                            imageVector = Icons.Default.Groups,
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(imageVector = Icons.Default.Groups,
                             contentDescription = null,
                             tint = AzulMarino,
                             modifier = Modifier.size(28.dp)
                         )
                     }
                 }
-
-                Spacer(
-                    modifier = Modifier.width(12.dp)
-                )
-
-                Column(
-                    modifier = Modifier.weight(1f)
-                ) {
-
-                    Text(
-                        text = "Comunidad",
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = "Comunidad",
                         style = MaterialTheme.typography.titleLarge,
                         color = AzulMarino
                     )
-
-                    Text(
-                        text = "Consulta avisos oficiales y comparte experiencias de otras familias.",
+                    Text(text = "Consulta avisos oficiales y comparte experiencias de otras familias.",
                         style = MaterialTheme.typography.bodySmall,
                         color = GrisTexto
                     )
                 }
             }
-
-            Spacer(
-                modifier = Modifier.height(16.dp)
-            )
+            Spacer(modifier = Modifier.height(16.dp))
 
             //tabs
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
+            Surface(modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
                 color = Color.Transparent,
                 border = androidx.compose.foundation.BorderStroke(
@@ -123,18 +93,13 @@ fun TarjetaComunidad(
                     color = GrisBorde
                 )
             ) {
-
-                Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                Row(modifier = Modifier.fillMaxWidth()) {
 
                     // AVISOS OFICIALES
-                    Box(
-                        modifier = Modifier
+                    Box(modifier = Modifier
                             .weight(1f)
                             .height(42.dp)
-                            .clip(
-                                RoundedCornerShape(
+                            .clip(RoundedCornerShape(
                                     topStart = 22.dp,
                                     bottomStart = 22.dp
                                 )
@@ -146,14 +111,11 @@ fun TarjetaComunidad(
                                     Blanco
                                 }
                             )
-                            .clickable {
-                                pestanaSeleccionada = "Oficial"
-                            },
+                            .clickable { pestanaSeleccionada = "Oficial" },
                         contentAlignment = Alignment.Center
                     ) {
 
-                        Text(
-                            text = "Avisos Oficiales",
+                        Text(text = "Avisos Oficiales",
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
                             color =
@@ -166,12 +128,10 @@ fun TarjetaComunidad(
                     }
 
                     // COMUNIDAD
-                    Box(
-                        modifier = Modifier
+                    Box(modifier = Modifier
                             .weight(1f)
                             .height(42.dp)
-                            .clip(
-                                RoundedCornerShape(
+                            .clip(RoundedCornerShape(
                                     topEnd = 22.dp,
                                     bottomEnd = 22.dp
                                 )
@@ -183,14 +143,11 @@ fun TarjetaComunidad(
                                     Blanco
                                 }
                             )
-                            .clickable {
-                                pestanaSeleccionada = "Comunidad"
-                            },
+                            .clickable { pestanaSeleccionada = "Comunidad" },
                         contentAlignment = Alignment.Center
                     ) {
 
-                        Text(
-                            text = "Comunidad",
+                        Text(text = "Comunidad",
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
                             color =
@@ -204,67 +161,40 @@ fun TarjetaComunidad(
                 }
             }
 
-            Spacer(
-                modifier = Modifier.height(14.dp)
-            )
-
-
+            Spacer(modifier = Modifier.height(14.dp))
             if (pestanaSeleccionada == "Oficial") {
                 if (ultimoAviso != null) {
                     ContenidoAvisoOficial(
                         publicacion = ultimoAviso,
-                        onClick = {
-                            onAbrirPublicacion(ultimoAviso.id)
-                        }
+                        onClick = { onAbrirPublicacion(ultimoAviso.id) }
                     )
                 } else {
-                    Text(
-                        text = "No hay avisos oficiales disponibles.",
+                    Text(text = "No hay avisos oficiales disponibles.",
                         color = GrisTexto
                     )
                 }
             } else {
                 if (ultimaPublicacion != null) {
-                    ContenidoComunidad(
-                        publicacion = ultimaPublicacion,
-                        onClick = {
-                            onAbrirPublicacion(ultimaPublicacion.id)
-                        }
+                    ContenidoComunidad(publicacion = ultimaPublicacion,
+                        onClick = { onAbrirPublicacion(ultimaPublicacion.id) }
                     )
                 } else {
-                    Text(
-                        text = "No hay publicaciones disponibles.",
+                    Text(text = "No hay publicaciones disponibles.",
                         color = GrisTexto
                     )
                 }
             }
-
-            Spacer(
-                modifier = Modifier.height(10.dp)
-            )
-
-
-            TextButton(
-                onClick = onVerComunidad,
+            Spacer(modifier = Modifier.height(10.dp))
+            TextButton(onClick = onVerComunidad,
                 modifier = Modifier.fillMaxWidth()
             ) {
-
-                Spacer(
-                    modifier = Modifier.weight(1f)
-                )
-
-                Text(
-                    text = "Ver comunidad",
+                Spacer(modifier = Modifier.weight(1f))
+                Text(text = "Ver comunidad",
                     style = MaterialTheme.typography.titleSmall,
                     color = AzulMarino
                 )
-
-                Spacer(
-                    modifier = Modifier.width(4.dp)
-                )
-
-                Icon(
-                    imageVector = Icons.Outlined.ChevronRight,
+                Spacer(modifier = Modifier.width(4.dp))
+                Icon(imageVector = Icons.Outlined.ChevronRight,
                     contentDescription = null,
                     tint = AzulMarino,
                     modifier = Modifier.size(20.dp)
@@ -276,22 +206,15 @@ fun TarjetaComunidad(
 
 //avisios oficiales
 @Composable
-private fun ContenidoAvisoOficial(
-    publicacion: PublicacionComunidadUi,
-    onClick: () -> Unit
-) {
-
-    Row(
-        modifier = Modifier
+private fun ContenidoAvisoOficial(publicacion: PublicacionComunidadUi, onClick: () -> Unit) {
+    Row(modifier = Modifier
             .fillMaxWidth()
             .clickable {
                 onClick()
             },
         verticalAlignment = Alignment.CenterVertically
     ) {
-
-        AsyncImage(
-            model = publicacion.imagenUrl,
+        AsyncImage(model = publicacion.imagenUrl,
             contentDescription = "Aviso oficial",
             modifier = Modifier
                 .width(120.dp)
@@ -299,48 +222,27 @@ private fun ContenidoAvisoOficial(
                 .clip(RoundedCornerShape(14.dp)),
             contentScale = ContentScale.Crop
         )
-
-        Spacer(
-            modifier = Modifier.width(12.dp)
-        )
-
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Icon(
-                    imageVector = Icons.Outlined.Campaign,
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(imageVector = Icons.Outlined.Campaign,
                     contentDescription = null,
                     tint = AzulMarino,
                     modifier = Modifier.size(16.dp)
                 )
-
-                Spacer(
-                    modifier = Modifier.width(5.dp)
-                )
-
-                Text(
-                    text = "Aviso oficial",
+                Spacer(modifier = Modifier.width(5.dp))
+                Text(text = "Aviso oficial",
                     style = MaterialTheme.typography.labelSmall,
                     color = AzulMarino
                 )
             }
-
-            Spacer(
-                modifier = Modifier.height(5.dp)
-            )
-
-            Text(
-                text = publicacion.titulo.orEmpty(),                style = MaterialTheme.typography.titleSmall,
+            Spacer(modifier = Modifier.height(5.dp))
+            Text(text = publicacion.titulo.orEmpty(),
+                style = MaterialTheme.typography.titleSmall,
                 color = AzulMarino
             )
-
-            Text(
-                text = publicacion.contenido,                style = MaterialTheme.typography.bodySmall,
+            Text(text = publicacion.contenido,
+                style = MaterialTheme.typography.bodySmall,
                 color = GrisTexto,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
@@ -352,72 +254,43 @@ private fun ContenidoAvisoOficial(
 
 //comunidad
 @Composable
-private fun ContenidoComunidad(
-    publicacion: PublicacionComunidadUi,
-    onClick: () -> Unit
-) {
-
-    Column(
-        modifier = Modifier
+private fun ContenidoComunidad(publicacion: PublicacionComunidadUi, onClick: () -> Unit) {
+    Column(modifier = Modifier
             .fillMaxWidth()
             .clickable {
                 onClick()
             }
     ) {
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-
-            Surface(
-                modifier = Modifier.size(36.dp),
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Surface(modifier = Modifier.size(36.dp),
                 shape = CircleShape,
                 color = AmbarClaro
             ) {
-
-                Box(
-                    contentAlignment = Alignment.Center
-                ) {
-
-                    Icon(
-                        imageVector = Icons.Default.Groups,
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(imageVector = Icons.Default.Groups,
                         contentDescription = null,
                         tint = AzulMarino,
                         modifier = Modifier.size(20.dp)
                     )
                 }
             }
-
-            Spacer(
-                modifier = Modifier.width(9.dp)
-            )
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-
-                Text(
-                    text = publicacion.autor,
+            Spacer(modifier = Modifier.width(9.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = publicacion.autor,
                     style = MaterialTheme.typography.titleSmall,
                     color = AzulMarino
                 )
-
-                Text(
-                    text = publicacion.tiempoRelativo,
+                Text(text = publicacion.tiempoRelativo,
                     style = MaterialTheme.typography.labelSmall,
                     color = GrisTexto
                 )
             }
         }
-
         Spacer(modifier = Modifier.height(10.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
+        Row(modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically)
         {
-            AsyncImage(
-                model = publicacion.imagenUrl,
+            AsyncImage(model = publicacion.imagenUrl,
                 contentDescription = "Publicación de comunidad",
                 modifier = Modifier
                     .width(120.dp)
@@ -426,25 +299,17 @@ private fun ContenidoComunidad(
                 contentScale = ContentScale.Crop
             )
             Spacer(modifier = Modifier.width(12.dp))
-
-            Column(
-                modifier = Modifier.weight(1f))
-            {
-
-                Text(
-                    text = publicacion.contenido,
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = publicacion.contenido,
                     style = MaterialTheme.typography.bodySmall,
                     color = GrisTexto,
                     maxLines = 4,
                     overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Row(verticalAlignment = Alignment.CenterVertically)
                 {
-                    Icon(
-                        imageVector = if (publicacion.meGusta) {
-                            Icons.Filled.Favorite
+                    Icon(imageVector = if (publicacion.meGusta) { Icons.Filled.Favorite
                         } else {
                             Icons.Outlined.FavoriteBorder
                         },
@@ -457,25 +322,18 @@ private fun ContenidoComunidad(
                         modifier = Modifier.size(17.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-
-                    Text(
-                        text = "${publicacion.numeroLikes}",
+                    Text(text = "${publicacion.numeroLikes}",
                         style = MaterialTheme.typography.labelSmall,
                         color = AzulMarino
                     )
                     Spacer(modifier = Modifier.width(16.dp))
-
-                    Icon(
-                        imageVector =
-                            Icons.Outlined.ChatBubbleOutline,
+                    Icon(imageVector = Icons.Outlined.ChatBubbleOutline,
                         contentDescription = null,
                         tint = AzulMarino,
                         modifier = Modifier.size(17.dp)
                     )
-
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${publicacion.numeroComentarios}",
+                    Text(text = "${publicacion.numeroComentarios}",
                         style = MaterialTheme.typography.labelSmall,
                         color = AzulMarino
                     )

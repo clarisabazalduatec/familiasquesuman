@@ -28,22 +28,18 @@ fun TarjetaPublicacion(
 ) {
     val repository = remember { ComunidadRepository() }
     val scope = rememberCoroutineScope()
-
     var tieneLike by remember(
         publicacion.id,
         publicacion.meGusta,
         publicacion.numeroLikes
     ) { mutableStateOf(publicacion.meGusta) }
-
     var likes by remember(
         publicacion.id,
         publicacion.meGusta,
         publicacion.numeroLikes
     ) { mutableIntStateOf(publicacion.numeroLikes) }
-
     var guardandoLike by remember(publicacion.id) { mutableStateOf(false) }
     var errorLike by remember(publicacion.id) { mutableStateOf<String?>(null) }
-
     LaunchedEffect(publicacion.meGusta, publicacion.numeroLikes) {
         if (!guardandoLike) {
             tieneLike = publicacion.meGusta
@@ -51,16 +47,14 @@ fun TarjetaPublicacion(
         }
     }
 
-    Card(
-        onClick = onClick,
+    Card(onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = Blanco),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column {
-            Row(
-                modifier = Modifier.padding(
+            Row(modifier = Modifier.padding(
                     start = 14.dp,
                     end = 14.dp,
                     top = 14.dp,
@@ -68,42 +62,35 @@ fun TarjetaPublicacion(
                 ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                FotoPerfil(
-                    fotoUrl = publicacion.autorFotoUrl,
+                FotoPerfil(fotoUrl = publicacion.autorFotoUrl,
                     nombre = publicacion.autor,
                     tamano = 42.dp
                 )
                 Spacer(Modifier.width(9.dp))
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = publicacion.autor,
+                    Text(text = publicacion.autor,
                         style = MaterialTheme.typography.titleSmall,
                         color = AzulMarino
                     )
-                    Text(
-                        text = publicacion.tiempoRelativo,
+                    Text(text = publicacion.tiempoRelativo,
                         style = MaterialTheme.typography.bodySmall,
                         color = GrisTexto
                     )
                 }
-
                 val etiqueta = if (publicacion.tipo == TipoPublicacion.OFICIAL) {
                     "Aviso Oficial"
                 } else {
                     publicacion.categoria
                 }
-
                 etiqueta?.let { texto ->
-                    Surface(
-                        shape = RoundedCornerShape(50),
+                    Surface(shape = RoundedCornerShape(50),
                         color = if (publicacion.tipo == TipoPublicacion.OFICIAL) {
                             AzulMarino.copy(alpha = .12f)
                         } else {
                             Ambar.copy(alpha = .28f)
                         }
                     ) {
-                        Text(
-                            text = texto,
+                        Text(text = texto,
                             modifier = Modifier.padding(
                                 horizontal = 10.dp,
                                 vertical = 5.dp
@@ -116,8 +103,7 @@ fun TarjetaPublicacion(
             }
 
             publicacion.imagenUrl?.takeIf { it.isNotBlank() }?.let { url ->
-                AsyncImage(
-                    model = url,
+                AsyncImage(model = url,
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -125,34 +111,27 @@ fun TarjetaPublicacion(
                     contentScale = ContentScale.Crop
                 )
             }
-
             Column(modifier = Modifier.padding(14.dp)) {
                 publicacion.titulo?.takeIf { it.isNotBlank() }?.let { titulo ->
-                    Text(
-                        text = titulo,
+                    Text(text = titulo,
                         style = MaterialTheme.typography.titleMedium,
                         color = AzulMarino
                     )
                     Spacer(Modifier.height(4.dp))
                 }
-
-                Text(
-                    text = publicacion.contenido,
+                Text(text = publicacion.contenido,
                     style = MaterialTheme.typography.bodyMedium,
                     color = AzulMarino,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
-
                 if (publicacion.fechaEvento != null || publicacion.horarioEvento != null || publicacion.ubicacion != null) {
                     Spacer(Modifier.height(8.dp))
                     publicacion.fechaEvento?.let { FilaDato(Icons.Outlined.CalendarMonth, it) }
                     publicacion.horarioEvento?.let { FilaDato(Icons.Outlined.Schedule, it) }
                     publicacion.ubicacion?.let { FilaDato(Icons.Outlined.LocationOn, it) }
                 }
-
                 Spacer(Modifier.height(10.dp))
-
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(
                         onClick = {
@@ -188,38 +167,26 @@ fun TarjetaPublicacion(
                             tint = if (tieneLike) ColorError else AzulMarino
                         )
                     }
-                    Text(
-                        text = likes.toString(),
+                    Text(text = likes.toString(),
                         style = MaterialTheme.typography.bodySmall,
                         color = AzulMarino
                     )
                     Spacer(Modifier.width(14.dp))
                     IconButton(onClick = onClick, modifier = Modifier.size(36.dp)) {
-                        Icon(
-                            imageVector = Icons.Outlined.ChatBubbleOutline,
+                        Icon(imageVector = Icons.Outlined.ChatBubbleOutline,
                             contentDescription = "Comentarios",
                             tint = AzulMarino
                         )
                     }
 
-                    Text(
-                        text = publicacion.numeroComentarios.toString(),
+                    Text(text = publicacion.numeroComentarios.toString(),
                         style = MaterialTheme.typography.bodySmall,
                         color = AzulMarino
                     )
-                    Spacer(Modifier.weight(1f))
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.Outlined.Share,
-                            contentDescription = "Compartir",
-                            tint = AzulMarino
-                        )
-                    }
-                }
 
+                }
                 errorLike?.let { mensaje ->
-                    Text(
-                        text = mensaje,
+                    Text(text = mensaje,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -231,8 +198,7 @@ fun TarjetaPublicacion(
 
 @Composable
 private fun FilaDato(icono: androidx.compose.ui.graphics.vector.ImageVector, texto: String) {
-    Row(
-        modifier = Modifier.padding(vertical = 3.dp),
+    Row(modifier = Modifier.padding(vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -242,8 +208,7 @@ private fun FilaDato(icono: androidx.compose.ui.graphics.vector.ImageVector, tex
             tint = AzulMarino
         )
         Spacer(Modifier.width(8.dp))
-        Text(
-            text = texto,
+        Text(text = texto,
             style = MaterialTheme.typography.bodySmall,
             color = AzulMarino
         )

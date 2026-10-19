@@ -73,11 +73,8 @@ class ComunidadRepository {
                 categoriaId = categoriaId,
                 imagenes = imagenes
             )
-
             val respuesta = RetrofitInstance.api.crearPublicacionComunidad(datos)
-
             Result.success(respuesta.toDomain())
-
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -95,7 +92,6 @@ class ComunidadRepository {
         publicoObjetivo: String? = null,
     ): Result<Unit> {
         return try {
-
             val datos = CrearAvisoOficialRequest(
                     titulo = titulo,
                 contenido = contenido,
@@ -104,12 +100,8 @@ class ComunidadRepository {
                 eventoTerminaEn = eventoTerminaEn,
                 publicoObjetivo = publicoObjetivo,
             )
-
-
             RetrofitInstance.api.crearAvisoOficial(datos)
-
             Result.success(Unit)
-
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -137,7 +129,6 @@ class ComunidadRepository {
     }
 
     // ---------- Admin: Moderación de Comunidad ----------
-
     // Obtener publicaciones pendientes
     suspend fun obtenerPublicacionesPendientes(): Result<List<PublicacionComunidadUi>> {
         return try {
@@ -192,10 +183,7 @@ class ComunidadRepository {
         motivo: String
     ): Result<Unit> {
         return try {
-            val datos = RechazarPublicacionRequest(
-                motivoRechazo = motivo
-            )
-
+            val datos = RechazarPublicacionRequest(motivoRechazo = motivo)
             RetrofitInstance.api.rechazarPublicacion(id, datos)
             Result.success(Unit)
         } catch (e: CancellationException) {
@@ -206,7 +194,6 @@ class ComunidadRepository {
     }
 
     //comentarios
-
     suspend fun publicarComentario(
         publicacionId: String,
         contenido: String
@@ -216,7 +203,6 @@ class ComunidadRepository {
                 id = publicacionId,
                 comentario = CrearComentarioRequest(contenido = contenido)
             )
-
             Result.success(respuesta.toDomain())
         } catch (e: Exception) {
             Result.failure(e)

@@ -72,7 +72,11 @@ fun PantallaPrincipalConMenu(
         scope.launch { drawerState.close() }
         if (navController.currentDestination?.route != route) {
             try {
-                when (route) {
+                when (route) {Rutas.SobreNosotros.ruta -> {
+                    navController.navigate(route) {
+                        launchSingleTop = true
+                    }
+                }
                     Rutas.Inicio.ruta -> {
                         navController.navigate(Rutas.Inicio.ruta) {
                             popUpTo(navController.graph.startDestinationId) {

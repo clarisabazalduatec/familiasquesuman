@@ -214,53 +214,23 @@ interface FamiliasApiService {
     @GET("comunidad/{id}/comentarios") suspend fun obtenerComentariosPublicacion(@Path("id") id: String, @Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<ComentarioDto>
     @POST("comunidad/{id}/comentarios") suspend fun publicarComentario(@Path("id") id: String, @Body comentario: CrearComentarioRequest): ComentarioDto
     // ---------- Admin: Moderación de Comunidad ----------
-    @GET("comunidad/pendientes")
-    suspend fun listarPublicacionesPendientes(
-        @Query("limit") limit: Int = 50,
-        @Query("offset") offset: Int = 0
-    ): List<PublicacionDto>
-
-    @POST("comunidad/{id}/aprobar")
-    suspend fun aprobarPublicacion(
-        @Path("id") id: String
-    ): PublicacionDto
-
-    @POST("comunidad/{id}/rechazar")
-    suspend fun rechazarPublicacion(
-        @Path("id") id: String,
-        @Body datos: RechazarPublicacionRequest
-    ): PublicacionDto
-
-    @GET("comunidad/aprobadas")
-    suspend fun listarPublicacionesAprobadas(): List<PublicacionDto>
-
-    @GET("comunidad/rechazadas")
-    suspend fun listarPublicacionesRechazadas(): List<PublicacionDto>
-
-    @GET("comunidad/mias")
-    suspend fun listarMisPublicaciones(
-        @Query("limit") limit: Int = 100,
-        @Query("offset") offset: Int = 0
-    ): List<PublicacionDto>
+    @GET("comunidad/pendientes") suspend fun listarPublicacionesPendientes(
+        @Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<PublicacionDto>
+    @POST("comunidad/{id}/aprobar") suspend fun aprobarPublicacion(@Path("id") id: String): PublicacionDto
+    @POST("comunidad/{id}/rechazar") suspend fun rechazarPublicacion(
+        @Path("id") id: String, @Body datos: RechazarPublicacionRequest): PublicacionDto
+    @GET("comunidad/aprobadas") suspend fun listarPublicacionesAprobadas(): List<PublicacionDto>
+    @GET("comunidad/rechazadas") suspend fun listarPublicacionesRechazadas(): List<PublicacionDto>
+    @GET("comunidad/mias") suspend fun listarMisPublicaciones(
+        @Query("limit") limit: Int = 100, @Query("offset") offset: Int = 0): List<PublicacionDto>
 
     // ---------- Admin: actividades ----------
-    @GET("actividades/admin")
-    suspend fun listarActividadesAdmin(@Query("limit") limit: Int = 100): List<ActividadDto>
-
-    @GET("actividades/admin/{id}")
-    suspend fun detalleActividadAdmin(@Path("id") id: String): ActividadDto
-
-    @POST("actividades")
-    suspend fun crearActividad(@Body datos: ActividadGuardarDto): ActividadDto
-
-    @PUT("actividades/{id}")
-    suspend fun editarActividad(@Path("id") id: String, @Body datos: ActividadGuardarDto): ActividadDto
-
-    @DELETE("actividades/{id}")
-    suspend fun borrarActividad(@Path("id") id: String)
-
-    @POST("categorias")
-    suspend fun crearCategoria(@Body datos: CategoriaCrearDto): CategoriaDto
+    @GET("actividades/admin") suspend fun listarActividadesAdmin(@Query("limit") limit: Int = 100): List<ActividadDto>
+    @GET("actividades/admin/{id}") suspend fun detalleActividadAdmin(@Path("id") id: String): ActividadDto
+    @POST("actividades") suspend fun crearActividad(@Body datos: ActividadGuardarDto): ActividadDto
+    @PUT("actividades/{id}") suspend fun editarActividad(@Path("id") id: String, @Body datos: ActividadGuardarDto): ActividadDto
+    @DELETE("actividades/{id}") suspend fun borrarActividad(@Path("id") id: String)
+    @POST("categorias") suspend fun crearCategoria(@Body datos: CategoriaCrearDto): CategoriaDto
 
     // ---------- Inscripciones ----------
     // Familia:
