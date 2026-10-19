@@ -41,7 +41,7 @@ import okhttp3.MultipartBody
 import retrofit2.http.Multipart
 import retrofit2.http.PUT
 import retrofit2.http.Part
-import retrofit2.http.Header
+import retrofit2.Response
 import com.example.familiasquesuman.data.remote.dto.CentroDto
 import com.example.familiasquesuman.data.remote.dto.CentroGuardarDto
 import com.example.familiasquesuman.data.remote.dto.PublicacionDto
@@ -50,6 +50,8 @@ import com.example.familiasquesuman.data.remote.dto.CrearComentarioRequest
 import com.example.familiasquesuman.data.remote.dto.CrearPublicacionRequest
 import com.example.familiasquesuman.data.remote.dto.CrearAvisoOficialRequest
 import com.example.familiasquesuman.data.remote.dto.RechazarPublicacionRequest
+import com.example.familiasquesuman.domain.EncuestaActividadRequest
+import okhttp3.ResponseBody
 
 /** El token lo agrega AuthInterceptor (en RetrofitInstance); no se pasa a mano. */
 interface FamiliasApiService {
@@ -301,5 +303,15 @@ interface FamiliasApiService {
 
     @POST("notificaciones/leidas")
     suspend fun marcarTodasLeidas()
+
+    // --- Encuesta después de una actividad ---
+    @POST("actividades/{actividad_id}/encuesta")
+    suspend fun enviarEncuestaActividad(
+        @Path("actividad_id") actividadId: String,
+        @Body encuesta: EncuestaActividadRequest
+    ): Response<Unit>
+
+    @GET("actividades/encuestas/exportar")
+    suspend fun exportarEncuestasCsv(): Response<ResponseBody>
 
 }
