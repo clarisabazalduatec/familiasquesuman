@@ -1,6 +1,7 @@
 package com.example.familiasquesuman.ui.screens.perfil
 
 import com.example.familiasquesuman.data.remote.dto.FamiliaDto
+import com.example.familiasquesuman.data.remote.dto.InsigniaDto
 import com.example.familiasquesuman.data.remote.dto.InvitacionRecibidaDto
 import com.example.familiasquesuman.data.remote.dto.MenorDto
 
@@ -28,7 +29,8 @@ data class PerfilUiState(
     val errorDialogo: String? = null,  // error que se muestra dentro del diálogo abierto
     val guardando: Boolean = false,
     val subiendoFoto: Boolean = false, // se está subiendo o quitando la foto de perfil// una acción está en curso (deshabilita botones)
-    val mensaje: String? = null        // aviso corto tras una acción
+    val mensaje: String? = null,        // aviso corto tras una acción
+    val insignias: List<InsigniaDto> = emptyList()
 ) {
     val tieneFamilia: Boolean get() = familia != null
 

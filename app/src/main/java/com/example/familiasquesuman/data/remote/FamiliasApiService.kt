@@ -49,6 +49,7 @@ import com.example.familiasquesuman.data.remote.dto.ComentarioDto
 import com.example.familiasquesuman.data.remote.dto.CrearComentarioRequest
 import com.example.familiasquesuman.data.remote.dto.CrearPublicacionRequest
 import com.example.familiasquesuman.data.remote.dto.CrearAvisoOficialRequest
+import com.example.familiasquesuman.data.remote.dto.InsigniaDto
 import com.example.familiasquesuman.data.remote.dto.RechazarPublicacionRequest
 import com.example.familiasquesuman.domain.EncuestaActividadRequest
 import okhttp3.ResponseBody
@@ -314,4 +315,7 @@ interface FamiliasApiService {
     @GET("actividades/encuestas/exportar")
     suspend fun exportarEncuestasCsv(): Response<ResponseBody>
 
+    // --- Insignias de actividades ---
+    @GET("usuarios/me/insignias")
+    suspend fun getMisInsignias(): List<InsigniaDto>
 }

@@ -15,6 +15,7 @@ import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
 import android.content.ContentResolver
 import android.net.Uri
+import com.example.familiasquesuman.data.remote.dto.InsigniaDto
 
 class FamiliaRepository {
 
@@ -73,6 +74,12 @@ class FamiliaRepository {
     suspend fun aceptarInvitacion(id: String): Result<FamiliaDto> = llamarApi { api.aceptarInvitacion(id) }
 
     suspend fun rechazarInvitacion(id: String): Result<Unit> = llamarApi { api.rechazarInvitacion(id) }
+
+    suspend fun misInsignias(): Result<List<InsigniaDto>> {
+        return runCatching {
+            api.getMisInsignias()
+        }
+    }
 }
 
 /**

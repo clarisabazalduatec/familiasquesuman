@@ -48,12 +48,16 @@ class PerfilViewModel(
             val perfil = async { repo.miPerfil() }
             val familia = async { repo.miFamilia() }
             val invitaciones = async { repo.misInvitaciones() }
+            val insignias = async { repo.misInsignias() }
 
             val p = perfil.await()
             val f = familia.await()
             val i = invitaciones.await()
+            val ins = insignias.await()
 
-            val error = listOf(p, f, i).firstNotNullOfOrNull { it.exceptionOrNull()?.message }
+            // Se agrega 'ins' a la lista de errores para saber si la API falló
+            val error = listOf(p, f, i, ins).firstNotNullOfOrNull { it.exceptionOrNull()?.message }
+
             _uiState.update {
                 it.copy(
                     cargando = false,
@@ -61,7 +65,8 @@ class PerfilViewModel(
                     miId = p.getOrNull()?.id ?: it.miId,
                     miParentesco = p.getOrNull()?.parentesco ?: it.miParentesco,
                     familia = if (f.isSuccess) f.getOrNull() else it.familia,
-                    invitacionesRecibidas = i.getOrNull() ?: it.invitacionesRecibidas
+                    invitacionesRecibidas = i.getOrNull() ?: it.invitacionesRecibidas,
+                    insignias = ins.getOrNull() ?: emptyList()
                 )
             }
         }
