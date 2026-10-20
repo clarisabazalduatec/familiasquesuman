@@ -27,7 +27,8 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
-
+import com.example.familiasquesuman.ui.components.EstadoVacio
+import com.example.familiasquesuman.ui.components.EstadoErrorServidor
 
 
 @Composable
@@ -101,14 +102,11 @@ fun DirectorioScreen(
                 }
             } else if (uiState.error != null && uiState.centros.isEmpty()) {
                 item {
-                    Column(Modifier.fillMaxWidth().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = uiState.error ?: "",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center,
-                        )
-                        TextButton(onClick = { viewModel.cargarLista() }) { Text("Reintentar") }
-                    }
+                    EstadoErrorServidor(
+                        onReintentar = {
+                            viewModel.cargarLista(ciudadId)
+                        }
+                    )
                 }
             } else if (centrosFiltrados.isEmpty()) {
                 item { EstadoVacioDirectorio() }

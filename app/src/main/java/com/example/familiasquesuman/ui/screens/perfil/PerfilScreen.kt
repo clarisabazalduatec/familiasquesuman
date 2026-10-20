@@ -33,6 +33,8 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.inicio.SaludoConUbicacion
 import com.example.familiasquesuman.ui.theme.*
+import com.example.familiasquesuman.ui.components.EstadoErrorServidor
+import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 
 enum class SeccionPerfil { INFORMACION, ACTIVIDADES }
 
@@ -120,11 +122,12 @@ fun PerfilScreen(
                         }
                     }
 
-                    uiState.errorCarga != null && uiState.familia == null -> item {
-                        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(uiState.errorCarga ?: "", color = GrisTexto)
-                            TextButton(onClick = { viewModel.cargar() }) { Text("Reintentar", color = Ambar) }
-                        }
+                    uiState.errorCarga != null -> item {
+                        EstadoErrorServidor(
+                            onReintentar = {
+                                viewModel.cargar()
+                            }
+                        )
                     }
 
                     uiState.familia != null -> item {
@@ -157,12 +160,24 @@ fun PerfilScreen(
                     }
                 }
 
-                // Conexión corregida pasando las insignias del estado
-                item { MisInsigniasCard(insignias = uiState.insignias) }
+                if (SesionManager.estaAutenticado &&
+                    !uiState.cargando &&
+                    uiState.errorCarga == null
+                ) {
+                    item {
+                        MisInsigniasCard(insignias = uiState.insignias)
+                    }
+                }
             }
 
             if (seccionSeleccionada == SeccionPerfil.ACTIVIDADES) {
                 item { MisActividadesPerfil(navController = navController) }
+            }
+            // Aviso de Privacidad
+            item {
+                PieAvisoPrivacidad(
+                    navController = navController
+                )
             }
         }
     }

@@ -38,6 +38,8 @@ import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import kotlinx.coroutines.launch
 import java.util.Date
+import com.example.familiasquesuman.ui.components.EstadoErrorServidor
+import com.example.familiasquesuman.ui.components.EstadoVacio
 
 class MisActividadesViewModel(
     private val repository: InscripcionRepository = InscripcionRepository(),
@@ -177,7 +179,10 @@ fun MisActividadesPerfil(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Próximas (${proximas.size})",
+                    text = if (viewModel.cargando || viewModel.error != null)
+                        "Próximas"
+                    else
+                        "Próximas (${proximas.size})",
                     color = if (tabSeleccionada == 0) Color.White else AzulMarino.copy(alpha = 0.7f),
                     fontWeight = if (tabSeleccionada == 0) FontWeight.Bold else FontWeight.Normal,
                     fontSize = 14.sp
@@ -196,7 +201,10 @@ fun MisActividadesPerfil(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Historial (${historial.size})",
+                    text = if (viewModel.cargando || viewModel.error != null)
+                        "Historial"
+                    else
+                        "Historial (${historial.size})",
                     color = if (tabSeleccionada == 1) Color.White else AzulMarino.copy(alpha = 0.7f),
                     fontWeight = if (tabSeleccionada == 1) FontWeight.Bold else FontWeight.Normal,
                     fontSize = 14.sp
@@ -214,22 +222,11 @@ fun MisActividadesPerfil(
                 CircularProgressIndicator(color = Ambar)
             }
         } else if (viewModel.error != null) {
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                color = Color.White
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = viewModel.error ?: "Ocurrió un error",
-                        color = MaterialTheme.colorScheme.error,
-                        fontSize = 14.sp
-                    )
+            EstadoErrorServidor(
+                onReintentar = {
+                    viewModel.cargar()
                 }
-            }
+            )
         } else {
             if (tabSeleccionada == 1) {
                 ResumenHistorialCard(
@@ -239,29 +236,20 @@ fun MisActividadesPerfil(
             }
 
             if (listaActual.isEmpty()) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(20.dp),
-                    color = Color.White
-                ) {
-                    Column(
-                        modifier = Modifier.padding(28.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Groups,
-                            contentDescription = null,
-                            tint = AzulMarino.copy(alpha = 0.35f),
-                            modifier = Modifier.size(42.dp)
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = if (tabSeleccionada == 0) "No tienes actividades próximas registradas." else "No tienes actividades en tu historial.",
-                            color = AzulMarino.copy(alpha = 0.60f),
-                            fontSize = 15.sp
-                        )
-                    }
-                }
+                EstadoVacio(
+                    icono = if (tabSeleccionada == 0)
+                        Icons.Outlined.Event
+                    else
+                        Icons.Outlined.CheckCircle,
+                    titulo = if (tabSeleccionada == 0)
+                        "Aún no tienes actividades próximas"
+                    else
+                        "Tu historial está vacío",
+                    mensaje = if (tabSeleccionada == 0)
+                        "Cuando te inscribas en una actividad, aparecerá aquí."
+                    else
+                        "Las actividades que hayas concluido o cancelado aparecerán aquí."
+                )
             } else {
                 listaActual.forEach { item ->
                     val actId = item.actividad?.id ?: item.actividadId ?: ""

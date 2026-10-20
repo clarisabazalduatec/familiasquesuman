@@ -38,11 +38,17 @@ class PerfilViewModel(
             return
         }
         if (usuarioActual != cargadoPara) {
-            // Cambió la cuenta: no mostrar nada de la anterior, ni un instante.
+            // Cambió la cuenta: no mostrar datos de la cuenta anterior.
             cargadoPara = usuarioActual
             _uiState.value = PerfilUiState(cargando = true)
         } else {
-            _uiState.update { it.copy(errorCarga = null) } // recarga silenciosa: se queda lo que ya se ve
+            // Al reintentar, esperar la respuesta antes de mostrar datos normales.
+            _uiState.update {
+                it.copy(
+                    cargando = true,
+                    errorCarga = null
+                )
+            }
         }
         viewModelScope.launch {
             val perfil = async { repo.miPerfil() }
@@ -55,8 +61,12 @@ class PerfilViewModel(
             val i = invitaciones.await()
             val ins = insignias.await()
 
-            // Se agrega 'ins' a la lista de errores para saber si la API falló
-            val error = listOf(p, f, i, ins).firstNotNullOfOrNull { it.exceptionOrNull()?.message }
+            val huboError = listOf(p, f, i, ins).any { it.isFailure }
+            val error = if (huboError) {
+                "No se pudo conectar con el servidor. Revisa tu conexión."
+            } else {
+                null
+            }
 
             _uiState.update {
                 it.copy(

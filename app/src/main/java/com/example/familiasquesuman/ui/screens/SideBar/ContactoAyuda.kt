@@ -127,14 +127,13 @@ fun ContactoAyudaScreen(navController: NavHostController) {
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = "Contacto y ayuda",
-                        style = MaterialTheme.typography
-                                .headlineMedium,
+                        style = MaterialTheme.typography.headlineLarge,
+
                         color = AzulMarino
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = "¿Tienes dudas o sugerencias? Escríbenos.",
-                        style = MaterialTheme.typography
-                                .titleSmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = AzulMarino
                     )
                 }
@@ -398,8 +397,7 @@ private fun ConfirmacionContactoScreen(
 @Composable
 private fun EtiquetaFormulario(texto: String) {
     Text(text = texto,
-        style = MaterialTheme.typography
-                .titleSmall,
+        style = MaterialTheme.typography.titleMedium,
         color = AzulMarino
     )
 }

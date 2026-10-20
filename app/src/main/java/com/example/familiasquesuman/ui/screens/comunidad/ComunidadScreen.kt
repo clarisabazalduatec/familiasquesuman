@@ -12,7 +12,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Article
+import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -38,6 +40,8 @@ import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
 import com.example.familiasquesuman.ui.components.FotoPerfil
 import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
+import com.example.familiasquesuman.ui.components.EstadoErrorServidor
+import com.example.familiasquesuman.ui.components.EstadoVacio
 
 private enum class SeccionComunidad { OFICIAL, COMUNIDAD }
 
@@ -53,7 +57,8 @@ fun ComunidadScreen(navController: NavHostController, esAdministrador: Boolean =
     var cargando by remember { mutableStateOf(true) }
     var errorCarga by remember { mutableStateOf<String?>(null) }
     val lifecycleOwner = LocalLifecycleOwner.current
-    LaunchedEffect(lifecycleOwner, actualizarAvisos) {
+    var reintentarCarga by remember { mutableIntStateOf(0) }
+    LaunchedEffect(lifecycleOwner, actualizarAvisos, reintentarCarga)  {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
             cargando = true
             errorCarga = null
@@ -65,7 +70,7 @@ fun ComunidadScreen(navController: NavHostController, esAdministrador: Boolean =
                         "Error al cargar publicaciones",
                         error
                     )
-                    errorCarga = "Error Comunidad: ${error.message}"
+                    errorCarga = "No se pudieron cargar las publicaciones"
                 }
                 val resultadoOficiales = comunidadRepository.obtenerAvisosOficiales()
                 resultadoOficiales.onSuccess { publicacionesOficiales = it }.onFailure { error ->
@@ -74,7 +79,7 @@ fun ComunidadScreen(navController: NavHostController, esAdministrador: Boolean =
                         "Error al cargar avisos oficiales",
                         error
                     )
-                    errorCarga = "Error Avisos: ${error.message}"
+                    errorCarga = "No se pudieron cargar los avisos oficiales"
                 }
             } finally {
                 cargando = false
@@ -111,90 +116,129 @@ fun ComunidadScreen(navController: NavHostController, esAdministrador: Boolean =
                         onSeleccionar = { seccionSeleccionada = it }
                     )
                 }
-                if (seccionSeleccionada == SeccionComunidad.OFICIAL) {
-                    items(publicacionesOficiales, key = { it.id }
-                    ) { publicacion ->
-                        TarjetaPublicacion(
-                            publicacion = publicacion,
-                            onClick = { navController.navigate(
-                                    Rutas.DetallePublicacion.crearRuta(
-                                        publicacion.id
-                                    )
-                                )
-                            },
-                            onRequiereLogin = { navController.navigate(Rutas.Login.ruta) }
-                        )
-                    }
-
-                } else {
+                if (seccionSeleccionada == SeccionComunidad.COMUNIDAD) {
                     item { AvisoRevision() }
-                    item { CajaCrearPublicacion(
+
+                    item {
+                        CajaCrearPublicacion(
                             texto = "¿Qué quieres compartir hoy?",
                             textoSecundario = "Tu publicación se enviará para revisión.",
                             onClick = {
                                 if (sesionIniciada) {
                                     navController.navigate(Rutas.NuevaPublicacion.ruta)
                                 } else {
-                                    navController.navigate(Rutas.Login.ruta
-                                    )
+                                    navController.navigate(Rutas.Login.ruta)
                                 }
                             }
                         )
                     }
 
-                    item { TextButton(
-                            onClick = { navController.navigate(Rutas.MisPublicaciones.ruta)},
+                    item {
+                        TextButton(
+                            onClick = {
+                                navController.navigate(Rutas.MisPublicaciones.ruta)
+                            },
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Icon(imageVector = Icons.Outlined.Article,
+                            Icon(
+                                imageVector = Icons.Outlined.Article,
                                 contentDescription = null,
                                 tint = AzulMarino
                             )
+
                             Spacer(Modifier.width(8.dp))
-                            Text(text = "Ver mis publicaciones",
+
+                            Text(
+                                text = "Ver mis publicaciones",
                                 style = MaterialTheme.typography.titleSmall,
                                 color = AzulMarino
                             )
+
                             Spacer(Modifier.weight(1f))
-                            Icon(imageVector = Icons.Outlined.ChevronRight,
+
+                            Icon(
+                                imageVector = Icons.Outlined.ChevronRight,
                                 contentDescription = null,
                                 tint = AzulMarino
                             )
                         }
                     }
-                    items(publicacionesComunidad, key = { it.id }) { publicacion ->
-                        TarjetaPublicacion(
-                            publicacion = publicacion,
-                            onClick = { navController.navigate(
-                                    Rutas.DetallePublicacion.crearRuta(
-                                        publicacion.id
-                                    )
-                                )
-                            },
-                            onRequiereLogin = { navController.navigate(Rutas.Login.ruta)
-                            }
-                        )
-                    }
                 }
 
-                if (cargando) {
-                    item {
-                        Box(modifier = Modifier.fillMaxWidth(),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator(
-                                color = AzulMarino,
-                                modifier = Modifier.padding(16.dp)
+                when {
+                    cargando -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = AzulMarino)
+                            }
+                        }
+                    }
+
+                    errorCarga != null -> {
+                        item {
+                            EstadoErrorServidor(
+                                onReintentar = {
+                                    reintentarCarga++
+                                }
                             )
                         }
                     }
-                }
 
-                if (errorCarga != null) {
-                    item {
-                        Text(text = errorCarga.orEmpty(),
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(16.dp)
-                        )
+                    seccionSeleccionada == SeccionComunidad.OFICIAL -> {
+                        if (publicacionesOficiales.isEmpty()) {
+                            item {
+                                EstadoVacio(
+                                    icono = Icons.Outlined.Campaign,
+                                    titulo = "Aún no hay avisos oficiales",
+                                    mensaje = "Pronto encontrarás aquí noticias, anuncios y novedades de Familias que Suman."
+                                )
+                            }
+                        } else {
+                            items(publicacionesOficiales, key = { it.id }) { publicacion ->
+                                TarjetaPublicacion(
+                                    publicacion = publicacion,
+                                    onClick = {
+                                        navController.navigate(
+                                            Rutas.DetallePublicacion.crearRuta(publicacion.id)
+                                        )
+                                    },
+                                    onRequiereLogin = {
+                                        navController.navigate(Rutas.Login.ruta)
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    else -> {
+                        if (publicacionesComunidad.isEmpty()) {
+                            item {
+                                EstadoVacio(
+                                    icono = Icons.Outlined.Forum,
+                                    titulo = "¡Sé parte de la conversación!",
+                                    mensaje = "Todavía no hay publicaciones. Comparte una experiencia, una idea o una historia que inspire a nuestra comunidad."
+                                )
+                            }
+                        } else {
+                            items(publicacionesComunidad, key = { it.id }) { publicacion ->
+                                TarjetaPublicacion(
+                                    publicacion = publicacion,
+                                    onClick = {
+                                        navController.navigate(
+                                            Rutas.DetallePublicacion.crearRuta(publicacion.id)
+                                        )
+                                    },
+                                    onRequiereLogin = {
+                                        navController.navigate(Rutas.Login.ruta)
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
                 // Aviso de Privacidad

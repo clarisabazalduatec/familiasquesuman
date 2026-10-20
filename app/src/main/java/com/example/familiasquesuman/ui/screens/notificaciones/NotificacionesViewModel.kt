@@ -27,15 +27,34 @@ class NotificacionesViewModel(
     private val _uiState = MutableStateFlow(NotificacionesUiState())
     val uiState: StateFlow<NotificacionesUiState> = _uiState.asStateFlow()
 
-    fun cargar() {
-        _uiState.update { it.copy(error = null) } // recarga silenciosa: se queda lo que ya se ve
+
+    fun cargar() { _uiState.update {
+            it.copy(cargando = true, error = null) }
         viewModelScope.launch {
             repo.listar()
-                .onSuccess { lista -> _uiState.update { it.copy(cargando = false, notificaciones = lista) } }
-                .onFailure { e -> _uiState.update { it.copy(cargando = false, error = e.message) } }
+                .onSuccess { lista ->
+                    _uiState.update {
+                        it.copy(cargando = false,
+                            error = null,
+                            notificaciones = lista
+                        )
+                    }
+                }
+                .onFailure { e -> android.util.Log.e(
+                        "NOTIFICACIONES",
+                        "Error al cargar notificaciones",
+                        e
+                    )
+                    _uiState.update {
+                        it.copy(cargando = false,
+                            error = "No se pudo conectar con el servidor."
+                        )
+                    }
+                }
             repo.refrescarContador()
         }
     }
+
 
     /** Al tocar una: se marca como leída y regresa la ruta a la que hay que ir (o null). */
     fun abrir(n: NotificacionDto): String? {

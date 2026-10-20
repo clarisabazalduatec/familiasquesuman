@@ -33,6 +33,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import com.example.familiasquesuman.ui.components.EstadoErrorServidor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,7 +85,7 @@ fun NotificacionesScreen(
                     )
                 },
                 actions = {
-                    if (estado.hayNoLeidas) {
+                    if (estado.hayNoLeidas && estado.error == null && !estado.cargando) {
                         TextButton(onClick = { viewModel.marcarTodas() }) {
                             Text("Marcar leídas", color = Ambar)
                         }
@@ -99,13 +100,19 @@ fun NotificacionesScreen(
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator(color = Ambar) }
 
-            estado.error != null && estado.notificaciones.isEmpty() && invitaciones.isEmpty() -> Column(
-                Modifier.padding(paddingInterno).fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+            (estado.error != null || perfil.errorCarga != null) &&
+                    estado.notificaciones.isEmpty() &&
+                    invitaciones.isEmpty() -> Box(
+                modifier = Modifier
+                    .padding(paddingInterno)
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                Text(estado.error ?: "", color = GrisTexto)
-                TextButton(onClick = { viewModel.cargar() }) { Text("Reintentar", color = Ambar) }
+                EstadoErrorServidor(
+                    onReintentar = { viewModel.cargar()
+                        perfilViewModel.cargar()
+                    }
+                )
             }
 
             estado.notificaciones.isEmpty() && invitaciones.isEmpty() -> Box(
