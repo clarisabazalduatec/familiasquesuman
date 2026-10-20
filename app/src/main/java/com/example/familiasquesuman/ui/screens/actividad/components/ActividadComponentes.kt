@@ -149,7 +149,7 @@ fun TarjetaActividadDia(
             Column(
                 modifier = Modifier
                     .weight(0.65f)
-                    .padding(10.dp)
+                    .padding(12.dp)
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
@@ -169,6 +169,14 @@ fun TarjetaActividadDia(
 
                 // Info (Fecha, Horario, Título, Lugar)
                 Column {
+                    Text(
+                        text = actividad.titulo,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = AzulOscuro,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                     if (actividad.fecha.isNotBlank()) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
@@ -205,14 +213,6 @@ fun TarjetaActividadDia(
                             )
                         }
                     }
-                    Text(
-                        text = actividad.titulo,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = AzulOscuro,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Place,
