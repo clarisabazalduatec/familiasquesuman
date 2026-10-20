@@ -78,6 +78,7 @@ fun ActividadDetalleScreen(
     val detalleState by viewModel.detalleUiState.collectAsState()
     val inscripcionState by inscripcionViewModel.uiState.collectAsState()
     var mostrarDialogoCancelar by remember { mutableStateOf(false) }
+    var cancelacionSolicitada by remember { mutableStateOf(false) }
     val irAActividades = {
         if (navController.currentDestination?.route != Rutas.Actividades.ruta) {
             navController.navigate(Rutas.Actividades.ruta) {
@@ -86,6 +87,15 @@ fun ActividadDetalleScreen(
                 }
                 launchSingleTop = true
             }
+        }
+    }
+    // Si el backend rechaza la cancelación (p. ej. faltan menos de 24 h), se muestra su mensaje
+    LaunchedEffect(inscripcionState.error) {
+        val error = inscripcionState.error
+        if (cancelacionSolicitada && error != null) {
+            Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+            inscripcionViewModel.limpiarError()
+            cancelacionSolicitada = false
         }
     }
     LaunchedEffect(inscripcionState.listo) {
@@ -368,6 +378,11 @@ fun ActividadDetalleScreen(
                                     val inscripcion = inscripcionState.inscripcionActual
                                     val estaInscrito = !esInvitado && inscripcion != null
                                     val esEnEspera = estaInscrito && inscripcion?.estado?.equals("EN_ESPERA", ignoreCase = true) == true
+                                    // RF-17: con lugar confirmado solo se cancela hasta 24 h antes (salir de la espera, siempre)
+                                    val faltanMenosDe24h = actividad.iniciaEn?.let {
+                                        it.time - System.currentTimeMillis() < 24L * 60 * 60 * 1000
+                                    } == true
+                                    val puedeCancelar = esEnEspera || !faltanMenosDe24h
                                     val sinLugares = actividad.lugaresDisponibles <= 0
 
                                     if (esEnEspera) {
@@ -457,25 +472,48 @@ fun ActividadDetalleScreen(
 
                                         Spacer(modifier = Modifier.height(8.dp))
 
-                                        OutlinedButton(
-                                            onClick = { mostrarDialogoCancelar = true },
-                                            shape = RoundedCornerShape(24.dp),
-                                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(48.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Delete,
-                                                contentDescription = null,
-                                                tint = Color.Red
-                                            )
-                                            Spacer(modifier = Modifier.width(8.dp))
-                                            Text(
-                                                text = "Cancelar inscripción",
-                                                fontSize = 15.sp,
-                                                fontWeight = FontWeight.SemiBold
-                                            )
+                                        if (puedeCancelar) {
+                                            OutlinedButton(
+                                                onClick = { mostrarDialogoCancelar = true },
+                                                shape = RoundedCornerShape(24.dp),
+                                                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Red),
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(48.dp)
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Delete,
+                                                    contentDescription = null,
+                                                    tint = Color.Red
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = if (esEnEspera) "Salir de la lista de espera" else "Cancelar inscripción",
+                                                    fontSize = 15.sp,
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                            }
+                                        } else {
+                                            // Menos de 24 h: ya no se puede cancelar desde la app
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Info,
+                                                    contentDescription = null,
+                                                    tint = TextoGrisActividad,
+                                                    modifier = Modifier.size(18.dp)
+                                                )
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text(
+                                                    text = "Ya no es posible cancelar: faltan menos de 24 horas para la actividad. " +
+                                                            "Si no puedes asistir, contacta a Familias que Suman.",
+                                                    fontSize = 12.sp,
+                                                    color = TextoGrisActividad,
+                                                    lineHeight = 16.sp
+                                                )
+                                            }
                                         }
                                     } else {
                                         Button(
@@ -530,7 +568,8 @@ fun ActividadDetalleScreen(
             },
             text = {
                 Text(
-                    text = "¿Estás seguro de que deseas cancelar la inscripción de tu familia a esta actividad?",
+                    text = "¿Estás seguro de que deseas cancelar la inscripción de tu familia a esta actividad? " +
+                            "Recuerda que solo se puede cancelar hasta 24 horas antes.",
                     fontSize = 14.sp
                 )
             },
@@ -538,6 +577,7 @@ fun ActividadDetalleScreen(
                 Button(
                     onClick = {
                         mostrarDialogoCancelar = false
+                        cancelacionSolicitada = true
                         inscripcionViewModel.cancelar(actividadId)
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Red, contentColor = Color.White)
