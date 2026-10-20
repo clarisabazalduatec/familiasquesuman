@@ -55,6 +55,8 @@ import com.example.familiasquesuman.data.remote.dto.InsigniaDto
 import com.example.familiasquesuman.data.remote.dto.RechazarPublicacionRequest
 import com.example.familiasquesuman.domain.EncuestaActividadRequest
 import okhttp3.ResponseBody
+import com.example.familiasquesuman.data.remote.dto.ContactoRequestDto
+import com.example.familiasquesuman.data.remote.dto.ContactoResponseDto
 
 /** El token lo agrega AuthInterceptor (en RetrofitInstance); no se pasa a mano. */
 interface FamiliasApiService {
@@ -177,6 +179,12 @@ interface FamiliasApiService {
 
     @GET("categorias")
     suspend fun getCategorias(@Query("ambito") ambito: String? = "ACTIVIDAD"): List<CategoriaDto>
+
+    // ---------- Contacto y Ayuda ----------
+    @POST("contacto")
+    suspend fun enviarMensajeContacto(
+        @Body datos: ContactoRequestDto
+    ): ContactoResponseDto
 
     // ---------- Ciudades ----------
     @GET("ciudades")
