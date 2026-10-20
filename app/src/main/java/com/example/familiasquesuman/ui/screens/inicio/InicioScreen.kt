@@ -108,6 +108,9 @@ fun InicioScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     var ultimoAviso by remember { mutableStateOf<PublicacionComunidadUi?>(null) }
     var ultimaPublicacion by remember { mutableStateOf<PublicacionComunidadUi?>(null) }
+    var cargandoComunidad by remember { mutableStateOf(true) }
+    var errorAvisos by remember { mutableStateOf(false) }
+    var errorPublicaciones by remember { mutableStateOf(false) }
     var actualizacion by remember { mutableIntStateOf(0) }
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, evento ->
@@ -123,19 +126,44 @@ fun InicioScreen(
         }
     }
 
+    //Pantallas de comunidad error de conexion y falta de publicaciones
     LaunchedEffect(actualizacion) {
-        comunidadRepository.obtenerAvisosOficiales()
-            .onSuccess { avisos ->
-                ultimoAviso = avisos.firstOrNull()
-            }
+        cargandoComunidad = true
+        errorAvisos = false
+        errorPublicaciones = false
 
-        comunidadRepository.obtenerPublicaciones()
-            .onSuccess { publicaciones ->
-                ultimaPublicacion = publicaciones.firstOrNull()
-            }
+        try { comunidadRepository.obtenerAvisosOficiales()
+                .onSuccess { avisos ->
+                    ultimoAviso = avisos.firstOrNull()
+                }
+                .onFailure { error ->
+                    android.util.Log.e(
+                        "INICIO",
+                        "Error al cargar avisos oficiales",
+                        error
+                    )
+                    errorAvisos = true
+                    ultimoAviso = null
+                }
+
+            comunidadRepository.obtenerPublicaciones()
+                .onSuccess { publicaciones ->
+                    ultimaPublicacion = publicaciones.firstOrNull()
+                }
+                .onFailure { error ->
+                    android.util.Log.e(
+                        "INICIO",
+                        "Error al cargar publicaciones",
+                        error
+                    )
+                    errorPublicaciones = true
+                    ultimaPublicacion = null
+                }
+        } finally {
+            cargandoComunidad = false
+        }
     }
     //comunidad
-
     val navegarASeccionPrincipal: (String) -> Unit = { ruta ->
         if (navController.currentDestination?.route != ruta) {
             try {
@@ -241,6 +269,13 @@ fun InicioScreen(
                 TarjetaComunidad(
                     ultimoAviso = ultimoAviso,
                     ultimaPublicacion = ultimaPublicacion,
+                    cargando = cargandoComunidad,
+                    errorAvisos = errorAvisos,
+                    errorPublicaciones = errorPublicaciones,
+                    onReintentar = {
+                        actualizacion++
+                    },
+
 
                     onVerComunidad = {
                         navegarASeccionPrincipal(Rutas.Comunidad.ruta)

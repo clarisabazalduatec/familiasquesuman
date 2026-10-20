@@ -80,7 +80,7 @@ fun SobreNosotrosScreen(navController: NavHostController) {
         ) {
             item { Column {
             Text(text = "Todo empezó en familia",
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.headlineLarge,
                 color = AzulMarino
             )
             Spacer(modifier = Modifier.height(18.dp))
@@ -173,7 +173,8 @@ fun SobreNosotrosScreen(navController: NavHostController) {
 }
 @Composable
 private fun ParrafoSobreNosotros(texto: String) {
-    Text(text = texto,
+    Text(
+        text = texto,
         style = MaterialTheme.typography.bodyMedium,
         color = AzulMarino
     )
