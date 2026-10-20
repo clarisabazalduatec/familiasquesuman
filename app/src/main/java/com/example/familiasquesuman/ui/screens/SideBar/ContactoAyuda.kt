@@ -3,6 +3,7 @@ package com.example.familiasquesuman.ui.screens.informacion
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -35,6 +36,10 @@ import com.example.familiasquesuman.ui.theme.Blanco
 import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.GrisTexto
 import kotlinx.coroutines.launch
+import com.example.familiasquesuman.data.remote.RetrofitInstance
+import com.example.familiasquesuman.data.remote.dto.ContactoRequestDto
+import androidx.compose.material.icons.filled.CheckCircle
+import com.example.familiasquesuman.ui.theme.AmbarClaro
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,9 +47,26 @@ fun ContactoAyudaScreen(navController: NavHostController) {
     var nombre by remember { mutableStateOf("") }
     var correo by remember { mutableStateOf("") }
     var mensaje by remember { mutableStateOf("") }
+    var enviando by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
+    var mensajeEnviado by remember { mutableStateOf(false) }
+
+
+    if (mensajeEnviado) {
+        ConfirmacionContactoScreen(
+            onVolverInicio = {
+                navController.navigate(Rutas.Inicio.ruta) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = false
+                    }
+                    launchSingleTop = true
+                }
+            }
+        )
+        return
+    }
 
     Scaffold(containerColor = CremaFondo,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -194,14 +216,23 @@ fun ContactoAyudaScreen(navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(145.dp),
+
                 placeholder = {
                     Text(text = "Cuéntanos en qué podemos ayudarte...")
                 },
                 leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Sms,
-                        contentDescription = null,
-                        tint = AzulMarino
-                    )
+                    Box(
+                        modifier = Modifier
+                            .height(145.dp)
+                            .padding(top = 16.dp),
+                        contentAlignment = Alignment.TopCenter
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Sms,
+                            contentDescription = null,
+                            tint = AzulMarino
+                        )
+                    }
                 },
                 shape = RoundedCornerShape(14.dp),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -212,42 +243,65 @@ fun ContactoAyudaScreen(navController: NavHostController) {
                     )
             )
             Spacer(modifier = Modifier.height(26.dp))
-            Button(onClick = {
-                    scope.launch {
-                        snackbarHostState
-                            .showSnackbar(
-                                message = "Tu mensaje fue enviado."
-                            )
+            Button(
+                onClick = {
+                    if (!enviando) {
+                        enviando = true
+                        scope.launch {
+                            try { RetrofitInstance.api.enviarMensajeContacto(
+                                    ContactoRequestDto(
+                                        nombre = nombre.trim(),
+                                        correo = correo.trim(),
+                                        mensaje = mensaje.trim()
+                                    )
+                                )
+                                nombre = ""
+                                correo = ""
+                                mensaje = ""
+                                mensajeEnviado = true
+                                snackbarHostState.showSnackbar(
+                                    message = "Tu mensaje fue enviado correctamente."
+                                )
+                            } catch (e: Exception) {
+                                if (e is kotlinx.coroutines.CancellationException) throw e
+                                snackbarHostState.showSnackbar(
+                                    message = "No se pudo enviar el mensaje. Intenta nuevamente."
+                                )
+                            } finally {
+                                enviando = false
+                            }
+                        }
                     }
-                    nombre = ""
-                    correo = ""
-                    mensaje = ""
                 },
-
                 enabled = nombre.isNotBlank() &&
-                            correo.isNotBlank() &&
-                            mensaje.isNotBlank(),
-
+                        correo.isNotBlank() &&
+                        mensaje.isNotBlank() &&
+                        !enviando,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(18.dp),
-
                 colors = ButtonDefaults.buttonColors(
-                        containerColor = AzulMarino,
-                        contentColor = Blanco
-                    )
+                    containerColor = AzulMarino,
+                    contentColor = Blanco
+                )
             ) {
-                Text(text = "Enviar mensaje",
-                    style = MaterialTheme.typography
-                            .titleSmall
+                Text(text = if (enviando) "Enviando..." else "Enviar mensaje",
+                    style = MaterialTheme.typography.titleSmall
                 )
-                Spacer(modifier = Modifier.weight(1f))
 
-                Icon(imageVector = Icons.Outlined
-                            .ChevronRight,
-                    contentDescription = null
-                )
+                Spacer(modifier = Modifier.weight(1f))
+                if (enviando) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = Blanco,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Icon(imageVector = Icons.Outlined.ChevronRight,
+                        contentDescription = null
+                    )
+                }
             }
             Spacer(modifier = Modifier.height(18.dp))
             Row(modifier = Modifier.fillMaxWidth(),
@@ -275,6 +329,71 @@ fun ContactoAyudaScreen(navController: NavHostController) {
     }
 }
 
+@Composable
+private fun ConfirmacionContactoScreen(
+    onVolverInicio: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(CremaFondo)
+            .padding(24.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(CremaFondo)
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Surface(
+                shape = CircleShape,
+                color = AmbarClaro,
+                modifier = Modifier.size(96.dp)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = "Mensaje enviado",
+                        tint = AzulMarino,
+                        modifier = Modifier.size(56.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = "¡Mensaje enviado!",
+                style = MaterialTheme.typography.headlineSmall,
+                color = AzulMarino
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Tu mensaje se envió correctamente. Gracias por ponerte en contacto con Familias que Suman.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = GrisTexto
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = onVolverInicio,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = AzulMarino)
+            ) {
+                Text("Volver al inicio")
+            }
+        }
+    }
+}
 
 @Composable
 private fun EtiquetaFormulario(texto: String) {
