@@ -6,7 +6,6 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -196,39 +195,7 @@ fun ActividadDetalleScreen(
                                     )
                             )
 
-                            Row(
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                IconButton(
-                                    onClick = { /* Compartir */ },
-                                    modifier = Modifier
-                                        .background(Color.White, CircleShape)
-                                        .size(40.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Share,
-                                        contentDescription = "Compartir",
-                                        tint = AzulOscuro,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                                IconButton(
-                                    onClick = { /* Favorito */ },
-                                    modifier = Modifier
-                                        .background(Color.White, CircleShape)
-                                        .size(40.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.FavoriteBorder,
-                                        contentDescription = "Favorito",
-                                        tint = AzulOscuro,
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                                }
-                            }
+
 
                             Column(
                                 modifier = Modifier

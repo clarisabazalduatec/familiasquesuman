@@ -92,60 +92,6 @@ fun CategoriaChip(
     }
 }
 
-/**
- * Muestra una lista de avatares superpuestos con badge opcional de participantes adicionales.
- */
-@Composable
-fun AvataresParticipantes(
-    participantesAdicionales: Int,
-    modifier: Modifier = Modifier,
-    tamanoAvatar: Dp = 20.dp,
-    desplazamientoOffset: Dp = 8.dp
-) {
-    Row(modifier = modifier) {
-        Box(
-            modifier = Modifier
-                .size(tamanoAvatar)
-                .background(Color.Gray, CircleShape)
-                .clip(CircleShape)
-                .border(1.dp, Color.White, CircleShape)
-        )
-        Box(
-            modifier = Modifier
-                .size(tamanoAvatar)
-                .offset(x = -desplazamientoOffset)
-                .background(Color.DarkGray, CircleShape)
-                .clip(CircleShape)
-                .border(1.dp, Color.White, CircleShape)
-        )
-        Box(
-            modifier = Modifier
-                .size(tamanoAvatar)
-                .offset(x = -(desplazamientoOffset * 2))
-                .background(Color.LightGray, CircleShape)
-                .clip(CircleShape)
-                .border(1.dp, Color.White, CircleShape)
-        )
-        if (participantesAdicionales > 0) {
-            Box(
-                modifier = Modifier
-                    .size(tamanoAvatar)
-                    .offset(x = -(desplazamientoOffset * 3))
-                    .background(Ambar, CircleShape)
-                    .clip(CircleShape)
-                    .border(1.dp, Color.White, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "+$participantesAdicionales",
-                    fontSize = 8.sp,
-                    color = AzulOscuro,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
-}
 
 /**
  * Tarjeta de actividad en la lista principal de Actividades.
@@ -206,10 +152,9 @@ fun TarjetaActividadDia(
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Header (Tag y Bookmark)
+                // Header (Tag)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     CategoriaChip(
@@ -218,12 +163,6 @@ fun TarjetaActividadDia(
                         backgroundColor = colorFondoCat,
                         textColor = colorTextoCat,
                         mostrarIcono = true
-                    )
-                    Icon(
-                        imageVector = Icons.Default.BookmarkBorder,
-                        contentDescription = "Guardar",
-                        tint = AzulOscuro,
-                        modifier = Modifier.size(20.dp)
                     )
                 }
 
@@ -269,20 +208,15 @@ fun TarjetaActividadDia(
                     }
                 }
 
-                // Footer (Lugares y Avatares)
+                // Footer (Lugares)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
                         text = "${actividad.lugaresDisponibles} lugares disponibles",
                         fontSize = 10.sp,
                         color = TextoGrisActividad
-                    )
-
-                    AvataresParticipantes(
-                        participantesAdicionales = 0
                     )
                 }
             }
@@ -564,13 +498,7 @@ fun TarjetaOrganizador(
                 )
             }
 
-            IconButton(onClick = { /* Info del organizador */ }) {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = "Info organizador",
-                    tint = AzulOscuro
-                )
-            }
+
         }
     }
 }
