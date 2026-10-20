@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 sealed interface ActividadUiState {
@@ -70,7 +71,10 @@ class ActividadViewModel(
             _uiState.value = ActividadUiState.Cargando
             repository.obtenerActividades(ciudadId)
                 .onSuccess { lista ->
-                    _uiState.value = ActividadUiState.Exito(lista)
+                    val listaOrdenada = lista.sortedWith(
+                        compareBy<Actividad> { it.iniciaEn ?: Date(Long.MAX_VALUE) }
+                    )
+                    _uiState.value = ActividadUiState.Exito(listaOrdenada)
                 }
                 .onFailure { e ->
                     _uiState.value = ActividadUiState.Error(

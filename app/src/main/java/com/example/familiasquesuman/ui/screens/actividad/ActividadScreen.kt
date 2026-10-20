@@ -75,13 +75,16 @@ fun ActividadScreen(
                 val actividadesFiltradas = remember(categoriaSeleccionada, uiState) {
                     val exitoState = uiState as? ActividadUiState.Exito
                     if (exitoState != null) {
-                        if (categoriaSeleccionada == null) {
+                        val lista = if (categoriaSeleccionada == null) {
                             exitoState.actividades
                         } else {
                             exitoState.actividades.filter {
                                 it.categoria.equals(categoriaSeleccionada, ignoreCase = true)
                             }
                         }
+                        lista.sortedWith(
+                            compareBy<com.example.familiasquesuman.domain.Actividad> { it.iniciaEn ?: java.util.Date(Long.MAX_VALUE) }
+                        )
                     } else {
                         emptyList()
                     }

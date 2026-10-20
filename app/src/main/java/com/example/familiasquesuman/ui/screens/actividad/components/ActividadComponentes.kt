@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -114,7 +115,7 @@ fun TarjetaActividadDia(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .height(140.dp)
+            .height(135.dp)
     ) {
         Row(modifier = Modifier.fillMaxSize()) {
             // Imagen Izquierda
@@ -148,7 +149,7 @@ fun TarjetaActividadDia(
             Column(
                 modifier = Modifier
                     .weight(0.65f)
-                    .padding(12.dp)
+                    .padding(10.dp)
                     .fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
@@ -166,25 +167,47 @@ fun TarjetaActividadDia(
                     )
                 }
 
-                // Info (Hora, Título, Lugar)
+                // Info (Fecha, Horario, Título, Lugar)
                 Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Schedule,
-                            contentDescription = null,
-                            modifier = Modifier.size(12.dp),
-                            tint = TextoGrisActividad
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = actividad.horario,
-                            fontSize = 11.sp,
-                            color = TextoGrisActividad
-                        )
+                    if (actividad.fecha.isNotBlank()) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Event,
+                                contentDescription = null,
+                                modifier = Modifier.size(11.dp),
+                                tint = TextoGrisActividad
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(
+                                text = actividad.fecha,
+                                fontSize = 10.sp,
+                                color = TextoGrisActividad,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                    if (actividad.horario.isNotBlank()) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.Schedule,
+                                contentDescription = null,
+                                modifier = Modifier.size(11.dp),
+                                tint = TextoGrisActividad
+                            )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(
+                                text = actividad.horario,
+                                fontSize = 10.sp,
+                                color = TextoGrisActividad,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                     Text(
                         text = actividad.titulo,
-                        fontSize = 15.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = AzulOscuro,
                         maxLines = 1,
@@ -194,13 +217,13 @@ fun TarjetaActividadDia(
                         Icon(
                             imageVector = Icons.Default.Place,
                             contentDescription = null,
-                            modifier = Modifier.size(12.dp),
+                            modifier = Modifier.size(11.dp),
                             tint = TextoGrisActividad
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(3.dp))
                         Text(
                             text = actividad.ubicacion,
-                            fontSize = 11.sp,
+                            fontSize = 10.sp,
                             color = TextoGrisActividad,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
