@@ -43,6 +43,16 @@ android {
         compose = true
         buildConfig = true
     }
+    testOptions {
+        unitTests {
+            // En pruebas unitarias las clases de Android (Log, etc.) no hacen nada en vez de lanzar excepción
+            isReturnDefaultValues = true
+            all {
+                // mockk/Byte Buddy todavía no reconocen Java 25: modo compatible
+                it.jvmArgs("-Dnet.bytebuddy.experimental=true")
+            }
+        }
+    }
 }
 
 dependencies {

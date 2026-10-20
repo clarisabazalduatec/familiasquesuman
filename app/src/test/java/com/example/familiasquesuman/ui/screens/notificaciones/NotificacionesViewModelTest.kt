@@ -67,7 +67,7 @@ class NotificacionesViewModelTest {
 
         val state = viewModel.uiState.value
         assertFalse(state.cargando)
-        assertEquals("Error de conexión", state.error)
+        assertEquals("No se pudo conectar con el servidor.", state.error)
     }
 
     @Test
