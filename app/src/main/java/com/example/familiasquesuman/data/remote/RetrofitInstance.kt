@@ -36,7 +36,9 @@ object RetrofitInstance {
     }
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.HEADERS
+                else HttpLoggingInterceptor.Level.NONE
+        redactHeader("Authorization")
     }
 
     // El chatbot puede tardar más de 10 s (consulta la base y llama a Gemini dos veces),

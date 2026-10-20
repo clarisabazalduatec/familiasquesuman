@@ -5,19 +5,21 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.example.familiasquesuman.data.remote.dto.CiudadDto
 import com.example.familiasquesuman.data.remote.dto.UsuarioDto
 import com.example.familiasquesuman.ui.model.TipoSesion
 
 /**
- * Única fuente de verdad de la sesión (reemplaza a SesionUsuario y SesionDemoState).
+ * Única fuente de verdad de la sesión.
  * - token y usuario son estado de Compose: las pantallas se redibujan solas al iniciar/cerrar sesión.
- * - Con "Recordarme" se guarda en SharedPreferences; si no, vive solo en memoria.
+ * - Con "Recordarme" se guarda cifrado con EncryptedSharedPreferences (AES-256 GCM); si no, vive solo en memoria.
  * - El rol viene del backend: sin token = INVITADO; con token = ADMIN o USUARIO.
  */
 object SesionManager {
 
-    private const val PREFS = "familias_sesion"
+    private const val PREFS = "familias_sesion_secure"
     private const val K_FOTO = "usuario_foto"
     private const val K_TOKEN = "token"
     private const val K_ID = "usuario_id"
@@ -51,7 +53,23 @@ object SesionManager {
     /** Llamar una vez en MainActivity.onCreate, antes de setContent. */
     fun init(context: Context) {
         if (prefs != null) return
-        val p = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val appContext = context.applicationContext
+        val p = try {
+            val masterKey = MasterKey.Builder(appContext)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+
+            EncryptedSharedPreferences.create(
+                appContext,
+                PREFS,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (_: Exception) {
+            // Fallback en caso de error de Keystore en emulador/dispositivo
+            appContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        }
         prefs = p
 
         val tokenGuardado = p.getString(K_TOKEN, null)
@@ -85,7 +103,7 @@ object SesionManager {
         }
     }
 
-    /** Actualiza los datos del usuario (por ejemplo, tras GET /usuarios/me) sin tocar el token. */
+    /** Actualiza los datos del usuario sin tocar el token. */
     fun actualizarUsuario(usuario: UsuarioDto) {
         this.usuario = usuario
         val p = prefs ?: return
