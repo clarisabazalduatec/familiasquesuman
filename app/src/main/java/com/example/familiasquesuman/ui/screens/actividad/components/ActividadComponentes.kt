@@ -225,7 +225,8 @@ fun TarjetaActividadDia(
 }
 
 /**
- * Banner informativo para sincronizar calendario.
+ * Banner del detalle de una actividad inscrita: la agrega al calendario del teléfono.
+ * (El calendario dentro de la app se llena solo; este es para Google Calendar, Samsung, etc.)
  */
 @Composable
 fun BannerSincronizarCalendario(
@@ -235,9 +236,7 @@ fun BannerSincronizarCalendario(
     Surface(
         shape = RoundedCornerShape(16.dp),
         color = AmbarClaro,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -267,7 +266,7 @@ fun BannerSincronizarCalendario(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Sincroniza las fechas que te interesan con tu calendario personal.",
+                    text = "Guárdala en el calendario de tu teléfono para que no se te pase.",
                     color = TextoGrisActividad,
                     fontSize = 10.sp,
                     lineHeight = 14.sp
@@ -291,7 +290,7 @@ fun BannerSincronizarCalendario(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Sincronizar",
+                        text = "Agregar",
                         color = AzulOscuro,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold

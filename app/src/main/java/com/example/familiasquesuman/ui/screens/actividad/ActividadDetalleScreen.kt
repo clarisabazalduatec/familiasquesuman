@@ -28,11 +28,15 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import com.example.familiasquesuman.data.CalendarioTelefono
 import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.ui.navigation.Rutas
+import com.example.familiasquesuman.ui.screens.actividad.components.BannerSincronizarCalendario
 import com.example.familiasquesuman.ui.screens.actividad.components.CategoriaChip
 import com.example.familiasquesuman.ui.screens.actividad.components.TarjetaInfoActividad
 import com.example.familiasquesuman.ui.screens.actividad.components.TarjetaOrganizador
@@ -51,6 +55,7 @@ fun ActividadDetalleScreen(
     inscripcionViewModel: InscripcionViewModel = viewModel()
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
 
     DisposableEffect(lifecycleOwner, actividadId) {
         val observer = LifecycleEventObserver { _, event ->
@@ -297,6 +302,30 @@ fun ActividadDetalleScreen(
                                 disponibles = actividad.lugaresDisponibles,
                                 totales = actividad.lugaresTotales
                             )
+
+                            // Agregar al calendario DEL TELÉFONO: solo si la familia ya tiene lugar
+                            // confirmado (no en lista de espera) y la actividad todavía no pasa.
+                            // El calendario de la app no necesita esto: se llena solo con las inscripciones.
+                            val inscripcionConfirmada = SesionManager.tipoSesion != TipoSesion.INVITADO &&
+                                    inscripcionState.inscripcionActual?.let {
+                                        !it.estado.equals("EN_ESPERA", ignoreCase = true)
+                                    } == true
+                            val esFutura = actividad.iniciaEn?.after(java.util.Date()) == true
+                            if (inscripcionConfirmada && esFutura) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                BannerSincronizarCalendario(
+                                    onSincronizarClick = {
+                                        val abierta = CalendarioTelefono.agregarUna(context, actividad)
+                                        if (!abierta) {
+                                            Toast.makeText(
+                                                context,
+                                                "No se encontró una app de calendario en tu teléfono.",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    }
+                                )
+                            }
 
                             Spacer(modifier = Modifier.height(140.dp))
                         }
