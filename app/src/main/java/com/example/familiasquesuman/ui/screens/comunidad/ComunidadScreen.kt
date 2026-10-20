@@ -39,6 +39,7 @@ import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.*
 import com.example.familiasquesuman.ui.components.FotoPerfil
+import com.example.familiasquesuman.ui.components.rememberGuardiaCorreoVerificado
 import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 import com.example.familiasquesuman.ui.components.EstadoErrorServidor
 import com.example.familiasquesuman.ui.components.EstadoVacio
@@ -49,6 +50,7 @@ private enum class SeccionComunidad { OFICIAL, COMUNIDAD }
 fun ComunidadScreen(navController: NavHostController, esAdministrador: Boolean = false) {
     var seccionSeleccionada by rememberSaveable { mutableStateOf(SeccionComunidad.OFICIAL) }
     val sesionIniciada = SesionManager.tipoSesion != TipoSesion.INVITADO
+    val conCorreoVerificado = rememberGuardiaCorreoVerificado(navController)
     var mostrarFormularioOficial by rememberSaveable { mutableStateOf(false) }
     val comunidadRepository = remember { ComunidadRepository() }
     var publicacionesComunidad by remember { mutableStateOf<List<PublicacionComunidadUi>>(emptyList()) }
@@ -125,7 +127,8 @@ fun ComunidadScreen(navController: NavHostController, esAdministrador: Boolean =
                             textoSecundario = "Tu publicación se enviará para revisión.",
                             onClick = {
                                 if (sesionIniciada) {
-                                    navController.navigate(Rutas.NuevaPublicacion.ruta)
+                                    // Publicar pide el correo verificado
+                                    conCorreoVerificado { navController.navigate(Rutas.NuevaPublicacion.ruta) }
                                 } else {
                                     navController.navigate(Rutas.Login.ruta)
                                 }

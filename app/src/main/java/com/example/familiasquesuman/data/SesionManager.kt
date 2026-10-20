@@ -5,19 +5,21 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.example.familiasquesuman.data.remote.dto.CiudadDto
 import com.example.familiasquesuman.data.remote.dto.UsuarioDto
 import com.example.familiasquesuman.ui.model.TipoSesion
 
 /**
- * Única fuente de verdad de la sesión (reemplaza a SesionUsuario y SesionDemoState).
+ * Única fuente de verdad de la sesión.
  * - token y usuario son estado de Compose: las pantallas se redibujan solas al iniciar/cerrar sesión.
- * - Con "Recordarme" se guarda en SharedPreferences; si no, vive solo en memoria.
+ * - Con "Recordarme" se guarda cifrado con EncryptedSharedPreferences (AES-256 GCM); si no, vive solo en memoria.
  * - El rol viene del backend: sin token = INVITADO; con token = ADMIN o USUARIO.
  */
 object SesionManager {
 
-    private const val PREFS = "familias_sesion"
+    private const val PREFS = "familias_sesion_secure"
     private const val K_FOTO = "usuario_foto"
     private const val K_TOKEN = "token"
     private const val K_ID = "usuario_id"
@@ -26,6 +28,7 @@ object SesionManager {
     private const val K_CIUDAD_ID = "usuario_ciudad_id"
     private const val K_CIUDAD = "usuario_ciudad"
     private const val K_ROL = "usuario_rol"
+    private const val K_VERIFICADO = "usuario_correo_verificado"
 
     private var prefs: SharedPreferences? = null
 
@@ -48,10 +51,30 @@ object SesionManager {
     val esAdmin: Boolean
         get() = tipoSesion == TipoSesion.ADMIN
 
+    /** false solo si el backend dijo que falta verificar el correo (inscribirse, publicar y comentar lo piden). */
+    val correoVerificado: Boolean
+        get() = usuario?.correoVerificado != false
+
     /** Llamar una vez en MainActivity.onCreate, antes de setContent. */
     fun init(context: Context) {
         if (prefs != null) return
-        val p = context.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        val appContext = context.applicationContext
+        val p = try {
+            val masterKey = MasterKey.Builder(appContext)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+
+            EncryptedSharedPreferences.create(
+                appContext,
+                PREFS,
+                masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+        } catch (_: Exception) {
+            // Fallback en caso de error de Keystore en emulador/dispositivo
+            appContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        }
         prefs = p
 
         val tokenGuardado = p.getString(K_TOKEN, null)
@@ -67,7 +90,8 @@ object SesionManager {
                 email = p.getString(K_EMAIL, "") ?: "",
                 ciudad = ciudadDto,
                 rol = p.getString(K_ROL, "USUARIO"),
-                fotoUrl = p.getString(K_FOTO, null)
+                fotoUrl = p.getString(K_FOTO, null),
+                correoVerificado = p.getBoolean(K_VERIFICADO, true)
             )
         }
     }
@@ -85,7 +109,7 @@ object SesionManager {
         }
     }
 
-    /** Actualiza los datos del usuario (por ejemplo, tras GET /usuarios/me) sin tocar el token. */
+    /** Actualiza los datos del usuario sin tocar el token. */
     fun actualizarUsuario(usuario: UsuarioDto) {
         this.usuario = usuario
         val p = prefs ?: return
@@ -112,4 +136,5 @@ object SesionManager {
             .putString(K_CIUDAD, u.ciudad?.nombre)
             .putString(K_ROL, u.rol)
             .putString(K_FOTO, u.fotoUrl)
+            .putBoolean(K_VERIFICADO, u.correoVerificado != false)
 }

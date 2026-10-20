@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -68,19 +66,22 @@ fun SaludoConUbicacion(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val repo = remember { FamiliaRepository() }
+    val estaAutenticado = SesionManager.estaAutenticado
 
     var listaCiudades by remember { mutableStateOf<List<CiudadDto>>(ciudadesDefault) }
     var menuExpandido by remember { mutableStateOf(false) }
     var guardandoCiudad by remember { mutableStateOf(false) }
     var ciudadSeleccionadaManual by remember { mutableStateOf<CiudadDto?>(null) }
 
-    LaunchedEffect(Unit) {
-        try {
-            val lista = RetrofitInstance.api.listarCiudades()
-            if (lista.isNotEmpty()) {
-                listaCiudades = lista
-            }
-        } catch (_: Exception) {}
+    LaunchedEffect(estaAutenticado) {
+        if (estaAutenticado) {
+            try {
+                val lista = RetrofitInstance.api.listarCiudades()
+                if (lista.isNotEmpty()) {
+                    listaCiudades = lista
+                }
+            } catch (_: Exception) {}
+        }
     }
 
     val usuarioCiudad = SesionManager.usuario?.ciudad
@@ -99,7 +100,7 @@ fun SaludoConUbicacion(
     }
 
     val textoUbicacion = ciudadActual?.let { etiquetaCiudad(it) }
-        ?: ciudad.ifBlank { "Seleccionar ciudad" }
+        ?: ciudad.ifBlank { "Monterrey, N.L." }
 
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
         // foto de perfil (la de la sesión; sin foto muestra las iniciales)
@@ -119,88 +120,87 @@ fun SaludoConUbicacion(
                 color = AzulMarino
             )
 
-            // ubicacion
-            Box {
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .clickable(enabled = !guardandoCiudad) { menuExpandido = true },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = GrisTexto,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = textoUbicacion,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = GrisTexto
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
-                    if (guardandoCiudad) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = AzulMarino
-                        )
-                    } else {
+            // La ubicación con selector de ciudad solo se muestra cuando el usuario ha iniciado sesión
+            if (estaAutenticado) {
+                Box {
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(10.dp))
+                            .clickable(enabled = !guardandoCiudad) { menuExpandido = true },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Icon(
-                            imageVector = Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Cambiar ciudad",
-                            tint = AzulMarino,
-                            modifier = Modifier.size(20.dp)
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = null,
+                            tint = GrisTexto,
+                            modifier = Modifier.size(18.dp)
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = textoUbicacion,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = GrisTexto
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        if (guardandoCiudad) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                                color = AzulMarino
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.KeyboardArrowDown,
+                                contentDescription = "Cambiar ciudad",
+                                tint = AzulMarino,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
-                }
 
-                // menu de ciudades
-                DropdownMenu(
-                    expanded = menuExpandido,
-                    onDismissRequest = { menuExpandido = false },
-                    offset = DpOffset(x = 0.dp, y = 6.dp),
-                    containerColor = Blanco,
-                    tonalElevation = 0.dp,
-                    shadowElevation = 4.dp,
-                    modifier = Modifier
-                        .width(215.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .border(width = 1.dp, color = GrisBorde, shape = RoundedCornerShape(14.dp))
-                ) {
-                    listaCiudades.forEach { ciudadOpcion ->
-                        val seleccionada = ciudadActual?.id == ciudadOpcion.id
-                        val etiqueta = etiquetaCiudad(ciudadOpcion)
-                        DropdownMenuItem(
-                            text = {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = etiqueta,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = if (seleccionada) FontWeight.SemiBold else FontWeight.Normal,
-                                        color = if (seleccionada) AzulMarino else GrisTexto,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    if (seleccionada) {
-                                        Icon(
-                                            imageVector = Icons.Default.Check,
-                                            contentDescription = "Seleccionada",
-                                            tint = AzulMarino,
-                                            modifier = Modifier.size(20.dp)
+                    DropdownMenu(
+                        expanded = menuExpandido,
+                        onDismissRequest = { menuExpandido = false },
+                        offset = DpOffset(x = 0.dp, y = 6.dp),
+                        containerColor = Blanco,
+                        tonalElevation = 0.dp,
+                        shadowElevation = 4.dp,
+                        modifier = Modifier
+                            .width(215.dp)
+                            .clip(RoundedCornerShape(14.dp))
+                            .border(width = 1.dp, color = GrisBorde, shape = RoundedCornerShape(14.dp))
+                    ) {
+                        listaCiudades.forEach { ciudadOpcion ->
+                            val seleccionada = ciudadActual?.id == ciudadOpcion.id
+                            val etiqueta = etiquetaCiudad(ciudadOpcion)
+                            DropdownMenuItem(
+                                text = {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = etiqueta,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = if (seleccionada) FontWeight.SemiBold else FontWeight.Normal,
+                                            color = if (seleccionada) AzulMarino else GrisTexto,
+                                            modifier = Modifier.weight(1f)
                                         )
+                                        if (seleccionada) {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = "Seleccionada",
+                                                tint = AzulMarino,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
                                     }
-                                }
-                            },
-                            onClick = {
-                                menuExpandido = false
-                                if (!seleccionada) {
-                                    val ciudadAnterior = ciudadActual
-                                    ciudadSeleccionadaManual = ciudadOpcion
-                                    if (SesionManager.estaAutenticado) {
+                                },
+                                onClick = {
+                                    menuExpandido = false
+                                    if (!seleccionada) {
+                                        val ciudadAnterior = ciudadActual
+                                        ciudadSeleccionadaManual = ciudadOpcion
                                         guardandoCiudad = true
                                         scope.launch {
                                             repo.cambiarMiCiudad(ciudadOpcion.id)
@@ -219,12 +219,10 @@ fun SaludoConUbicacion(
                                                     ).show()
                                                 }
                                         }
-                                    } else {
-                                        onCiudadCambiada?.invoke(ciudadOpcion)
                                     }
                                 }
-                            }
-                        )
+                            )
+                        }
                     }
                 }
             }

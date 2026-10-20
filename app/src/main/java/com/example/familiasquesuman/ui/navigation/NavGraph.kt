@@ -117,6 +117,9 @@ fun NavGraphFamilias(
         composable(Rutas.Registro.ruta) {
             com.example.familiasquesuman.ui.screens.login.RegistroScreen(navController = navController)
         }
+        composable(Rutas.VerificarCorreo.ruta) {
+            com.example.familiasquesuman.ui.screens.login.VerificarCorreoScreen(navController = navController)
+        }
 
         // Administración
         composable(Rutas.Admin.ruta) {

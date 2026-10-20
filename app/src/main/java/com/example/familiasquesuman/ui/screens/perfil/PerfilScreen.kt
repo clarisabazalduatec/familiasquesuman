@@ -30,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.components.TarjetaVerificarCorreo
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.inicio.SaludoConUbicacion
 import com.example.familiasquesuman.ui.theme.*
@@ -101,6 +102,13 @@ fun PerfilScreen(
                         viewModel.cargar()
                     }
                 )
+            }
+
+            // Correo sin verificar: aviso con botón (inscribirse, publicar y comentar lo piden)
+            if (SesionManager.estaAutenticado && !SesionManager.correoVerificado) {
+                item {
+                    TarjetaVerificarCorreo(onVerificar = { navController.navigate(Rutas.VerificarCorreo.ruta) })
+                }
             }
 
             item {
