@@ -62,14 +62,13 @@ class ActividadViewModel(
     private val _detalleUiState = MutableStateFlow<ActividadDetalleUiState>(ActividadDetalleUiState.Cargando)
     val detalleUiState: StateFlow<ActividadDetalleUiState> = _detalleUiState.asStateFlow()
 
-    init {
-        cargarActividades()
-    }
+    private var ciudadActual: Int? = null
 
-    fun cargarActividades() {
+    fun cargarActividades(ciudadId: Int? = ciudadActual) {
+        ciudadActual = ciudadId
         viewModelScope.launch {
             _uiState.value = ActividadUiState.Cargando
-            repository.obtenerActividades()
+            repository.obtenerActividades(ciudadId)
                 .onSuccess { lista ->
                     _uiState.value = ActividadUiState.Exito(lista)
                 }

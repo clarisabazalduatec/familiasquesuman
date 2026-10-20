@@ -40,20 +40,19 @@ class DonacionViewModel(
 
     var esModoAdmin = false
 
-    init {
-        cargarDonaciones()
-    }
+    private var ciudadActual: Int? = null
 
-    // Se agrega incluirDesactivadas como parámetro con valor por defecto
     fun cargarDonaciones(
         modalidad: String? = null,
-        incluirDesactivadas: Boolean = esModoAdmin
+        incluirDesactivadas: Boolean = esModoAdmin,
+        ciudadId: Int? = ciudadActual
     ) {
+        ciudadActual = ciudadId
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
             try {
-                _donaciones.value = repository.obtenerDonaciones(modalidad, incluirDesactivadas)
+                _donaciones.value = repository.obtenerDonaciones(modalidad, incluirDesactivadas, ciudadId)
             } catch (e: Exception) {
                 _error.value = e.localizedMessage ?: "Error al obtener las donaciones"
             } finally {

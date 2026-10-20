@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.domain.CentroVisiteo
 import com.example.familiasquesuman.domain.TipoCentro
 import com.example.familiasquesuman.ui.components.BarraBusqueda
@@ -38,8 +39,8 @@ fun DirectorioScreen(
     var textoBusqueda by remember { mutableStateOf("") }
     var tipoSeleccionado by remember { mutableStateOf<TipoCentro?>(null) }
 
-    // Se recarga cada vez que se abre la pantalla (por si el admin agregó o editó centros).
-    LaunchedEffect(Unit) { viewModel.cargarLista() }
+    val ciudadId = SesionManager.usuario?.ciudad?.id
+    LaunchedEffect(ciudadId) { viewModel.cargarLista(ciudadId) }
 
     val centrosFiltrados = remember(textoBusqueda, tipoSeleccionado, uiState.centros) {
         uiState.centros.filter { centro ->

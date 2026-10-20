@@ -17,7 +17,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import com.example.familiasquesuman.data.SesionManager
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +52,11 @@ fun DonacionScreen(
     navController: NavHostController,
     viewModel: DonacionViewModel = viewModel(),
 ) {
+    val ciudadId = SesionManager.usuario?.ciudad?.id
+    LaunchedEffect(ciudadId) {
+        viewModel.cargarDonaciones(ciudadId = ciudadId)
+    }
+
     val donaciones by viewModel.donaciones.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()

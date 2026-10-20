@@ -8,8 +8,7 @@ import com.example.familiasquesuman.domain.Donacion
 import com.example.familiasquesuman.domain.TipoDonacion
 
 interface DonacionRepository {
-    // 1. Agrega el parámetro aquí con valor por defecto false
-    suspend fun obtenerDonaciones(modalidad: String? = null, incluirDesactivadas: Boolean = true): List<Donacion>
+    suspend fun obtenerDonaciones(modalidad: String? = null, incluirDesactivadas: Boolean = true, ciudadId: Int? = null): List<Donacion>
     suspend fun obtenerDonacionPorId(id: String): Donacion
     suspend fun crearDonacion(datos: DonacionGuardarDto): Donacion
     suspend fun actualizarDonacion(id: String, datos: DonacionGuardarDto): Donacion
@@ -20,9 +19,8 @@ class DonacionRepositoryImpl(
     private val apiService: FamiliasApiService
 ) : DonacionRepository {
 
-    // 2. Recibe el parámetro aquí y pásalo al apiService
-    override suspend fun obtenerDonaciones(modalidad: String?, incluirDesactivadas: Boolean): List<Donacion> {
-        val dtos = apiService.listarDonaciones(modalidad = modalidad, incluirDesactivadas = incluirDesactivadas)
+    override suspend fun obtenerDonaciones(modalidad: String?, incluirDesactivadas: Boolean, ciudadId: Int?): List<Donacion> {
+        val dtos = apiService.listarDonaciones(modalidad = modalidad, ciudadId = ciudadId, incluirDesactivadas = incluirDesactivadas)
         return dtos.map { it.toDomain() }
     }
 

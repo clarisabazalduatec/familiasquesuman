@@ -10,8 +10,8 @@ class CentroRepository(
 ) {
 
     /** Centros activos (directorio público). */
-    suspend fun listar(): Result<List<CentroVisiteo>> = llamarApi {
-        RetrofitInstance.api.listarCentros().map { it.aDominio() }
+    suspend fun listar(ciudadId: Int? = null): Result<List<CentroVisiteo>> = llamarApi {
+        RetrofitInstance.api.listarCentros(ciudadId = ciudadId).map { it.aDominio() }
     }
 
     suspend fun detalle(id: String): Result<CentroVisiteo> = llamarApi {

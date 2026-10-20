@@ -11,8 +11,8 @@ import com.example.familiasquesuman.domain.Actividad
 class ActividadRepository(
     private val imagenes: ImagenRepository = ImagenRepository()
 ) {
-    suspend fun obtenerActividades(): Result<List<Actividad>> = llamarApi {
-        RetrofitInstance.api.getActividades().map { it.toDomain() }
+    suspend fun obtenerActividades(ciudadId: Int? = null): Result<List<Actividad>> = llamarApi {
+        RetrofitInstance.api.getActividades(ciudadId).map { it.toDomain() }
     }
 
     suspend fun obtenerActividadPorId(id: String): Result<Actividad> = llamarApi {

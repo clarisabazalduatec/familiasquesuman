@@ -32,11 +32,14 @@ class ProyectoViewModel(
     private val _detalle = MutableStateFlow(ProyectoDetalleUiState())
     val detalle: StateFlow<ProyectoDetalleUiState> = _detalle.asStateFlow()
 
+    private var ciudadActual: Int? = null
+
     /** Se llama cada vez que se abre la pantalla: si ya hay datos, se quedan visibles mientras recarga. */
-    fun cargarLista() {
+    fun cargarLista(ciudadId: Int? = ciudadActual) {
+        ciudadActual = ciudadId
         _lista.update { it.copy(cargando = true, error = null) }
         viewModelScope.launch {
-            repo.listar()
+            repo.listar(ciudadId)
                 .onSuccess { proyectos -> _lista.value = ProyectosUiState(cargando = false, proyectos = proyectos) }
                 .onFailure { e -> _lista.update { it.copy(cargando = false, error = e.message) } }
         }

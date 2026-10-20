@@ -121,7 +121,10 @@ interface FamiliasApiService {
 
     // ---------- Proyectos ----------
     @GET("proyectos")
-    suspend fun listarProyectos(@Query("limit") limit: Int = 100): List<ProyectoDto>
+    suspend fun listarProyectos(
+        @Query("limit") limit: Int = 100,
+        @Query("ciudad_id") ciudadId: Int? = null
+    ): List<ProyectoDto>
 
     @GET("proyectos/{id}")
     suspend fun detalleProyecto(@Path("id") id: String): ProyectoDto
@@ -148,7 +151,10 @@ interface FamiliasApiService {
 
     // ---------- Directorio de visiteo ----------
     @GET("centros")
-    suspend fun listarCentros(@Query("limit") limit: Int = 100): List<CentroDto>
+    suspend fun listarCentros(
+        @Query("limit") limit: Int = 100,
+        @Query("ciudad_id") ciudadId: Int? = null
+    ): List<CentroDto>
 
     @GET("centros/{id}")
     suspend fun detalleCentro(@Path("id") id: String): CentroDto
@@ -174,7 +180,7 @@ interface FamiliasApiService {
     suspend fun enviarMensajeChat(@Body entrada: ChatMensajeEntradaDto): ChatMensajeRespuestaDto
 
     @GET("actividades")
-    suspend fun getActividades(): List<ActividadDto>
+    suspend fun getActividades(@Query("ciudad_id") ciudadId: Int? = null): List<ActividadDto>
 
     @GET("actividades/{id}")
     suspend fun getActividadDetalle(@Path("id") id: String): ActividadDto
