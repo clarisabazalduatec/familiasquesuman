@@ -35,9 +35,11 @@ import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.Blanco
 import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.GrisTexto
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import com.example.familiasquesuman.data.remote.RetrofitInstance
-import com.example.familiasquesuman.data.remote.dto.ContactoRequestDto
+import android.util.Patterns
+import androidx.compose.material.icons.outlined.Lock
+import com.example.familiasquesuman.data.repository.ContactoRepository
 import androidx.compose.material.icons.filled.CheckCircle
 import com.example.familiasquesuman.ui.theme.AmbarClaro
 
@@ -52,6 +54,84 @@ fun ContactoAyudaScreen(navController: NavHostController) {
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     var mensajeEnviado by remember { mutableStateOf(false) }
+    val repositorio = remember { ContactoRepository() }
+
+    // Paso 2: diálogo para escribir el código que llegó al correo
+    var mostrarDialogoCodigo by remember { mutableStateOf(false) }
+    var codigo by remember { mutableStateOf("") }
+    var errorCodigo by remember { mutableStateOf<String?>(null) }
+    var confirmando by remember { mutableStateOf(false) }
+    var reenviando by remember { mutableStateOf(false) }
+    var segundosReenvio by remember { mutableIntStateOf(0) } // el backend pide 60 s entre códigos
+
+    val correoValido = Patterns.EMAIL_ADDRESS.matcher(correo.trim()).matches()
+
+    LaunchedEffect(segundosReenvio) {
+        if (segundosReenvio > 0) {
+            delay(1_000)
+            segundosReenvio -= 1
+        }
+    }
+
+    // Paso 1 (y "Reenviar código"): el backend manda un código de 6 dígitos al correo
+    fun solicitarCodigo(alTerminar: (String?) -> Unit) {
+        scope.launch {
+            repositorio.solicitarCodigo(nombre.trim(), correo.trim(), mensaje.trim())
+                .onSuccess {
+                    segundosReenvio = 60
+                    alTerminar(null)
+                }
+                .onFailure { alTerminar(it.message ?: "No se pudo enviar el código.") }
+        }
+    }
+
+    if (mostrarDialogoCodigo) {
+        DialogoCodigoVerificacion(
+            correo = correo.trim(),
+            codigo = codigo,
+            onCodigoCambia = { nuevo ->
+                codigo = nuevo.filter { it.isDigit() }.take(6)
+                errorCodigo = null
+            },
+            error = errorCodigo,
+            confirmando = confirmando,
+            reenviando = reenviando,
+            segundosReenvio = segundosReenvio,
+            onConfirmar = {
+                confirmando = true
+                errorCodigo = null
+                scope.launch {
+                    repositorio.confirmarCodigo(correo.trim(), codigo)
+                        .onSuccess {
+                            mostrarDialogoCodigo = false
+                            nombre = ""
+                            correo = ""
+                            mensaje = ""
+                            codigo = ""
+                            mensajeEnviado = true
+                        }
+                        .onFailure { errorCodigo = it.message }
+                    confirmando = false
+                }
+            },
+            onReenviar = {
+                reenviando = true
+                codigo = ""
+                errorCodigo = null
+                solicitarCodigo { error ->
+                    errorCodigo = error ?: "Te enviamos un código nuevo."
+                    reenviando = false
+                }
+            },
+            onCancelar = {
+                if (!confirmando) {
+                    mostrarDialogoCodigo = false
+                    codigo = ""
+                    errorCodigo = null
+                }
+            }
+        )
+    }
 
 
     if (mensajeEnviado) {
@@ -73,16 +153,16 @@ fun ContactoAyudaScreen(navController: NavHostController) {
         topBar = {
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                            containerColor = CremaFondo,
-                            navigationIconContentColor = AzulMarino,
-                            actionIconContentColor = AzulMarino
-                        ),
+                    containerColor = CremaFondo,
+                    navigationIconContentColor = AzulMarino,
+                    actionIconContentColor = AzulMarino
+                ),
 
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(imageVector = Icons.AutoMirrored
-                                    .Outlined
-                                    .ArrowBack,
+                            .Outlined
+                            .ArrowBack,
                             contentDescription = "Regresar",
                             tint = AzulMarino
                         )
@@ -101,26 +181,26 @@ fun ContactoAyudaScreen(navController: NavHostController) {
                     )
                 },
                 actions = { IconButton(onClick = { navController.navigate(Rutas.Notificaciones.ruta) }) {
-                        Icon(imageVector = Icons.Default.Notifications,
-                            contentDescription = "Notificaciones",
-                            tint = AzulMarino
-                        )
-                    }
+                    Icon(imageVector = Icons.Default.Notifications,
+                        contentDescription = "Notificaciones",
+                        tint = AzulMarino
+                    )
+                }
                 }
             )
         }
     ) { paddingInterno ->
         Column(modifier = Modifier
-                .padding(paddingInterno)
-                .fillMaxSize()
-                .background(CremaFondo)
-                .verticalScroll(scrollState)
-                .padding(
-                    start = 20.dp,
-                    end = 20.dp,
-                    top = 18.dp,
-                    bottom = 28.dp
-                )
+            .padding(paddingInterno)
+            .fillMaxSize()
+            .background(CremaFondo)
+            .verticalScroll(scrollState)
+            .padding(
+                start = 20.dp,
+                end = 20.dp,
+                top = 18.dp,
+                bottom = 28.dp
+            )
         ) {
             Row(modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -128,13 +208,13 @@ fun ContactoAyudaScreen(navController: NavHostController) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = "Contacto y ayuda",
                         style = MaterialTheme.typography
-                                .headlineMedium,
+                            .headlineMedium,
                         color = AzulMarino
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(text = "¿Tienes dudas o sugerencias? Escríbenos.",
                         style = MaterialTheme.typography
-                                .titleSmall,
+                            .titleSmall,
                         color = AzulMarino
                     )
                 }
@@ -160,7 +240,7 @@ fun ContactoAyudaScreen(navController: NavHostController) {
                 placeholder = {
                     Text(text = "Escribe tu nombre",
                         style = MaterialTheme.typography
-                                .bodyMedium
+                            .bodyMedium
                     )
                 },
                 leadingIcon = {
@@ -172,13 +252,13 @@ fun ContactoAyudaScreen(navController: NavHostController) {
                 singleLine = true,
                 shape = RoundedCornerShape(14.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AzulMarino,
-                        unfocusedBorderColor = AzulMarino.copy(
-                                alpha = .20f
-                            ),
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent
-                    )
+                    focusedBorderColor = AzulMarino,
+                    unfocusedBorderColor = AzulMarino.copy(
+                        alpha = .20f
+                    ),
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent
+                )
             )
             Spacer(modifier = Modifier.height(20.dp))
             EtiquetaFormulario(texto = "Correo electrónico")
@@ -199,14 +279,18 @@ fun ContactoAyudaScreen(navController: NavHostController) {
                     )
                 },
                 singleLine = true,
+                isError = correo.isNotBlank() && !correoValido,
+                supportingText = if (correo.isNotBlank() && !correoValido) {
+                    { Text("Escribe un correo válido, ej. nombre@gmail.com") }
+                } else null,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 shape = RoundedCornerShape(14.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AzulMarino,
-                        unfocusedBorderColor = AzulMarino.copy(
-                                alpha = .20f
-                            )
+                    focusedBorderColor = AzulMarino,
+                    unfocusedBorderColor = AzulMarino.copy(
+                        alpha = .20f
                     )
+                )
             )
             Spacer(modifier = Modifier.height(20.dp))
             EtiquetaFormulario(texto = "Mensaje")
@@ -236,45 +320,32 @@ fun ContactoAyudaScreen(navController: NavHostController) {
                 },
                 shape = RoundedCornerShape(14.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = AzulMarino,
-                        unfocusedBorderColor = AzulMarino.copy(
-                            alpha = .20f
-                            )
+                    focusedBorderColor = AzulMarino,
+                    unfocusedBorderColor = AzulMarino.copy(
+                        alpha = .20f
                     )
+                )
             )
             Spacer(modifier = Modifier.height(26.dp))
             Button(
                 onClick = {
                     if (!enviando) {
                         enviando = true
-                        scope.launch {
-                            try { RetrofitInstance.api.enviarMensajeContacto(
-                                    ContactoRequestDto(
-                                        nombre = nombre.trim(),
-                                        correo = correo.trim(),
-                                        mensaje = mensaje.trim()
-                                    )
-                                )
-                                nombre = ""
-                                correo = ""
-                                mensaje = ""
-                                mensajeEnviado = true
-                                snackbarHostState.showSnackbar(
-                                    message = "Tu mensaje fue enviado correctamente."
-                                )
-                            } catch (e: Exception) {
-                                if (e is kotlinx.coroutines.CancellationException) throw e
-                                snackbarHostState.showSnackbar(
-                                    message = "No se pudo enviar el mensaje. Intenta nuevamente."
-                                )
-                            } finally {
-                                enviando = false
+                        // Paso 1: pedir el código; si sale bien, se abre el diálogo para escribirlo
+                        solicitarCodigo { error ->
+                            enviando = false
+                            if (error == null) {
+                                codigo = ""
+                                errorCodigo = null
+                                mostrarDialogoCodigo = true
+                            } else {
+                                scope.launch { snackbarHostState.showSnackbar(error) }
                             }
                         }
                     }
                 },
                 enabled = nombre.isNotBlank() &&
-                        correo.isNotBlank() &&
+                        correoValido &&
                         mensaje.isNotBlank() &&
                         !enviando,
                 modifier = Modifier
@@ -314,10 +385,10 @@ fun ContactoAyudaScreen(navController: NavHostController) {
                         Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(10.dp))
-                Text(text = "Este formulario es para dudas o sugerencias sobre Familias que Suman+.",
+                Text(text = "Este formulario es para dudas o sugerencias sobre Familias que Suman+. Para confirmar que el correo es tuyo, te enviaremos un código de 6 dígitos.",
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography
-                            .bodySmall,
+                        .bodySmall,
                     color = GrisTexto
                 )
             }
@@ -395,11 +466,91 @@ private fun ConfirmacionContactoScreen(
     }
 }
 
+/** Paso 2: escribir el código de 6 dígitos que llegó al correo. */
+@Composable
+private fun DialogoCodigoVerificacion(
+    correo: String,
+    codigo: String,
+    onCodigoCambia: (String) -> Unit,
+    error: String?,
+    confirmando: Boolean,
+    reenviando: Boolean,
+    segundosReenvio: Int,
+    onConfirmar: () -> Unit,
+    onReenviar: () -> Unit,
+    onCancelar: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onCancelar,
+        containerColor = CremaFondo,
+        icon = { Icon(Icons.Outlined.Lock, contentDescription = null, tint = AzulMarino) },
+        title = { Text("Revisa tu correo", color = AzulMarino) },
+        text = {
+            Column {
+                Text(
+                    text = "Te enviamos un código de 6 dígitos a $correo. Escríbelo para enviar tu mensaje. Vence en 10 minutos.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = GrisTexto
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = codigo,
+                    onValueChange = onCodigoCambia,
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("000000") },
+                    singleLine = true,
+                    enabled = !confirmando,
+                    isError = error != null && error != "Te enviamos un código nuevo.",
+                    supportingText = error?.let { { Text(it) } },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                    textStyle = MaterialTheme.typography.headlineSmall,
+                    shape = RoundedCornerShape(14.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = AzulMarino,
+                        unfocusedBorderColor = AzulMarino.copy(alpha = .20f)
+                    )
+                )
+                TextButton(
+                    onClick = onReenviar,
+                    enabled = segundosReenvio == 0 && !reenviando && !confirmando
+                ) {
+                    Text(
+                        text = when {
+                            reenviando -> "Enviando código..."
+                            segundosReenvio > 0 -> "Reenviar código en $segundosReenvio s"
+                            else -> "Reenviar código"
+                        },
+                        color = if (segundosReenvio == 0 && !reenviando) AzulMarino else GrisTexto
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirmar,
+                enabled = codigo.length == 6 && !confirmando,
+                colors = ButtonDefaults.buttonColors(containerColor = AzulMarino, contentColor = Blanco)
+            ) {
+                if (confirmando) {
+                    CircularProgressIndicator(modifier = Modifier.size(18.dp), color = Blanco, strokeWidth = 2.dp)
+                } else {
+                    Text("Confirmar y enviar")
+                }
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onCancelar, enabled = !confirmando) {
+                Text("Cancelar", color = AzulMarino)
+            }
+        }
+    )
+}
+
 @Composable
 private fun EtiquetaFormulario(texto: String) {
     Text(text = texto,
         style = MaterialTheme.typography
-                .titleSmall,
+            .titleSmall,
         color = AzulMarino
     )
 }

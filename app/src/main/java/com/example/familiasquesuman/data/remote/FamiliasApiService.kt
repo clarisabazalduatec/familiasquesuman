@@ -58,6 +58,8 @@ import com.example.familiasquesuman.domain.EncuestaActividadRequest
 import okhttp3.ResponseBody
 import com.example.familiasquesuman.data.remote.dto.ContactoRequestDto
 import com.example.familiasquesuman.data.remote.dto.ContactoResponseDto
+import com.example.familiasquesuman.data.remote.dto.ContactoCodigoResponseDto
+import com.example.familiasquesuman.data.remote.dto.ConfirmarCodigoDto
 
 /** El token lo agrega AuthInterceptor (en RetrofitInstance); no se pasa a mano. */
 interface FamiliasApiService {
@@ -191,9 +193,16 @@ interface FamiliasApiService {
     suspend fun getCategorias(@Query("ambito") ambito: String? = "ACTIVIDAD"): List<CategoriaDto>
 
     // ---------- Contacto y Ayuda ----------
-    @POST("contacto")
-    suspend fun enviarMensajeContacto(
+    // 1) Manda un código de 6 dígitos al correo de la persona (guarda el mensaje en el servidor)
+    @POST("contacto/solicitar-codigo")
+    suspend fun solicitarCodigoContacto(
         @Body datos: ContactoRequestDto
+    ): ContactoCodigoResponseDto
+
+    // 2) Con el código correcto, el servidor envía el mensaje al correo de Familias que Suman
+    @POST("contacto/confirmar-codigo")
+    suspend fun confirmarCodigoContacto(
+        @Body datos: ConfirmarCodigoDto
     ): ContactoResponseDto
 
     // ---------- Ciudades ----------
@@ -233,7 +242,7 @@ interface FamiliasApiService {
     // ---------- LIKES ----------
     @POST("comunidad/{id}/like")  suspend fun darLikePublicacion(@Path("id") id: String)
     @DELETE("comunidad/{id}/like") suspend fun quitarLikePublicacion(@Path("id") id: String)
-        // ---------- COMENTARIOS ----------
+    // ---------- COMENTARIOS ----------
     @GET("comunidad/{id}/comentarios") suspend fun obtenerComentariosPublicacion(@Path("id") id: String, @Query("limit") limit: Int = 50, @Query("offset") offset: Int = 0): List<ComentarioDto>
     @POST("comunidad/{id}/comentarios") suspend fun publicarComentario(@Path("id") id: String, @Body comentario: CrearComentarioRequest): ComentarioDto
     // ---------- Admin: Moderación de Comunidad ----------
