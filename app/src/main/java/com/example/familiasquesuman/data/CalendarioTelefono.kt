@@ -19,21 +19,29 @@ object CalendarioTelefono {
 
     /** Abre el calendario del teléfono con el evento listo. false si no hay app de calendario. */
     fun agregarUna(context: Context, actividad: Actividad): Boolean {
-        val inicio = actividad.iniciaEn ?: return false
+        val intent = crearEvento(actividad) ?: return false
+        return try {
+            context.startActivity(intent)
+            true
+        } catch (_: ActivityNotFoundException) {
+            false
+        }
+    }
+
+    /**
+     * El evento que se le pasa a la app de calendario (título, inicio, fin, lugar y descripción).
+     * null si la actividad no tiene fecha. Separado de agregarUna para poder probarlo (RF-07).
+     */
+    fun crearEvento(actividad: Actividad): Intent? {
+        val inicio = actividad.iniciaEn ?: return null
         val fin = actividad.terminaEn ?: inicio
-        val intent = Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI).apply {
+        return Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI).apply {
             putExtra(CalendarContract.Events.TITLE, actividad.titulo)
             putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, inicio.time)
             putExtra(CalendarContract.EXTRA_EVENT_END_TIME, fin.time)
             putExtra(CalendarContract.Events.EVENT_LOCATION, actividad.ubicacion)
             putExtra(CalendarContract.Events.DESCRIPTION, descripcion(actividad))
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-        return try {
-            context.startActivity(intent)
-            true
-        } catch (_: ActivityNotFoundException) {
-            false
         }
     }
 
