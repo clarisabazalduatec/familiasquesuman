@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -525,7 +526,7 @@ private fun DialogoBase(
         containerColor = Blanco,
         title = { Text(titulo, color = AzulMarino, fontWeight = FontWeight.Bold) },
         text = {
-            Column {
+            Column(modifier = Modifier.imePadding()) {
                 contenido()
                 if (error != null) {
                     Spacer(Modifier.height(10.dp))

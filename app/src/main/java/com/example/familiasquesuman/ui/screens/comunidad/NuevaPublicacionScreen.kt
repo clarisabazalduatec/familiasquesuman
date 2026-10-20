@@ -108,6 +108,7 @@ fun NuevaPublicacionScreen(
         Column(modifier = Modifier
                 .padding(paddingInterno)
                 .fillMaxSize()
+                .imePadding()
                 .background(CremaFondo)
                 .verticalScroll(scrollState)
                 .padding(18.dp)

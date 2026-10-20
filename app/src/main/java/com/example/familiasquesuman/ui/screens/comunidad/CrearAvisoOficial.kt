@@ -82,6 +82,7 @@ fun CrearAvisoOficialSheet(onCerrar: () -> Unit, onPublicado: () -> Unit) {
             Column(modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .imePadding()
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {

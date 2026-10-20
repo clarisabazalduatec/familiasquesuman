@@ -193,6 +193,7 @@ fun ContactoAyudaScreen(navController: NavHostController) {
         Column(modifier = Modifier
             .padding(paddingInterno)
             .fillMaxSize()
+            .imePadding()
             .background(CremaFondo)
             .verticalScroll(scrollState)
             .padding(

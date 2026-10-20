@@ -20,6 +20,7 @@ fun BarraEscribirMensaje(
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .imePadding()
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

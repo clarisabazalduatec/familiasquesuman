@@ -80,6 +80,7 @@ fun PerfilScreen(
             modifier = Modifier
                 .padding(paddingInterno)
                 .fillMaxSize()
+                .imePadding()
                 .background(CremaFondo),
             contentPadding = PaddingValues(
                 start = 16.dp,

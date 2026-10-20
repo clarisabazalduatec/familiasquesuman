@@ -141,6 +141,7 @@ private fun DetallePublicacion(
     LazyColumn(modifier = Modifier
             .padding(paddingInterno)
             .fillMaxSize()
+            .imePadding()
             .background(CremaFondo),
         contentPadding = PaddingValues(bottom = 28.dp)
     ) {
