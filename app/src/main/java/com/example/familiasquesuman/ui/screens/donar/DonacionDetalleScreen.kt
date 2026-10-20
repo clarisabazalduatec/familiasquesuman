@@ -39,6 +39,7 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
+import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.GrisBorde
 import com.example.familiasquesuman.ui.navigation.Rutas
 
@@ -129,17 +130,17 @@ fun DonacionDetalleScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.background)
+                .background(CremaFondo)
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState()),
         ) {
             if (donacion.imagenUrl.isNotBlank()) {
-                Box(modifier = Modifier.fillMaxWidth()) {
+                Box(modifier = Modifier.fillMaxWidth().height(240.dp)) {
                     AsyncImage(
                         model = donacion.imagenUrl,
                         contentDescription = donacion.titulo,
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxWidth().height(200.dp)
+                        modifier = Modifier.fillMaxSize()
                     )
                 }
             }
@@ -749,11 +750,11 @@ fun SeccionOpcionesSugeridas(donacion: Donacion) {
 fun TarjetaSeccion(content: @Composable ColumnScope.() -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp), content = content)
+        Column(modifier = Modifier.padding(20.dp), content = content)
     }
 }
 

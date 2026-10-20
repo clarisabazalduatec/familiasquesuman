@@ -147,6 +147,93 @@ fun formatearHoraDisplay(hora: Pair<Int, Int>?): String {
     return sdf.format(cal.time)
 }
 
+fun crearFechaUtcMillis(year: Int, month: Int, day: Int): Long {
+    val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+        clear()
+        set(Calendar.YEAR, year)
+        set(Calendar.MONTH, month)
+        set(Calendar.DAY_OF_MONTH, day)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }
+    return cal.timeInMillis
+}
+
+fun parsearFechaFallback(fechaStr: String): Long? {
+    if (fechaStr.isBlank()) return null
+    val limpio = fechaStr.replace(Regex("^[A-Za-záéíóúÁÉÍÓÚ]+,\\s*"), "").trim()
+    val localeEsMx = Locale.forLanguageTag("es-MX")
+    val tzMty = TimeZone.getTimeZone("America/Monterrey")
+    val formatos = listOf(
+        SimpleDateFormat("d 'de' MMM, yyyy", localeEsMx).apply { timeZone = tzMty },
+        SimpleDateFormat("d 'de' MMM", localeEsMx).apply { timeZone = tzMty },
+        SimpleDateFormat("d 'de' MMMM, yyyy", localeEsMx).apply { timeZone = tzMty },
+        SimpleDateFormat("d 'de' MMMM", localeEsMx).apply { timeZone = tzMty },
+        SimpleDateFormat("dd/MM/yyyy", Locale.US).apply { timeZone = tzMty },
+        SimpleDateFormat("yyyy-MM-dd", Locale.US).apply { timeZone = tzMty },
+        SimpleDateFormat("d MMM yyyy", localeEsMx).apply { timeZone = tzMty },
+        SimpleDateFormat("d MMM", localeEsMx).apply { timeZone = tzMty }
+    )
+    val currentYear = Calendar.getInstance(tzMty).get(Calendar.YEAR)
+    for (sdf in formatos) {
+        sdf.isLenient = true
+        try {
+            val date = sdf.parse(limpio)
+            if (date != null) {
+                val tempCal = Calendar.getInstance(tzMty).apply { time = date }
+                var year = tempCal.get(Calendar.YEAR)
+                if (year <= 1970) {
+                    year = currentYear
+                }
+                val month = tempCal.get(Calendar.MONTH)
+                val day = tempCal.get(Calendar.DAY_OF_MONTH)
+                return crearFechaUtcMillis(year, month, day)
+            }
+        } catch (_: Exception) {
+        }
+    }
+    return null
+}
+
+private fun parsearHora(horaStr: String): Pair<Int, Int>? {
+    val limpio = horaStr.trim().uppercase(Locale.US)
+    val regex = Regex("(\\d{1,2}):(\\d{2})")
+    val match = regex.find(limpio)
+    if (match != null) {
+        var h = match.groupValues[1].toIntOrNull() ?: return null
+        val m = match.groupValues[2].toIntOrNull() ?: return null
+        val esPM = limpio.contains("PM")
+        val esAM = limpio.contains("AM")
+        if (esPM && h < 12) h += 12
+        else if (esAM && h == 12) h = 0
+        if (h in 0..23 && m in 0..59) return h to m
+    }
+    val regexSoloHora = Regex("(\\d{1,2})\\s*(AM|PM)?")
+    val matchSolo = regexSoloHora.find(limpio)
+    if (matchSolo != null) {
+        var h = matchSolo.groupValues[1].toIntOrNull() ?: return null
+        val amPm = matchSolo.groupValues[2]
+        if (amPm == "PM" && h < 12) h += 12
+        else if (amPm == "AM" && h == 12) h = 0
+        if (h in 0..23) return h to 0
+    }
+    return null
+}
+
+fun parsearHorarioFallback(horarioStr: String): Pair<Pair<Int, Int>?, Pair<Int, Int>?> {
+    if (horarioStr.isBlank()) return null to null
+    try {
+        val partes = horarioStr.split("-").map { it.trim() }
+        val inicio = partes.getOrNull(0)?.let { parsearHora(it) }
+        val fin = partes.getOrNull(1)?.let { parsearHora(it) }
+        return inicio to fin
+    } catch (_: Exception) {
+        return null to null
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Modelo -> formulario (para precargar al editar)
 // ---------------------------------------------------------------------------
@@ -159,16 +246,29 @@ fun Actividad.aFormulario(): Pair<ComunForm, ActividadForm> {
         Calendar.getInstance(TimeZone.getTimeZone("America/Monterrey")).apply { time = it }
     }
 
-    val fechaMillis = calInicio?.run {
-        val calUtc = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
-            clear()
-            set(get(Calendar.YEAR), get(Calendar.MONTH), get(Calendar.DAY_OF_MONTH))
-        }
-        calUtc.timeInMillis
+    val fechaMillisFromDate = calInicio?.run {
+        val y = get(Calendar.YEAR)
+        if (y > 1970) {
+            crearFechaUtcMillis(y, get(Calendar.MONTH), get(Calendar.DAY_OF_MONTH))
+        } else null
+    }
+
+    val fechaMillis = fechaMillisFromDate ?: parsearFechaFallback(fecha) ?: run {
+        val today = Calendar.getInstance(TimeZone.getTimeZone("America/Monterrey"))
+        crearFechaUtcMillis(
+            today.get(Calendar.YEAR),
+            today.get(Calendar.MONTH),
+            today.get(Calendar.DAY_OF_MONTH)
+        )
     }
 
     val horaInicioPair = calInicio?.let { it.get(Calendar.HOUR_OF_DAY) to it.get(Calendar.MINUTE) }
+        ?: parsearHorarioFallback(horario).first
+        ?: (9 to 0)
+
     val horaFinPair = calFin?.let { it.get(Calendar.HOUR_OF_DAY) to it.get(Calendar.MINUTE) }
+        ?: parsearHorarioFallback(horario).second
+        ?: (12 to 0)
 
     return ComunForm(
         titulo = titulo,
