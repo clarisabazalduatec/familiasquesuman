@@ -22,7 +22,9 @@ data class UsuarioDto(
     // "USUARIO" o "ADMIN". Nullable porque Gson deja null si el backend no lo manda.
     val rol: String? = "USUARIO",
     // "/imagenes/abc.jpg" o null si no tiene foto
-    @SerializedName("foto_url") val fotoUrl: String? = null
+    @SerializedName("foto_url") val fotoUrl: String? = null,
+    // false = falta escribir el código que llegó al correo. null (backend viejo) se toma como verificado.
+    @SerializedName("correo_verificado") val correoVerificado: Boolean? = null
 )
 
 data class TokenResponseDto(
@@ -40,9 +42,20 @@ data class PerfilDto(
     val rol: String?,
     val parentesco: String?,
     val familia_id: String?,
-    @SerializedName("foto_url") val fotoUrl: String? = null
+    @SerializedName("foto_url") val fotoUrl: String? = null,
+    @SerializedName("correo_verificado") val correoVerificado: Boolean? = null
 ) {
     fun aUsuarioDto() = UsuarioDto(
-        id = id, nombre = nombre, email = email, ciudad = ciudad, rol = rol, fotoUrl = fotoUrl
+        id = id, nombre = nombre, email = email, ciudad = ciudad, rol = rol, fotoUrl = fotoUrl,
+        correoVerificado = correoVerificado
     )
 }
+
+/** POST /auth/verificacion/confirmar */
+data class CodigoVerificacionDto(val codigo: String)
+
+/** Respuesta de POST /auth/verificacion/enviar */
+data class EnvioCodigoDto(
+    val mensaje: String,
+    @SerializedName("expira_en_minutos") val expiraEnMinutos: Int = 10
+)
