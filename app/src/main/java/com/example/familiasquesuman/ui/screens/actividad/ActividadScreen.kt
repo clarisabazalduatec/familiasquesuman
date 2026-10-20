@@ -24,7 +24,6 @@ import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 import com.example.familiasquesuman.ui.navigation.Rutas
-import com.example.familiasquesuman.ui.screens.actividad.components.BannerSincronizarCalendario
 import com.example.familiasquesuman.ui.screens.actividad.components.HeaderDiaActividades
 import com.example.familiasquesuman.ui.screens.actividad.components.TarjetaActividadDia
 import com.example.familiasquesuman.ui.theme.CremaFondo
@@ -178,8 +177,6 @@ fun ActividadScreen(
                             }
                         }
                     }
-
-                    item { BannerSincronizarCalendario() }
 
                     // Aviso de Privacidad
                     item {

@@ -1,5 +1,6 @@
 package com.example.familiasquesuman.ui.screens.actividad
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -20,6 +21,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import com.example.familiasquesuman.data.CalendarioTelefono
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +52,7 @@ fun ActividadConfirmacionScreen(
     }
 
     val detalleState by viewModel.detalleUiState.collectAsState()
+    val context = LocalContext.current
     val inscripcionState by inscripcionViewModel.uiState.collectAsState()
 
     val regresarAlDetalle = {
@@ -285,7 +289,13 @@ fun ActividadConfirmacionScreen(
 
                     Column(modifier = Modifier.padding(horizontal = 24.dp)) {
                         Button(
-                            onClick = { /* Calendario */ },
+                            onClick = {
+                                // Abre la app de calendario con el evento listo (no pide permisos)
+                                val agregada = CalendarioTelefono.agregarUna(context, actividad)
+                                if (!agregada) {
+                                    Toast.makeText(context, "No se encontró una app de calendario.", Toast.LENGTH_SHORT).show()
+                                }
+                            },
                             colors = ButtonDefaults.buttonColors(containerColor = AmarilloOscuro),
                             shape = RoundedCornerShape(12.dp),
                             modifier = Modifier
