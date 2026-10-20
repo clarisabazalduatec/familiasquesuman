@@ -47,8 +47,8 @@ fun NotificacionItem(
         onClick = onClick,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            // Las no leídas resaltan un poco
-            containerColor = if (notificacion.leida) Blanco else AmbarClaro.copy(alpha = 0.45f),
+            // Las no leídas resaltan con un fondo sólido y cálido
+            containerColor = if (notificacion.leida) Blanco else AmbarClaro,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = modifier.fillMaxWidth(),
