@@ -42,6 +42,7 @@ import com.example.familiasquesuman.domain.Proyecto
 import com.example.familiasquesuman.ui.components.BotonComoLlegar
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.components.TarjetaContacto
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AmbarClaro
@@ -212,11 +213,12 @@ private fun ContenidoDetalle(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                // Link de Google Maps que guardó el admin (si no hay, no se muestra)
-                if (!proyecto.ubicacionUrl.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    BotonComoLlegar(url = proyecto.ubicacionUrl)
-                }
+                // Link / búsqueda de Google Maps
+                Spacer(modifier = Modifier.height(16.dp))
+                BotonComoLlegar(
+                    url = proyecto.ubicacionUrl,
+                    direccion = proyecto.ubicacion
+                )
             }
         }
 
@@ -290,36 +292,12 @@ private fun ContenidoDetalle(
         Spacer(modifier = Modifier.height(16.dp))
 
         // ---------- Contacto ----------
-        proyecto.telefonoWhatsapp?.let { numero ->
-            BotonPrimario(
-                onClick = {
-                    abrirWhatsApp(
-                        context, numero,
-                        "Hola, vi el proyecto \"${proyecto.nombre}\" en Familias que Suman " +
-                                "y me gustaría más información."
-                    )
-                },
-                containerColor = AzulMarino,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.Chat, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Escribir por WhatsApp", fontWeight = FontWeight.Bold)
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-
-        proyecto.telefonoLlamada?.let { telefono ->
-            BotonPrimario(
-                onClick = { abrirEnlace(context, "tel:$telefono") },
-                containerColor = Ambar,
-                contentColor = AzulMarino
-            ) {
-                Icon(imageVector = Icons.Default.Phone, contentDescription = null)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Llamar: $telefono", fontWeight = FontWeight.Bold)
-            }
-        }
+        TarjetaContacto(
+            nombreContacto = proyecto.nombre,
+            telefono = proyecto.telefonoLlamada,
+            whatsapp = proyecto.telefonoWhatsapp,
+            mensajeWhatsapp = "Hola, vi el proyecto \"${proyecto.nombre}\" en Familias que Suman y me gustaría más información."
+        )
 
         // Curado por
         Spacer(modifier = Modifier.height(16.dp))

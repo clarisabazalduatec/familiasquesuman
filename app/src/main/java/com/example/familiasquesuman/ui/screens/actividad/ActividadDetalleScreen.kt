@@ -277,11 +277,12 @@ fun ActividadDetalleScreen(
                                 )
                             }
 
-                            // Link de Google Maps que guardó el admin (si no hay, no se muestra)
-                            if (!actividad.ubicacionUrl.isNullOrBlank()) {
-                                Spacer(modifier = Modifier.height(12.dp))
-                                BotonComoLlegar(url = actividad.ubicacionUrl)
-                            }
+                            // Botón "Cómo llegar"
+                            Spacer(modifier = Modifier.height(12.dp))
+                            BotonComoLlegar(
+                                url = actividad.ubicacionUrl,
+                                direccion = actividad.ubicacion
+                            )
 
                             Spacer(modifier = Modifier.height(16.dp))
 

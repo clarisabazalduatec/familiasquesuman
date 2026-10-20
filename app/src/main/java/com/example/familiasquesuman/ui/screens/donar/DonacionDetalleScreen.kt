@@ -34,24 +34,16 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.familiasquesuman.domain.Donacion
 import com.example.familiasquesuman.domain.TipoDonacion
+import com.example.familiasquesuman.ui.components.BotonComoLlegar
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.components.TarjetaContacto
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.GrisBorde
 import com.example.familiasquesuman.ui.navigation.Rutas
-
-fun abrirEnlaceWeb(context: Context, url: String) {
-    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
-    context.startActivity(intent)
-}
-
-fun abrirMaps(context: Context, direccion: String) {
-    val intent = Intent(Intent.ACTION_VIEW, "geo:0,0?q=${Uri.encode(direccion)}".toUri())
-    context.startActivity(intent)
-}
 
 @Composable
 fun EncabezadoBadges(tipoTexto: String, activa: Boolean) {
@@ -94,7 +86,6 @@ fun DonacionDetalleScreen(
 
     val donacion = viewModel.donacionSeleccionada.collectAsState().value
     val isLoading by viewModel.isLoading.collectAsState()
-    val context = LocalContext.current
     val iraDonacion = {
         if (navController.currentDestination?.route != Rutas.Donar.ruta) {
             navController.navigate(Rutas.Donar.ruta) {
@@ -152,9 +143,9 @@ fun DonacionDetalleScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 when (donacion.tipo) {
-                    TipoDonacion.ESPECIE -> DetalleEspecieView(donacion = donacion, context = context)
-                    TipoDonacion.TIEMPO -> DetalleTiempoView(donacion = donacion, context = context)
-                    else -> DetalleCampanaView(donacion = donacion, context = context)
+                    TipoDonacion.ESPECIE -> DetalleEspecieView(donacion = donacion)
+                    TipoDonacion.TIEMPO -> DetalleTiempoView(donacion = donacion)
+                    else -> DetalleCampanaView(donacion = donacion)
                 }
             }
         }
@@ -162,7 +153,7 @@ fun DonacionDetalleScreen(
 }
 
 @Composable
-fun DetalleEspecieView(donacion: Donacion, context: Context) {
+fun DetalleEspecieView(donacion: Donacion) {
     TarjetaSeccion {
         EncabezadoBadges(tipoTexto = "En Especie", activa = donacion.activa)
 
@@ -262,54 +253,21 @@ fun DetalleEspecieView(donacion: Donacion, context: Context) {
         }
     }
 
-    TarjetaSeccion {
-        Text(
-            text = "Contacto",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = AzulMarino,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+    TarjetaContacto(
+        nombreContacto = donacion.fundacion,
+        telefono = donacion.telefonoWhatsapp,
+        whatsapp = donacion.telefonoWhatsapp,
+        mensajeWhatsapp = "Hola, me interesa apoyar en la donación: ${donacion.titulo}"
+    )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            if (!donacion.telefonoWhatsapp.isNullOrBlank()) {
-                Button(
-                    onClick = {
-                        val numero = donacion.telefonoWhatsapp
-                        context.startActivity(Intent(Intent.ACTION_DIAL, "tel:$numero".toUri()))
-                    },
-                    modifier = Modifier.weight(1f).height(48.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = AzulMarino)
-                ) {
-                    Icon(Icons.Default.Phone, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Llamar", fontWeight = FontWeight.Bold)
-                }
-            }
-
-            val urlMapa = donacion.ubicacionUrl
-            if (!urlMapa.isNullOrBlank()) {
-                Button(
-                    onClick = { abrirEnlaceWeb(context, urlMapa) },
-                    modifier = Modifier.weight(1f).height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Ambar),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Icon(Icons.Default.Navigation, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.White)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Cómo llegar", fontWeight = FontWeight.Bold, color = Color.White)
-                }
-            }
-        }
-    }
+    BotonComoLlegar(
+        url = donacion.ubicacionUrl,
+        direccion = donacion.direccionCompleta ?: donacion.ubicacion
+    )
 }
 
 @Composable
-fun DetalleCampanaView(donacion: Donacion, context: Context) {
+fun DetalleCampanaView(donacion: Donacion) {
     TarjetaSeccion {
         EncabezadoBadges(tipoTexto = "Campaña", activa = donacion.activa)
 
@@ -449,58 +407,21 @@ fun DetalleCampanaView(donacion: Donacion, context: Context) {
         }
     }
 
-    TarjetaSeccion {
-        Text(
-            text = "Contacto",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = AzulMarino,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+    TarjetaContacto(
+        nombreContacto = donacion.fundacion,
+        telefono = donacion.telefonoWhatsapp,
+        whatsapp = donacion.telefonoWhatsapp,
+        mensajeWhatsapp = "Hola, me interesa ayudar en la campaña: ${donacion.titulo}"
+    )
 
-        if (donacion.fundacion.isNotBlank()) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = donacion.fundacion, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        if (!donacion.telefonoWhatsapp.isNullOrBlank()) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Phone, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = donacion.telefonoWhatsapp, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Button(
-                    onClick = {
-                        val numero = donacion.telefonoWhatsapp
-                        val mensaje = "Hola, me interesa ayudar en la campaña: ${donacion.titulo}"
-                        abrirEnlaceWeb(context, "https://wa.me/$numero?text=${Uri.encode(mensaje)}")
-                    },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF66BB6A)),
-                    shape = RoundedCornerShape(12.dp),
-                ) {
-                    Icon(Icons.Default.Phone, contentDescription = "WhatsApp", modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Contactar por WhatsApp", fontWeight = FontWeight.Bold)
-                }
-            }
-        }
-    }
+    BotonComoLlegar(
+        url = donacion.ubicacionUrl,
+        direccion = donacion.ubicacion
+    )
 }
 
 @Composable
-fun DetalleTiempoView(donacion: Donacion, context: Context) {
+fun DetalleTiempoView(donacion: Donacion) {
     TarjetaSeccion {
         EncabezadoBadges(tipoTexto = "Voluntariado", activa = donacion.activa)
 
@@ -597,54 +518,17 @@ fun DetalleTiempoView(donacion: Donacion, context: Context) {
         }
     }
 
-    TarjetaSeccion {
-        Text(
-            text = "Contacto",
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = AzulMarino,
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+    TarjetaContacto(
+        nombreContacto = donacion.fundacion,
+        telefono = donacion.telefonoWhatsapp,
+        whatsapp = donacion.telefonoWhatsapp,
+        mensajeWhatsapp = "Hola, me interesa participar como voluntario en: ${donacion.titulo}"
+    )
 
-        if (donacion.fundacion.isNotBlank()) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = donacion.fundacion, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        if (!donacion.telefonoWhatsapp.isNullOrBlank()) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Phone, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(text = donacion.telefonoWhatsapp, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Button(
-                    onClick = {
-                        val numero = donacion.telefonoWhatsapp
-                        val mensaje = "Hola, me interesa participar como voluntario en: ${donacion.titulo}"
-                        abrirEnlaceWeb(context, "https://wa.me/$numero?text=${Uri.encode(mensaje)}")
-                    },
-                    modifier = Modifier.fillMaxWidth().height(48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF66BB6A)),
-                    shape = RoundedCornerShape(12.dp),
-                ) {
-                    Icon(Icons.Default.Phone, contentDescription = "WhatsApp", modifier = Modifier.size(18.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Quiero ser voluntario", fontWeight = FontWeight.Bold)
-                }
-            }
-        }
-    }
+    BotonComoLlegar(
+        url = donacion.ubicacionUrl,
+        direccion = donacion.ubicacion
+    )
 }
 
 @Composable

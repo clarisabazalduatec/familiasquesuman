@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.familiasquesuman.ui.components.BotonComoLlegar
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
@@ -225,6 +226,11 @@ fun ActividadConfirmacionScreen(
                                     Text(actividad.ubicacion, color = AzulOscuro, fontSize = 16.sp)
                                 }
                             }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            BotonComoLlegar(
+                                url = actividad.ubicacionUrl,
+                                direccion = actividad.ubicacion
+                            )
                             HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = GrisBordeClaro)
 
                             Row {

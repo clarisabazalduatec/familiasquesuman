@@ -43,8 +43,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.familiasquesuman.domain.CentroVisiteo
+import com.example.familiasquesuman.ui.components.BotonComoLlegar
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.components.TarjetaContacto
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AmbarClaro
@@ -53,25 +55,6 @@ import com.example.familiasquesuman.ui.theme.CremaFondo
 import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 import com.example.familiasquesuman.ui.theme.GrisBorde
 import com.example.familiasquesuman.ui.theme.GrisTexto
-
-/** Abre la app que maneje el link; si no hay ninguna (emulador sin Maps, etc.) no truena. */
-private fun abrirLink(context: Context, url: String) {
-    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri())) }
-}
-
-/** "Cómo llegar": el link que guardó el admin; si no hay, busca la dirección en Google Maps. */
-private fun abrirUbicacionEnMapa(context: Context, mapaUrl: String?, direccion: String) {
-    abrirLink(context, mapaUrl ?: "https://www.google.com/maps/search/?api=1&query=${Uri.encode(direccion)}")
-}
-
-private fun abrirWhatsApp(context: Context, numeroWhatsapp: String, nombreCentro: String) {
-    val mensaje = "Hola, me interesa apoyar/visitar el centro: $nombreCentro"
-    abrirLink(context, "https://wa.me/$numeroWhatsapp?text=${Uri.encode(mensaje)}")
-}
-
-private fun realizarLlamada(context: Context, telefono: String) {
-    abrirLink(context, "tel:$telefono")
-}
 
 @Composable
 fun DirectorioDetalleScreen(
@@ -132,7 +115,6 @@ private fun ContenidoCentro(
     centro: CentroVisiteo,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -346,84 +328,19 @@ private fun ContenidoCentro(
             }
         }
 
-        // Botón 1: WhatsApp (Verde)
-        val numWhatsapp = centro.whatsapp
-        if (numWhatsapp != null) Button(
-            onClick = { abrirWhatsApp(context, numWhatsapp, centro.nombre) },
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF22C55E),
-                contentColor = Color.White,
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Chat,
-                contentDescription = "WhatsApp",
-                modifier = Modifier.size(20.dp),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "WhatsApp",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-            )
-        }
+        // Tarjeta de contacto estandarizada
+        TarjetaContacto(
+            nombreContacto = centro.nombre,
+            telefono = centro.telefono,
+            whatsapp = centro.whatsapp,
+            mensajeWhatsapp = "Hola, me interesa apoyar/visitar el centro: ${centro.nombre}"
+        )
 
-        // Botón 2: Llamar (Verde Delineado)
-        val numTelefono = centro.telefono
-        if (numTelefono != null) OutlinedButton(
-            onClick = { realizarLlamada(context, numTelefono) },
-            shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(1.5.dp, Color(0xFF22C55E)),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = Color(0xFF22C55E),
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-        ) {
-            Icon(
-                imageVector = Icons.Default.Phone,
-                contentDescription = "Llamar",
-                modifier = Modifier.size(20.dp),
-                tint = Color(0xFF22C55E),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Llamar: $numTelefono",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                color = Color(0xFF22C55E),
-            )
-        }
-
-        // Botón 3: Cómo llegar (Azul)
-        Button(
-            onClick = { abrirUbicacionEnMapa(context, centro.mapaUrl, centro.direccion) },
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF2563EB),
-                contentColor = Color.White,
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-        ) {
-            Icon(
-                imageVector = Icons.Default.NearMe,
-                contentDescription = "Cómo llegar",
-                modifier = Modifier.size(20.dp),
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = "Cómo llegar",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-            )
-        }
+        // Botón "Cómo llegar"
+        BotonComoLlegar(
+            url = centro.mapaUrl,
+            direccion = centro.direccion
+        )
 
         // Tarjeta 6: Centro verificado
         if (centro.verificado) Card(
