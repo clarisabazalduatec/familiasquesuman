@@ -33,11 +33,14 @@ class DirectorioViewModel(
     private val _detalle = MutableStateFlow(CentroDetalleUiState())
     val detalle: StateFlow<CentroDetalleUiState> = _detalle.asStateFlow()
 
+    private var ciudadActual: Int? = null
+
     /** Se llama cada vez que se abre la pantalla: si ya hay datos, se quedan visibles mientras recarga. */
-    fun cargarLista() {
+    fun cargarLista(ciudadId: Int? = ciudadActual) {
+        ciudadActual = ciudadId
         _lista.update { it.copy(cargando = true, error = null) }
         viewModelScope.launch {
-            repo.listar()
+            repo.listar(ciudadId)
                 .onSuccess { centros -> _lista.value = DirectorioUiState(cargando = false, centros = centros) }
                 .onFailure { e -> _lista.update { it.copy(cargando = false, error = e.message) } }
         }

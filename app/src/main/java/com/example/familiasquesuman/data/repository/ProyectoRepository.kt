@@ -10,8 +10,8 @@ class ProyectoRepository(
 ) {
 
     /** Proyectos visibles (activos y anteriores). */
-    suspend fun listar(): Result<List<Proyecto>> = llamarApi {
-        RetrofitInstance.api.listarProyectos().map { it.aDominio() }
+    suspend fun listar(ciudadId: Int? = null): Result<List<Proyecto>> = llamarApi {
+        RetrofitInstance.api.listarProyectos(ciudadId = ciudadId).map { it.aDominio() }
     }
 
     suspend fun detalle(id: String): Result<Proyecto> = llamarApi {

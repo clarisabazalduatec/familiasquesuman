@@ -38,8 +38,9 @@ fun ActividadScreen(
 ) {
     var mostrarCalendario by remember { mutableStateOf(value = false) }
 
-    LaunchedEffect(Unit) {
-        viewModel.cargarActividades()
+    val ciudadId = SesionManager.usuario?.ciudad?.id
+    LaunchedEffect(ciudadId) {
+        viewModel.cargarActividades(ciudadId)
     }
 
     val uiState by viewModel.uiState.collectAsState()

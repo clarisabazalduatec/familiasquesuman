@@ -94,7 +94,10 @@ fun PerfilScreen(
                     onClickFoto = if (SesionManager.estaAutenticado) {
                         { viewModel.abrirDialogo(DialogoPerfil.Foto) }
                     } else null,
-                    subiendoFoto = uiState.subiendoFoto
+                    subiendoFoto = uiState.subiendoFoto,
+                    onCiudadCambiada = {
+                        viewModel.cargar()
+                    }
                 )
             }
 

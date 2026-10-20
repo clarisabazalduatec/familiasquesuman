@@ -174,6 +174,11 @@ class PerfilViewModel(
             }
         }
 
+    fun cambiarCiudad(ciudadId: Int) =
+        accionDirecta("Ciudad actualizada") {
+            repo.cambiarMiCiudad(ciudadId)
+        }
+
     // ---------- menores ----------
 
     /** id null = agregar; fecha en formato "AAAA-MM-DD". */

@@ -193,7 +193,10 @@ fun InicioScreen(
                 SaludoConUbicacion(
                     nombreUsuario = com.example.familiasquesuman.data.SesionManager.usuario?.nombre
                         ?.substringBefore(" ") ?: "familia",
-                    ciudad = com.example.familiasquesuman.data.SesionManager.usuario?.ciudad?.nombre.orEmpty()
+                    ciudad = com.example.familiasquesuman.data.SesionManager.usuario?.ciudad?.nombre.orEmpty(),
+                    onCiudadCambiada = {
+                        actualizacion++
+                    }
                 )
             }
             item {

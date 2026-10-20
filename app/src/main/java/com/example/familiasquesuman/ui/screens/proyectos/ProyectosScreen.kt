@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.domain.EstadoProyecto
 import com.example.familiasquesuman.ui.components.BarraBusqueda
 import com.example.familiasquesuman.ui.components.EstadoErrorServidor
@@ -36,8 +37,8 @@ fun ProyectosScreen(
 
     val uiState by viewModel.lista.collectAsState()
 
-    // Recarga cada vez que se abre la pantalla (por si el admin agregó o editó algo).
-    LaunchedEffect(Unit) { viewModel.cargarLista() }
+    val ciudadId = SesionManager.usuario?.ciudad?.id
+    LaunchedEffect(ciudadId) { viewModel.cargarLista(ciudadId) }
 
     val proyectosFiltrados = remember(uiState.proyectos, pestanaActiva, textoBusqueda) {
         uiState.proyectos.filter { it.estado == pestanaActiva }.filter {
