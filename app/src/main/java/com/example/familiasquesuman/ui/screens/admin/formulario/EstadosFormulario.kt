@@ -320,6 +320,7 @@ fun validarFormulario(
 
         TipoContenidoAdmin.DONACION -> when {
             donacion.fundacion.isBlank() -> "Indica la fundación u organización."
+            donacion.whatsapp.isBlank() -> "El teléfono de WhatsApp / contacto es obligatorio."
             donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && donacion.categoria.isBlank() -> "Elige o crea una categoría."
             imagenes.isEmpty() -> "Agrega una imagen para la donación."
             !telefonoValido(donacion.whatsapp) -> MSG_TELEFONO
