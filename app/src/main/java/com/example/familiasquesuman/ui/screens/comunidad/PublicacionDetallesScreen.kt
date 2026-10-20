@@ -326,13 +326,6 @@ private fun DetallePublicacion(
                     style = MaterialTheme.typography.bodyMedium,
                     color = AzulMarino
                 )
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = {}) {
-                    Icon(imageVector = Icons.Outlined.Share,
-                        contentDescription = "Compartir",
-                        tint = AzulMarino
-                    )
-                }
             }
             errorLike?.let { mensaje ->
                 Text(text = mensaje,
