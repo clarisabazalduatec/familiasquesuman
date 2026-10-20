@@ -77,6 +77,10 @@ data class PerfilActualizarDto(
     val parentesco: String? = null
 )
 
+data class CiudadActualizarDto(
+    @SerializedName("ciudad_id") val ciudadId: Int
+)
+
 // ---------- Parentescos: código del backend <-> texto en pantalla ----------
 
 object Parentescos {

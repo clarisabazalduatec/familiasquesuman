@@ -8,6 +8,7 @@ import com.example.familiasquesuman.data.remote.dto.InscripcionDto
 import com.example.familiasquesuman.data.remote.dto.InscripcionGuardarDto
 import com.example.familiasquesuman.data.remote.dto.MiInscripcionDto
 import com.example.familiasquesuman.data.remote.dto.ActividadDto
+import com.example.familiasquesuman.data.remote.dto.CiudadActualizarDto
 import com.example.familiasquesuman.data.remote.dto.CiudadDto
 import com.example.familiasquesuman.data.remote.dto.ActividadGuardarDto
 import com.example.familiasquesuman.data.remote.dto.CategoriaCrearDto
@@ -72,6 +73,9 @@ interface FamiliasApiService {
 
     @PATCH("usuarios/me")
     suspend fun actualizarMiPerfil(@Body datos: PerfilActualizarDto): PerfilDto
+
+    @PUT("usuarios/me/ciudad")
+    suspend fun cambiarMiCiudad(@Body datos: CiudadActualizarDto): PerfilDto
 
     @Multipart
     @PUT("usuarios/me/foto")

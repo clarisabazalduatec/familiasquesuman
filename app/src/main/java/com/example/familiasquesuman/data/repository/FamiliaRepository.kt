@@ -39,6 +39,12 @@ class FamiliaRepository {
         api.actualizarMiPerfil(PerfilActualizarDto(parentesco = parentesco))
     }
 
+    suspend fun cambiarMiCiudad(ciudadId: Int): Result<PerfilDto> = llamarApi {
+        api.cambiarMiCiudad(com.example.familiasquesuman.data.remote.dto.CiudadActualizarDto(ciudadId)).also { perfil ->
+            SesionManager.actualizarUsuario(perfil.aUsuarioDto())
+        }
+    }
+
     /** null = el usuario todavía no tiene familia (el backend responde 404). */
     suspend fun miFamilia(): Result<FamiliaDto?> = llamarApi {
         try {
