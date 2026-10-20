@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.familiasquesuman.data.actividadesMockData
+import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.components.EstadoErrorServidor
 import com.example.familiasquesuman.ui.components.EstadoVacio
 import com.example.familiasquesuman.ui.components.FiltrosChips
@@ -47,36 +47,6 @@ fun ActividadScreen(
     val categoriaSeleccionada by viewModel.categoriaSeleccionada.collectAsState()
     val categorias by viewModel.categorias.collectAsState()
 
-    val actividadesActivas = remember(actividadesMockData) { actividadesMockData.filter { it.activa } }
-    val actividadesInscritas = remember(actividadesActivas) {
-        buildList {
-            actividadesActivas.getOrNull(0)?.let { actividad ->
-                add(
-                    ActividadInscritaCalendario(
-                        actividadId = actividad.id,
-                        fecha = "2026-10-24",
-                    )
-                )
-            }
-            actividadesActivas.getOrNull(2)?.let { actividad ->
-                add(
-                    ActividadInscritaCalendario(
-                        actividadId = actividad.id,
-                        fecha = "2026-10-28",
-                    )
-                )
-            }
-            actividadesActivas.getOrNull(1)?.let { actividad ->
-                add(
-                    ActividadInscritaCalendario(
-                        actividadId = actividad.id,
-                        fecha = "2026-10-25",
-                    )
-                )
-            }
-        }
-    }
-
     PantallaPrincipalConMenu(
         navController = navController,
         pantallaActual = PantallaPrincipal.ACTIVIDADES,
@@ -90,13 +60,16 @@ fun ActividadScreen(
                 .padding(paddingValues)
         ) {
             if (mostrarCalendario) {
+                // Inscripciones reales de la familia (se recarga al abrirlo y si cambia la sesión)
+                val calendario by viewModel.calendario.collectAsState()
+                LaunchedEffect(SesionManager.token) { viewModel.cargarCalendario() }
                 CalendarioActividades(
-                    todasLasActividades = actividadesMockData,
-                    inscripciones = actividadesInscritas,
+                    estado = calendario,
                     onActividadClick = { id ->
                         navController.navigate(Rutas.ActividadDetalle.crearRuta(id))
                     },
-                    onVolver = { mostrarCalendario = false },
+                    onReintentar = { viewModel.cargarCalendario() },
+                    onIniciarSesion = { navController.navigate(Rutas.Login.ruta) },
                 )
             } else {
                 val actividadesFiltradas = remember(categoriaSeleccionada, uiState) {
@@ -158,7 +131,8 @@ fun ActividadScreen(
                         )
                     }
                     item {
-                        HeaderDiaActividades {
+                        // Antes decía una fecha fija ("Sábado, 24 de Octubre")
+                        HeaderDiaActividades(fechaTexto = "Próximas actividades") {
                             mostrarCalendario = true
                         }
                     }
