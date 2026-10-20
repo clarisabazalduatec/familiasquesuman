@@ -39,6 +39,7 @@ import coil.compose.AsyncImage
 import com.example.familiasquesuman.domain.EstadoProyecto
 import com.example.familiasquesuman.domain.OpcionApoyo
 import com.example.familiasquesuman.domain.Proyecto
+import com.example.familiasquesuman.ui.components.BotonComoLlegar
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.navigation.Rutas
@@ -210,6 +211,12 @@ private fun ContenidoDetalle(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                // Link de Google Maps que guardó el admin (si no hay, no se muestra)
+                if (!proyecto.ubicacionUrl.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    BotonComoLlegar(url = proyecto.ubicacionUrl)
+                }
             }
         }
 
