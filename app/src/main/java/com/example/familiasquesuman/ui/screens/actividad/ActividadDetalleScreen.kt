@@ -32,6 +32,7 @@ import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 import com.example.familiasquesuman.data.CalendarioTelefono
 import com.example.familiasquesuman.data.SesionManager
+import com.example.familiasquesuman.ui.components.BotonComoLlegar
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
 import com.example.familiasquesuman.ui.model.TipoSesion
@@ -262,6 +263,12 @@ fun ActividadDetalleScreen(
                                     icono = Icons.Default.DateRange,
                                     modifier = Modifier.weight(1f)
                                 )
+                            }
+
+                            // Link de Google Maps que guardó el admin (si no hay, no se muestra)
+                            if (!actividad.ubicacionUrl.isNullOrBlank()) {
+                                Spacer(modifier = Modifier.height(12.dp))
+                                BotonComoLlegar(url = actividad.ubicacionUrl)
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
