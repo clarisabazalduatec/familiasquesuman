@@ -27,6 +27,8 @@ import com.example.familiasquesuman.data.remote.dto.MenorDto
 import com.example.familiasquesuman.data.remote.dto.MenorGuardarDto
 import com.example.familiasquesuman.data.remote.dto.PerfilActualizarDto
 import com.example.familiasquesuman.data.remote.dto.PerfilDto
+import com.example.familiasquesuman.data.remote.dto.CodigoVerificacionDto
+import com.example.familiasquesuman.data.remote.dto.EnvioCodigoDto
 import com.example.familiasquesuman.data.remote.dto.RegistroRequestDto
 import com.example.familiasquesuman.data.remote.dto.TokenResponseDto
 import retrofit2.http.Body
@@ -70,6 +72,13 @@ interface FamiliasApiService {
 
     @POST("auth/registro")
     suspend fun registro(@Body datos: RegistroRequestDto): TokenResponseDto
+
+    // Verificación del correo (con sesión): manda el código / lo confirma y regresa el perfil
+    @POST("auth/verificacion/enviar")
+    suspend fun enviarCodigoVerificacion(): EnvioCodigoDto
+
+    @POST("auth/verificacion/confirmar")
+    suspend fun confirmarCodigoVerificacion(@Body datos: CodigoVerificacionDto): PerfilDto
 
     // ---------- Perfil ----------
     @GET("usuarios/me")

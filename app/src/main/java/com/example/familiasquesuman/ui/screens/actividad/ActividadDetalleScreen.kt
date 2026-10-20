@@ -35,6 +35,7 @@ import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.ui.components.BotonComoLlegar
 import com.example.familiasquesuman.ui.components.PantallaPrincipal
 import com.example.familiasquesuman.ui.components.PantallaPrincipalConMenu
+import com.example.familiasquesuman.ui.components.rememberGuardiaCorreoVerificado
 import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.screens.actividad.components.BannerSincronizarCalendario
@@ -57,6 +58,7 @@ fun ActividadDetalleScreen(
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
+    val conCorreoVerificado = rememberGuardiaCorreoVerificado(navController)
 
     DisposableEffect(lifecycleOwner, actividadId) {
         val observer = LifecycleEventObserver { _, event ->
@@ -478,11 +480,14 @@ fun ActividadDetalleScreen(
                                     } else {
                                         Button(
                                             onClick = {
-                                                navController.navigate(
-                                                    Rutas.ActividadSeleccionParticipantes.crearRuta(
-                                                        actividadId
+                                                // Inscribirse pide el correo verificado
+                                                conCorreoVerificado {
+                                                    navController.navigate(
+                                                        Rutas.ActividadSeleccionParticipantes.crearRuta(
+                                                            actividadId
+                                                        )
                                                     )
-                                                )
+                                                }
                                             },
                                             colors = ButtonDefaults.buttonColors(containerColor = Ambar),
                                             shape = RoundedCornerShape(24.dp),

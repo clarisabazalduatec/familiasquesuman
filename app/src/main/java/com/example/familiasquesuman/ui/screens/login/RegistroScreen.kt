@@ -87,7 +87,8 @@ fun RegistroScreen(
     // Cuenta creada = sesión iniciada: ir a Inicio y limpiar el historial.
     LaunchedEffect(uiState.exito) {
         if (uiState.exito) {
-            navController.navigate(Rutas.Inicio.ruta) {
+            // Cuenta creada (ya con sesión): falta verificar el correo con el código que le llegó
+            navController.navigate(Rutas.VerificarCorreo.ruta) {
                 popUpTo(navController.graph.id) { inclusive = true }
                 launchSingleTop = true
             }

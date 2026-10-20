@@ -25,6 +25,7 @@ import com.example.familiasquesuman.ui.model.TipoSesion
 import com.example.familiasquesuman.data.repository.ComunidadRepository
 import kotlinx.coroutines.launch
 import com.example.familiasquesuman.ui.components.FotoPerfil
+import com.example.familiasquesuman.ui.components.rememberGuardiaCorreoVerificado
 import coil.compose.AsyncImage
 
 @Composable
@@ -107,6 +108,7 @@ private fun DetallePublicacion(
 ) {
     val repository = remember { ComunidadRepository() }
     val scope = rememberCoroutineScope()
+    val conCorreoVerificado = rememberGuardiaCorreoVerificado(navController)
     var enviandoComentario by remember(publicacion.id) { mutableStateOf(false) }
     var errorEnvioComentario by remember(publicacion.id) { mutableStateOf<String?>(null) }
     var tieneLike by remember(publicacion.id) { mutableStateOf(publicacion.meGusta) }
@@ -406,7 +408,7 @@ private fun DetallePublicacion(
                         Text(text = "Escribe un comentario...", style = MaterialTheme.typography.bodyMedium)
                     },
                     trailingIcon = {
-                        IconButton(onClick = {
+                        IconButton(onClick = { conCorreoVerificado {  // comentar pide el correo verificado
                                 val texto = comentario.trim()
                                 if (texto.isNotEmpty() && !enviandoComentario) {
                                     enviandoComentario = true
@@ -425,7 +427,7 @@ private fun DetallePublicacion(
                                         enviandoComentario = false
                                     }
                                 }
-                            },
+                            } },
                             enabled = comentario.isNotBlank() && !enviandoComentario
                         ) {
                             Icon(imageVector = Icons.Outlined.Send,

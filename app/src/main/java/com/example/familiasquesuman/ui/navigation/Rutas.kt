@@ -26,6 +26,7 @@ sealed class Rutas(val ruta: String) {
 
     object Login : Rutas("login")
     object Registro : Rutas("registro")
+    object VerificarCorreo : Rutas("verificar_correo")
 
     object Comunidad : Rutas("comunidad")
 

@@ -28,6 +28,7 @@ object SesionManager {
     private const val K_CIUDAD_ID = "usuario_ciudad_id"
     private const val K_CIUDAD = "usuario_ciudad"
     private const val K_ROL = "usuario_rol"
+    private const val K_VERIFICADO = "usuario_correo_verificado"
 
     private var prefs: SharedPreferences? = null
 
@@ -49,6 +50,10 @@ object SesionManager {
 
     val esAdmin: Boolean
         get() = tipoSesion == TipoSesion.ADMIN
+
+    /** false solo si el backend dijo que falta verificar el correo (inscribirse, publicar y comentar lo piden). */
+    val correoVerificado: Boolean
+        get() = usuario?.correoVerificado != false
 
     /** Llamar una vez en MainActivity.onCreate, antes de setContent. */
     fun init(context: Context) {
@@ -85,7 +90,8 @@ object SesionManager {
                 email = p.getString(K_EMAIL, "") ?: "",
                 ciudad = ciudadDto,
                 rol = p.getString(K_ROL, "USUARIO"),
-                fotoUrl = p.getString(K_FOTO, null)
+                fotoUrl = p.getString(K_FOTO, null),
+                correoVerificado = p.getBoolean(K_VERIFICADO, true)
             )
         }
     }
@@ -130,4 +136,5 @@ object SesionManager {
             .putString(K_CIUDAD, u.ciudad?.nombre)
             .putString(K_ROL, u.rol)
             .putString(K_FOTO, u.fotoUrl)
+            .putBoolean(K_VERIFICADO, u.correoVerificado != false)
 }

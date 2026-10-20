@@ -2,6 +2,7 @@ package com.example.familiasquesuman.data.repository
 
 import com.example.familiasquesuman.data.SesionManager
 import com.example.familiasquesuman.data.remote.RetrofitInstance
+import com.example.familiasquesuman.data.remote.dto.CodigoVerificacionDto
 import com.example.familiasquesuman.data.remote.dto.LoginRequestDto
 import com.example.familiasquesuman.data.remote.dto.RegistroRequestDto
 import com.google.gson.JsonParser
@@ -26,6 +27,17 @@ class AuthRepository {
             )
         )
         SesionManager.guardarSesion(respuesta.access_token, respuesta.usuario, recordar = true)
+    }
+
+    /** Manda (o vuelve a mandar) el código de verificación al correo de la cuenta. */
+    suspend fun enviarCodigoVerificacion(): Result<Unit> = llamar {
+        RetrofitInstance.api.enviarCodigoVerificacion()
+    }
+
+    /** Con el código correcto el correo queda verificado; se actualiza la sesión con el perfil nuevo. */
+    suspend fun confirmarCodigoVerificacion(codigo: String): Result<Unit> = llamar {
+        val perfil = RetrofitInstance.api.confirmarCodigoVerificacion(CodigoVerificacionDto(codigo))
+        SesionManager.actualizarUsuario(perfil.aUsuarioDto())
     }
 
     /** Al abrir la app: confirma con el backend que la sesión guardada sigue sirviendo. */
