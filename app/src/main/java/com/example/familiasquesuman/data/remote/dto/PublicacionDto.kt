@@ -26,6 +26,7 @@ data class PublicacionDto(
     @SerializedName("titulo") val titulo: String? = null,
     @SerializedName("contenido") val contenido: String,
     @SerializedName("ubicacion") val ubicacion: String? = null,
+    @SerializedName("ciudad") val ciudad: CiudadDto? = null,
     @SerializedName("estado") val estado: String,
     @SerializedName("autor") val autor: AutorPublicacionDto,
     @SerializedName("categoria") val categoria: CategoriaDto? = null,
@@ -91,7 +92,7 @@ fun PublicacionDto.toDomain(): PublicacionComunidadUi {
             null
         },
 
-        ubicacion = ubicacion,
+        ubicacion = ciudad?.nombre,
         publicoObjetivo = publicoObjetivo,
         documentoNombre = documentoNombre,
         documentoDetalle = documentoUrl,

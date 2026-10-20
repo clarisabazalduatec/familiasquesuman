@@ -93,11 +93,11 @@ fun DonacionDto.toDomain(): Donacion {
         meta = metaVal,
         textoProgreso = textoProgresoCalc,
         telefonoWhatsapp = this.whatsapp.orEmpty(),
-        ubicacion = this.ubicacion.orEmpty(),
+        ubicacion = this.ciudad?.nombre.orEmpty(),
         condiciones = this.condicionesRecepcion.orEmpty(),
         opcionesDisponibles = this.opcionesDisponibles ?: listaOpciones.size.takeIf { it > 0 },
         opcionesDetalle = listaOpciones.map { Pair(it.titulo, "$${it.monto.toInt()}") },
-        direccionCompleta = this.ubicacion.orEmpty(),
+        direccionCompleta = null,
         categoriasEspecie = mapaEtiquetas["categorias_especie"],
         destinatarios = mapaEtiquetas["destinatarios"],
         condicionesArticulos = mapaEtiquetas["condiciones_articulos"],
@@ -106,6 +106,8 @@ fun DonacionDto.toDomain(): Donacion {
         fechaLimite = this.fechaLimite.orEmpty(),
         horario = this.horario.orEmpty(),
         imagenesUrl = listaImagenesUrl,
-        activa = this.activa ?: true
+        activa = this.activa ?: true,
+        ubicacionUrl = this.ubicacion?.ifBlank { null },
+        ciudadId = this.ciudad?.id
     )
 }

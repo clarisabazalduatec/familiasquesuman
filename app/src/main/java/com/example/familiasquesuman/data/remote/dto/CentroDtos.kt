@@ -1,4 +1,4 @@
-package com.example.familiasquesuman.data.remote.dto
+    package com.example.familiasquesuman.data.remote.dto
 
 import com.example.familiasquesuman.data.remote.RetrofitInstance
 import com.example.familiasquesuman.domain.CentroVisiteo
@@ -25,7 +25,8 @@ data class CentroDto(
     val recomendaciones: String?,
     val telefono: String?,
     val whatsapp: String?,
-    @SerializedName("mapa_url") val mapaUrl: String?,
+    val ubicacion: String?,
+    val ciudad: CiudadDto?,
 
     // solo admin (en lo público siempre es true)
     val activo: Boolean?
@@ -39,13 +40,15 @@ data class CentroDto(
         informacionGeneral = informacionGeneral.orEmpty(),
         necesidades = necesidades.orEmpty(),
         direccion = direccion,
-        mapaUrl = mapaUrl?.ifBlank { null },
+        mapaUrl = ubicacion?.ifBlank { null },
         logoUrl = RetrofitInstance.urlCompleta(logoUrl),
         comoAyudar = comoAyudar?.ifBlank { null },
         recomendaciones = recomendaciones?.ifBlank { null },
         telefono = telefono?.ifBlank { null },
         whatsapp = whatsapp?.ifBlank { null },
-        verificado = verificado ?: true
+        verificado = verificado ?: true,
+        ciudadId = ciudad?.id,
+        ciudadNombre = ciudad?.nombre
     )
 }
 
@@ -56,7 +59,8 @@ data class CentroGuardarDto(
     @SerializedName("descripcion_corta") val descripcionCorta: String,
     @SerializedName("informacion_general") val informacionGeneral: String,
     val direccion: String,
-    @SerializedName("mapa_url") val mapaUrl: String?,
+    val ubicacion: String?,
+    @SerializedName("ciudad_id") val ciudadId: Int?,
     @SerializedName("logo_url") val logoUrl: String?,
     @SerializedName("como_ayudar") val comoAyudar: String?,
     val recomendaciones: String?,

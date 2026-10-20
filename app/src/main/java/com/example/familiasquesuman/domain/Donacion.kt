@@ -46,5 +46,7 @@ data class Donacion(
     val horario: String? = null,
 
     val imagenesUrl: List<String> = emptyList(),
-    val activa: Boolean = true
+    val activa: Boolean = true,
+    val ubicacionUrl: String? = null,
+    val ciudadId: Int? = null
 )

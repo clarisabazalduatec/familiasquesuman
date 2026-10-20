@@ -80,7 +80,7 @@ class AdminActividadViewModel(
             titulo = comun.titulo.trim(),
             descripcionCorta = comun.descripcionCorta.trim(),
             ubicacion = comun.ubicacion.trim().ifBlank { null },
-            ciudadId = null,
+            ciudadId = comun.ciudadId,
             categoriaId = form.categoriaId ?: return,
             organizacionNombre = form.organizador.trim().ifBlank { null },
             iniciaEn = iniciaEnIso,

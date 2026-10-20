@@ -43,7 +43,7 @@ data class ProyectoDto(
         nombre = titulo,
         logoUrl = RetrofitInstance.urlCompleta(logoUrl ?: imagenes?.firstOrNull()),
         estado = runCatching { EstadoProyecto.valueOf(estado) }.getOrDefault(EstadoProyecto.ACTIVO),
-        ubicacion = ubicacion ?: ciudad?.nombre ?: "",
+        ubicacion = ciudad?.nombre ?: "",
         participantes = beneficiarios,
         descripcionCorta = descripcionCorta,
         acercaDe = acercaDe.orEmpty(),
@@ -59,7 +59,9 @@ data class ProyectoDto(
         telefonoLlamada = telefono?.ifBlank { null },
         imagenesUrl = imagenes.orEmpty().mapNotNull { RetrofitInstance.urlCompleta(it) },
         comoAyudar = comoAyudar?.ifBlank { null },
-        instagramUrl = instagramUrl?.ifBlank { null }
+        instagramUrl = instagramUrl?.ifBlank { null },
+        ubicacionUrl = ubicacion?.ifBlank { null },
+        ciudadId = ciudad?.id
     )
 }
 
@@ -78,6 +80,7 @@ data class ProyectoGuardarDto(
     val beneficiarios: String,
     val estado: String, // "ACTIVO" o "ANTERIOR"
     val ubicacion: String?,
+    @SerializedName("ciudad_id") val ciudadId: Int?,
     @SerializedName("acerca_de") val acercaDe: String?,
     @SerializedName("descripcion_larga") val descripcionLarga: String?,
     @SerializedName("como_ayudar") val comoAyudar: String?,

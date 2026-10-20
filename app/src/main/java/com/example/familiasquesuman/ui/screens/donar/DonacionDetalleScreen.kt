@@ -290,10 +290,10 @@ fun DetalleEspecieView(donacion: Donacion, context: Context) {
                 }
             }
 
-            val dir = donacion.direccionCompleta ?: donacion.ubicacion
-            if (!dir.isNullOrBlank()) {
+            val urlMapa = donacion.ubicacionUrl
+            if (!urlMapa.isNullOrBlank()) {
                 Button(
-                    onClick = { abrirMaps(context, dir) },
+                    onClick = { abrirEnlaceWeb(context, urlMapa) },
                     modifier = Modifier.weight(1f).height(48.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Ambar),
                     shape = RoundedCornerShape(12.dp)

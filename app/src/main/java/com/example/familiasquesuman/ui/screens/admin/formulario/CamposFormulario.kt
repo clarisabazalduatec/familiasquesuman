@@ -58,6 +58,7 @@ import com.example.familiasquesuman.domain.TipoCentro
 import com.example.familiasquesuman.domain.TipoDonacion
 import com.example.familiasquesuman.ui.components.SelectorCategoria
 import com.example.familiasquesuman.ui.components.SelectorCategoriaDto
+import com.example.familiasquesuman.ui.components.SelectorCiudad
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.ColorError
 import com.example.familiasquesuman.ui.theme.FondoVerde
@@ -233,12 +234,19 @@ fun CamposComunes(
         placeholder = "Breve resumen visible en la tarjeta",
         maxLineas = 2,
     )
-    com.example.familiasquesuman.ui.components.SelectorCiudad(
-        valorSeleccionado = form.ubicacion.ifBlank { "Monterrey, Nuevo León" },
-        onCiudadSeleccionada = { onCambio(form.copy(ubicacion = it)) },
-        etiqueta = if (tipo == TipoContenidoAdmin.DIRECTORIO) "Ciudad" else "Ubicación / Ciudad"
+    SelectorCiudad(
+        ciudadIdSeleccionada = form.ciudadId,
+        onCiudadSeleccionada = { onCambio(form.copy(ciudadId = it.id)) },
+        etiqueta = "Ciudad"
     )
-    Spacer(modifier = Modifier.height(12.dp))
+    CampoTexto(
+        valor = form.ubicacion,
+        onCambio = { onCambio(form.copy(ubicacion = it)) },
+        etiqueta = "Ubicación (link de Google Maps)",
+        placeholder = "https://maps.app.goo.gl/...",
+        ayuda = ayudaUbicacion ?: "En Google Maps: busca el lugar → Compartir → Copiar vínculo.",
+        teclado = KeyboardType.Uri,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -728,6 +736,13 @@ fun CamposCentro(form: CentroForm, onCambio: (CentroForm) -> Unit) {
     }
 
     CampoTexto(
+        valor = form.direccion,
+        onCambio = { onCambio(form.copy(direccion = it)) },
+        etiqueta = "Dirección (texto)",
+        placeholder = "Blvd. José María González #1000, Cadereyta",
+    )
+
+    CampoTexto(
         valor = form.informacionGeneral,
         onCambio = { onCambio(form.copy(informacionGeneral = it)) },
         etiqueta = "Información general",
@@ -790,14 +805,5 @@ fun CamposCentro(form: CentroForm, onCambio: (CentroForm) -> Unit) {
             placeholder = "528112345678", teclado = KeyboardType.Phone,
         )
     }
-    CampoTexto(
-        valor = form.mapaUrl,
-        onCambio = { onCambio(form.copy(mapaUrl = it)) },
-        etiqueta = "Link de cómo llegar (opcional)",
-        placeholder = "https://maps.app.goo.gl/...",
-        ayuda = "En Google Maps: busca el lugar → Compartir → Copiar vínculo. " +
-                "Si lo dejas vacío, \"Cómo llegar\" busca la dirección.",
-        teclado = KeyboardType.Uri,
-    )
     OpcionConCheck("Centro verificado por Familias que Suman", form.verificado) { onCambio(form.copy(verificado = it)) }
 }

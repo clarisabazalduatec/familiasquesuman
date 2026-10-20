@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.familiasquesuman.data.remote.dto.CiudadDto
 import com.example.familiasquesuman.data.remote.dto.UsuarioDto
 import com.example.familiasquesuman.ui.model.TipoSesion
 
@@ -22,7 +23,8 @@ object SesionManager {
     private const val K_ID = "usuario_id"
     private const val K_NOMBRE = "usuario_nombre"
     private const val K_EMAIL = "usuario_email"
-    private const val K_UBICACION = "usuario_ubicacion"
+    private const val K_CIUDAD_ID = "usuario_ciudad_id"
+    private const val K_CIUDAD = "usuario_ciudad"
     private const val K_ROL = "usuario_rol"
 
     private var prefs: SharedPreferences? = null
@@ -56,11 +58,14 @@ object SesionManager {
         val idGuardado = p.getString(K_ID, null)
         if (tokenGuardado != null && idGuardado != null) {
             token = tokenGuardado
+            val ciudadId = p.getInt(K_CIUDAD_ID, -1)
+            val ciudadNombre = p.getString(K_CIUDAD, "") ?: ""
+            val ciudadDto = if (ciudadId >= 0) CiudadDto(id = ciudadId, nombre = ciudadNombre) else null
             usuario = UsuarioDto(
                 id = idGuardado,
                 nombre = p.getString(K_NOMBRE, "") ?: "",
                 email = p.getString(K_EMAIL, "") ?: "",
-                ubicacion = p.getString(K_UBICACION, null),
+                ciudad = ciudadDto,
                 rol = p.getString(K_ROL, "USUARIO"),
                 fotoUrl = p.getString(K_FOTO, null)
             )
@@ -103,7 +108,8 @@ object SesionManager {
         putString(K_ID, u.id)
             .putString(K_NOMBRE, u.nombre)
             .putString(K_EMAIL, u.email)
-            .putString(K_UBICACION, u.ubicacion)
+            .putInt(K_CIUDAD_ID, u.ciudad?.id ?: -1)
+            .putString(K_CIUDAD, u.ciudad?.nombre)
             .putString(K_ROL, u.rol)
             .putString(K_FOTO, u.fotoUrl)
 }

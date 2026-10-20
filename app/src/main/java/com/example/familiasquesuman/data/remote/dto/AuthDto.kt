@@ -11,14 +11,14 @@ data class RegistroRequestDto(
     val nombre: String,
     val email: String,
     val password: String,
-    val ubicacion: String? = null
+    @SerializedName("ciudad_id") val ciudadId: Int? = null
 )
 
 data class UsuarioDto(
     val id: String,
     val nombre: String,
     val email: String,
-    val ubicacion: String?,
+    val ciudad: CiudadDto? = null,
     // "USUARIO" o "ADMIN". Nullable porque Gson deja null si el backend no lo manda.
     val rol: String? = "USUARIO",
     // "/imagenes/abc.jpg" o null si no tiene foto
@@ -36,13 +36,13 @@ data class PerfilDto(
     val id: String,
     val nombre: String,
     val email: String,
-    val ubicacion: String?,
+    val ciudad: CiudadDto?,
     val rol: String?,
     val parentesco: String?,
     val familia_id: String?,
     @SerializedName("foto_url") val fotoUrl: String? = null
 ) {
     fun aUsuarioDto() = UsuarioDto(
-        id = id, nombre = nombre, email = email, ubicacion = ubicacion, rol = rol, fotoUrl = fotoUrl
+        id = id, nombre = nombre, email = email, ciudad = ciudad, rol = rol, fotoUrl = fotoUrl
     )
 }

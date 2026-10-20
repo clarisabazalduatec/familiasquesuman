@@ -111,11 +111,6 @@ private fun formatHorario(iniciaDate: Date?, terminaDate: Date?): String {
 fun ActividadDto.toDomain(): Actividad {
     val iniciaDate = parseIsoDate(iniciaEn)
     val terminaDate = parseIsoDate(terminaEn)
-    val ubicacionFinal = if (!ubicacion.isNullOrBlank()) {
-        ubicacion
-    } else {
-        ciudad?.nombre ?: "Sin ubicación"
-    }
     val organizadorNombre = organizacion?.nombre ?: "Organización comunitaria"
     val esVerificado = organizacion?.verificada ?: false
     val acercaDeTexto = acercaDe ?: descripcionCorta ?: ""
@@ -127,7 +122,7 @@ fun ActividadDto.toDomain(): Actividad {
         categoria = categoria?.nombre ?: "General",
         fecha = formatFecha(iniciaDate),
         horario = formatHorario(iniciaDate, terminaDate),
-        ubicacion = ubicacionFinal,
+        ubicacion = ciudad?.nombre ?: "Sin ciudad",
         organizador = organizadorNombre,
         organizadorVerificado = esVerificado,
         acercaDe = acercaDeTexto,
@@ -137,6 +132,8 @@ fun ActividadDto.toDomain(): Actividad {
         iniciaEn = iniciaDate,
         terminaEn = terminaDate,
         activa = activa ?: true,
-        categoriaId = categoria?.id
+        categoriaId = categoria?.id,
+        ubicacionUrl = this.ubicacion?.ifBlank { null },
+        ciudadId = ciudad?.id
     )
 }

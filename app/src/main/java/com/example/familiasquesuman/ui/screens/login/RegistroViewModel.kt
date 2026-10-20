@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 data class RegistroUiState(
     val nombre: String = "",
     val email: String = "",
-    val ubicacion: String = "",
+    val ciudadId: Int? = null,
     val password: String = "",
     val confirmarPassword: String = "",
     val errorNombre: String? = null,
@@ -38,7 +38,7 @@ class RegistroViewModel(
     // Al escribir en un campo se borra su error.
     fun onNombre(v: String) = _uiState.update { it.copy(nombre = v, errorNombre = null, errorGeneral = null) }
     fun onEmail(v: String) = _uiState.update { it.copy(email = v, errorEmail = null, errorGeneral = null) }
-    fun onUbicacion(v: String) = _uiState.update { it.copy(ubicacion = v) }
+    fun onCiudad(id: Int) = _uiState.update { it.copy(ciudadId = id) }
     fun onPassword(v: String) = _uiState.update { it.copy(password = v, errorPassword = null, errorGeneral = null) }
     fun onConfirmar(v: String) = _uiState.update { it.copy(confirmarPassword = v, errorConfirmar = null) }
 
@@ -69,7 +69,7 @@ class RegistroViewModel(
 
         _uiState.update { it.copy(cargando = true, errorGeneral = null) }
         viewModelScope.launch {
-            authRepository.registrar(nombre = s.nombre, email = s.email, password = s.password, ubicacion = s.ubicacion)
+            authRepository.registrar(nombre = s.nombre, email = s.email, password = s.password, ciudadId = s.ciudadId)
                 .onSuccess { _uiState.update { it.copy(cargando = false, exito = true) } }
                 .onFailure { e ->
                     _uiState.update { it.copy(cargando = false, errorGeneral = e.message ?: "No se pudo crear la cuenta") }

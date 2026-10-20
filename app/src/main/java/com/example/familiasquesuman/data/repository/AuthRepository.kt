@@ -16,13 +16,13 @@ class AuthRepository {
         SesionManager.guardarSesion(respuesta.access_token, respuesta.usuario, recordar)
     }
 
-    suspend fun registrar(nombre: String, email: String, password: String, ubicacion: String?): Result<Unit> = llamar {
+    suspend fun registrar(nombre: String, email: String, password: String, ciudadId: Int?): Result<Unit> = llamar {
         val respuesta = RetrofitInstance.api.registro(
             RegistroRequestDto(
                 nombre = nombre.trim(),
                 email = email.trim(),
                 password = password,
-                ubicacion = ubicacion?.trim()?.ifBlank { null }
+                ciudadId = ciudadId
             )
         )
         SesionManager.guardarSesion(respuesta.access_token, respuesta.usuario, recordar = true)

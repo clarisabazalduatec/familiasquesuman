@@ -23,6 +23,7 @@ data class ComunForm(
     val descripcionCorta: String = "",
     val ubicacion: String = "",
     val activa: Boolean = true,
+    val ciudadId: Int? = null,
 )
 
 data class ActividadForm(
@@ -85,13 +86,13 @@ data class DonacionForm(
  */
 data class CentroForm(
     val tipo: TipoCentro = TipoCentro.ASILO,
+    val direccion: String = "",
     val informacionGeneral: String = "",
     val necesidades: List<String> = listOf(""),
     val comoAyudar: String = "",
     val recomendaciones: String = "",
     val telefono: String = "",
     val whatsapp: String = "",
-    val mapaUrl: String = "",      // link de "Cómo llegar" (Google Maps, etc.)
     val verificado: Boolean = true,
 )
 
@@ -172,8 +173,9 @@ fun Actividad.aFormulario(): Pair<ComunForm, ActividadForm> {
     return ComunForm(
         titulo = titulo,
         descripcionCorta = descripcion,
-        ubicacion = ubicacion,
-        activa = activa
+        ubicacion = ubicacionUrl.orEmpty(),
+        activa = activa,
+        ciudadId = ciudadId
     ) to ActividadForm(
         categoriaId = categoriaId,
         categoriaNombre = categoria,
@@ -187,7 +189,7 @@ fun Actividad.aFormulario(): Pair<ComunForm, ActividadForm> {
 }
 
 fun Proyecto.aFormulario(): Pair<ComunForm, ProyectoForm> =
-    ComunForm(nombre, descripcionCorta, ubicacion, activo) to ProyectoForm(
+    ComunForm(nombre, descripcionCorta, ubicacionUrl.orEmpty(), activo, ciudadId) to ProyectoForm(
         estado = estado,
         participantes = participantes,
         acercaDe = acercaDe,
@@ -203,7 +205,6 @@ fun Donacion.aFormulario(): Pair<ComunForm, DonacionForm> {
     val esMonetaria = tipo == TipoDonacion.CAMPANA
     val esEspecie = tipo == TipoDonacion.ESPECIE
 
-    // Forma súper segura de Kotlin sin usar operadores '?' dudosos
     val montosTexto = if (esMonetaria && !opcionesDetalle.isNullOrEmpty()) {
         opcionesDetalle!!.map { pair ->
             val valor = pair.second.ifBlank { pair.first }
@@ -220,8 +221,9 @@ fun Donacion.aFormulario(): Pair<ComunForm, DonacionForm> {
     return ComunForm(
         titulo = titulo,
         descripcionCorta = descripcionCorta,
-        ubicacion = ubicacion.orEmpty(),
-        activa = activa
+        ubicacion = ubicacionUrl.orEmpty(),
+        activa = activa,
+        ciudadId = ciudadId
     ) to DonacionForm(
         tipo = tipo,
         tipoDonacionAdmin = when (tipo) {
@@ -245,15 +247,15 @@ fun Donacion.aFormulario(): Pair<ComunForm, DonacionForm> {
 }
 
 fun CentroVisiteo.aFormulario(): Pair<ComunForm, CentroForm> =
-    ComunForm(nombre, descripcionCorta, direccion, activo) to CentroForm(
+    ComunForm(nombre, descripcionCorta, mapaUrl.orEmpty(), activo, ciudadId) to CentroForm(
         tipo = tipo,
+        direccion = direccion,
         informacionGeneral = informacionGeneral.orEmpty(),
         necesidades = necesidades.ifEmpty { listOf("") },
         comoAyudar = comoAyudar.orEmpty(),
         recomendaciones = recomendaciones.orEmpty(),
         telefono = telefono.orEmpty(),
         whatsapp = whatsapp.orEmpty(),
-        mapaUrl = mapaUrl.orEmpty(),
         verificado = verificado,
     )
 
@@ -278,6 +280,9 @@ fun validarFormulario(
 ): String? {
     if (comun.titulo.isBlank()) return "El título no puede estar vacío."
     if (comun.descripcionCorta.isBlank()) return "Agrega una descripción corta."
+    if (comun.ciudadId == null) return "Elige la ciudad."
+    if (comun.ubicacion.isNotBlank() && !comun.ubicacion.trim().startsWith("http"))
+        return "La ubicación debe ser un link de Google Maps (https://...)."
 
     return when (tipo) {
         TipoContenidoAdmin.ACTIVIDAD -> {
@@ -289,7 +294,7 @@ fun validarFormulario(
             } else null
 
             when {
-                comun.ubicacion.isBlank() -> "Indica la ubicación."
+                comun.ubicacion.isBlank() -> "Pega el link de Google Maps de la ubicación."
                 actividad.categoriaId == null && actividad.categoriaNombre.isBlank() -> "Elige o crea una categoría."
                 actividad.fechaMillis == null -> "Indica la fecha."
                 actividad.horaInicio == null -> "Indica la hora de inicio."
@@ -303,7 +308,7 @@ fun validarFormulario(
         }
 
         TipoContenidoAdmin.PROYECTO -> when {
-            comun.ubicacion.isBlank() -> "Indica la ubicación."
+            comun.ubicacion.isBlank() -> "Pega el link de Google Maps de la ubicación."
             proyecto.participantes.isBlank() -> "Indica los participantes o beneficiarios."
             !telefonoValido(proyecto.whatsapp) || !telefonoValido(proyecto.telefono) -> MSG_TELEFONO
             proyecto.opciones.any { it.titulo.isBlank() && it.descripcion.isNotBlank() } ->
@@ -322,19 +327,18 @@ fun validarFormulario(
             donacion.tipoDonacionAdmin == TipoDonacionAdmin.MONETARIA && donacion.tieneMeta && (donacion.meta.toFloatOrNull() ?: 0f) <= 0f -> "La meta económica debe ser mayor a 0."
             donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && donacion.articulosNecesarios.isBlank() -> "Indica los artículos requeridos."
             donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && donacion.tieneMeta && (donacion.meta.toFloatOrNull() ?: 0f) <= 0f -> "La meta de artículos debe ser mayor a 0."
-            donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && comun.ubicacion.isBlank() -> "Indica el centro de acopio o ubicación."
+            donacion.tipoDonacionAdmin == TipoDonacionAdmin.ESPECIE && comun.ubicacion.isBlank() -> "Pega el link de Google Maps de la ubicación."
             donacion.tipoDonacionAdmin == TipoDonacionAdmin.TIEMPO && donacion.fechaLimite.isBlank() -> "Indica la fecha del evento o límite."
-            donacion.tipoDonacionAdmin == TipoDonacionAdmin.TIEMPO && comun.ubicacion.isBlank() -> "Indica la ubicación donde se requiere el apoyo."
+            donacion.tipoDonacionAdmin == TipoDonacionAdmin.TIEMPO && comun.ubicacion.isBlank() -> "Pega el link de Google Maps de la ubicación."
             else -> null
         }
 
         TipoContenidoAdmin.DIRECTORIO -> when {
-            comun.ubicacion.isBlank() -> "Indica la dirección del centro."
+            comun.ubicacion.isBlank() -> "Pega el link de Google Maps de la ubicación."
+            centro.direccion.isBlank() -> "Indica la dirección del centro."
             centro.informacionGeneral.isBlank() -> "Agrega la información general del centro."
             centro.comoAyudar.isBlank() -> "Explica cómo se puede ayudar al centro."
             !telefonoValido(centro.telefono) || !telefonoValido(centro.whatsapp) -> MSG_TELEFONO
-            centro.mapaUrl.isNotBlank() && !centro.mapaUrl.trim().startsWith("http") ->
-                "El link de cómo llegar debe ser un enlace completo (https://maps.app.goo.gl/...)."
             else -> null
         }
     }

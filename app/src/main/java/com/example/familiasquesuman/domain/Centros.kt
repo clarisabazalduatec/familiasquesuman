@@ -21,5 +21,7 @@ data class CentroVisiteo(
     val recomendaciones: String? = null,
     val telefono: String? = null,
     val whatsapp: String? = null,
-    val verificado: Boolean = true
+    val verificado: Boolean = true,
+    val ciudadId: Int? = null,
+    val ciudadNombre: String? = null
 )

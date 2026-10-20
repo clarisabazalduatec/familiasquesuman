@@ -64,7 +64,7 @@ fun SaludoConUbicacion(
             if (lista.isNotEmpty()) {
                 val formateadas = lista.map { if (!it.estado.isNullOrBlank()) "${it.nombre}, ${it.estado}" else it.nombre }
                 ciudades = formateadas
-                val perfil = SesionManager.usuario?.ubicacion
+                val perfil = SesionManager.usuario?.ciudad?.nombre
                 val match = formateadas.find { perfil != null && it.contains(perfil, ignoreCase = true) }
                     ?: formateadas.find { it.contains(ciudad, ignoreCase = true) }
                     ?: formateadas.first()

@@ -65,6 +65,7 @@ class ComunidadRepository {
         contenido: String,
         categoriaId: Int?,
         imagenes: List<String>,
+        ciudadId: Int? = null,
         ubicacion: String? = null
     ): Result<PublicacionComunidadUi> {
         return try {
@@ -72,6 +73,7 @@ class ComunidadRepository {
                 titulo = titulo,
                 contenido = contenido,
                 ubicacion = ubicacion,
+                ciudadId = ciudadId,
                 categoriaId = categoriaId,
                 imagenes = imagenes
             )

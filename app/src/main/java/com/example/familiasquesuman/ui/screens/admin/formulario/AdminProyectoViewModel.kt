@@ -60,6 +60,7 @@ class AdminProyectoViewModel(
             beneficiarios = form.participantes.trim(),
             estado = form.estado.name,
             ubicacion = comun.ubicacion.trim().ifBlank { null },
+            ciudadId = comun.ciudadId,
             acercaDe = form.acercaDe.trim().ifBlank { null },
             descripcionLarga = form.descripcionLarga.trim().ifBlank { null },
             comoAyudar = form.comoAyudar.trim().ifBlank { null },

@@ -31,6 +31,7 @@ import com.example.familiasquesuman.data.repository.ComunidadRepository
 import kotlinx.coroutines.launch
 import com.example.familiasquesuman.data.remote.RetrofitInstance
 import com.example.familiasquesuman.data.remote.dto.CategoriaDto
+import com.example.familiasquesuman.ui.components.SelectorCiudad
 import kotlinx.coroutines.CancellationException
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,7 +61,8 @@ fun NuevaPublicacionScreen(
 
     var titulo by rememberSaveable { mutableStateOf("") }
     var descripcion by rememberSaveable { mutableStateOf("") }
-    var ubicacion by rememberSaveable { mutableStateOf("Monterrey, Nuevo León") }
+    var ciudadId by rememberSaveable { mutableStateOf<Int?>(null) }
+    var ubicacionLink by rememberSaveable { mutableStateOf("") }
     var categoria by rememberSaveable { mutableStateOf("") }
     var categoriaId by rememberSaveable { mutableStateOf<Int?>(null) }
     var menuCategoriasAbierto by remember { mutableStateOf(false) }
@@ -186,10 +188,19 @@ fun NuevaPublicacionScreen(
             )
 
             Spacer(modifier = Modifier.height(18.dp))
-            com.example.familiasquesuman.ui.components.SelectorCiudad(
-                valorSeleccionado = ubicacion,
-                onCiudadSeleccionada = { ubicacion = it },
-                etiqueta = "Ubicación / Ciudad"
+            SelectorCiudad(
+                ciudadIdSeleccionada = ciudadId,
+                onCiudadSeleccionada = { ciudadId = it.id },
+                etiqueta = "Ciudad"
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedTextField(
+                value = ubicacionLink,
+                onValueChange = { ubicacionLink = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Ubicación (link de Google Maps, opcional)") },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
             )
 
             Spacer(modifier = Modifier.height(18.dp))
@@ -261,7 +272,8 @@ fun NuevaPublicacionScreen(
                                     contenido = descripcion.trim(),
                                     categoriaId = categoriaId,
                                     imagenes = urlsImagenes,
-                                    ubicacion = ubicacion
+                                    ciudadId = ciudadId,
+                                    ubicacion = ubicacionLink.trim().ifBlank { null }
                                 ).getOrThrow()
                                 navController.navigate(Rutas.ResultadoPublicacion.crearRuta(true))
                             } catch (e: CancellationException) {
@@ -275,7 +287,8 @@ fun NuevaPublicacionScreen(
                         }
                     }
                 },
-                enabled = titulo.isNotBlank() &&
+                enabled = (ubicacionLink.isBlank() || ubicacionLink.trim().startsWith("http")) &&
+                        titulo.isNotBlank() &&
                         descripcion.isNotBlank() &&
                         (esOficial || (categoriaId != null && !cargandoCategorias)) &&
                         !estaEnviando&&

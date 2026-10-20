@@ -196,8 +196,8 @@ fun RegistroScreen(
             )
 
             com.example.familiasquesuman.ui.components.SelectorCiudad(
-                valorSeleccionado = uiState.ubicacion.ifBlank { "Monterrey, Nuevo León" },
-                onCiudadSeleccionada = registroViewModel::onUbicacion,
+                ciudadIdSeleccionada = uiState.ciudadId,
+                onCiudadSeleccionada = { registroViewModel.onCiudad(it.id) },
                 etiqueta = "Ciudad",
                 modifier = Modifier.padding(bottom = 12.dp)
             )

@@ -26,5 +26,7 @@ data class Proyecto(
     val imagenesUrl: List<String> = emptyList(),
     val activo: Boolean = true,
     val comoAyudar: String? = null,   // recuadro "¿Cómo ayudar?" (opcional)
-    val instagramUrl: String? = null  // "Síguenos en" (opcional)
+    val instagramUrl: String? = null,  // "Síguenos en" (opcional)
+    val ubicacionUrl: String? = null,
+    val ciudadId: Int? = null
 )

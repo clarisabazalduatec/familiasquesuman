@@ -43,6 +43,7 @@ fun DonacionForm.toGuardarDto(comun: ComunForm, imagenes: List<String>): Donacio
         modalidad = modalidad,
         categoria = if (esEspecie) categoria.trim().ifBlank { null } else null,
         ubicacion = comun.ubicacion.trim().ifBlank { null },
+        ciudadId = comun.ciudadId ?: 1,
         meta = if (tieneMeta) meta.toDoubleOrNull() else null,
         recaudado = recaudado.toDoubleOrNull() ?: 0.0,
         descripcionLarga = descripcionLarga.trim().ifBlank { null },

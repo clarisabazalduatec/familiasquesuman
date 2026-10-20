@@ -73,7 +73,7 @@ data class InvitacionCrearDto(
 
 data class PerfilActualizarDto(
     val nombre: String? = null,
-    val ubicacion: String? = null,
+    @SerializedName("ciudad_id") val ciudadId: Int? = null,
     val parentesco: String? = null
 )
 

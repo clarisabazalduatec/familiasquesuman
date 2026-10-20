@@ -19,5 +19,7 @@ data class Actividad(
     val iniciaEn: Date? = null,
     val terminaEn: Date? = null,
     val activa: Boolean = true,
-    val categoriaId: Int? = null
+    val categoriaId: Int? = null,
+    val ubicacionUrl: String? = null,
+    val ciudadId: Int? = null
 )
