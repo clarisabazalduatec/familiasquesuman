@@ -174,7 +174,7 @@ fun DetalleEspecieView(donacion: Donacion, context: Context) {
             color = AzulMarino
         )
 
-        if (!donacion.fundacion.isNullOrBlank()) {
+        if (donacion.fundacion.isNotBlank()) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = donacion.fundacion,
@@ -321,7 +321,7 @@ fun DetalleCampanaView(donacion: Donacion, context: Context) {
             color = AzulMarino,
         )
 
-        if (!donacion.fundacion.isNullOrBlank()) {
+        if (donacion.fundacion.isNotBlank()) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = donacion.fundacion,
@@ -457,7 +457,7 @@ fun DetalleCampanaView(donacion: Donacion, context: Context) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (!donacion.fundacion.isNullOrBlank()) {
+        if (donacion.fundacion.isNotBlank()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
@@ -512,7 +512,7 @@ fun DetalleTiempoView(donacion: Donacion, context: Context) {
             color = AzulMarino,
         )
 
-        if (!donacion.fundacion.isNullOrBlank()) {
+        if (donacion.fundacion.isNotBlank()) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = donacion.fundacion,
@@ -605,7 +605,7 @@ fun DetalleTiempoView(donacion: Donacion, context: Context) {
         )
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (!donacion.fundacion.isNullOrBlank()) {
+        if (donacion.fundacion.isNotBlank()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Person, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
@@ -665,12 +665,18 @@ fun SeccionOpcionesSugeridas(donacion: Donacion) {
             Spacer(modifier = Modifier.height(12.dp))
 
             donacion.opcionesDetalle.forEachIndexed { index, opcion ->
-                val bgColor = if (index % 2 == 0) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                val bgColor = if (index % 2 == 0) {
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                }
 
                 Surface(
                     color = bgColor,
                     shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
                 ) {
                     Row(
                         modifier = Modifier.padding(12.dp),
@@ -682,25 +688,56 @@ fun SeccionOpcionesSugeridas(donacion: Donacion) {
                             modifier = Modifier.size(28.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
-                                Text(text = "${index + 1}", color = MaterialTheme.colorScheme.surface, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                                Text(
+                                    text = "${index + 1}",
+                                    color = MaterialTheme.colorScheme.surface,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 12.sp
+                                )
                             }
                         }
                         Spacer(modifier = Modifier.width(12.dp))
+
+                        val esEspecie = donacion.tipo == TipoDonacion.ESPECIE
+                        val montoLimpio = opcion.second.trim()
+                        val esMontoCero = montoLimpio in listOf("$0", "$0.0", "$0.00", "$0 MXN", "0", "")
+
+                        // Textos genéricos que no queremos que se repitan en cada fila
+                        val tituloOriginal = opcion.first.trim()
+                        val esTextoGenerico = tituloOriginal.equals("Aporte sugerido", ignoreCase = true) ||
+                                tituloOriginal.equals("Monto sugerido", ignoreCase = true) ||
+                                tituloOriginal.equals("Opción de donación", ignoreCase = true) ||
+                                tituloOriginal.equals("Sugerido", ignoreCase = true)
+
                         Column {
-                            if (opcion.first.isNotBlank()) {
+                            if (esEspecie || esMontoCero) {
+                                // Para artículos en especie (Agua, Juguetes, etc.)
+                                val nombreArticulo = if (esTextoGenerico || tituloOriginal.isBlank()) opcion.second else tituloOriginal
                                 Text(
-                                    text = opcion.first,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
+                                    text = nombreArticulo,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = AzulMarino
+                                )
+                            } else {
+                                // Para montos en dinero
+                                if (tituloOriginal.isNotBlank() && !esTextoGenerico) {
+                                    // Muestra el título solo si es una descripción real (ej: "Paquete Escolar")
+                                    Text(
+                                        text = tituloOriginal,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = AzulMarino
+                                    )
+                                }
+                                // Muestra el monto en negrita directamente
+                                Text(
+                                    text = opcion.second,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
                                     color = AzulMarino
                                 )
                             }
-                            Text(
-                                text = opcion.second,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = AzulMarino
-                            )
                         }
                     }
                 }
@@ -708,7 +745,6 @@ fun SeccionOpcionesSugeridas(donacion: Donacion) {
         }
     }
 }
-
 @Composable
 fun TarjetaSeccion(content: @Composable ColumnScope.() -> Unit) {
     Card(
