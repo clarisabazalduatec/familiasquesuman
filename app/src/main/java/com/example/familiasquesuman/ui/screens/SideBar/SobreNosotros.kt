@@ -3,6 +3,7 @@ package com.example.familiasquesuman.ui.screens.informacion
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -19,15 +20,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.familiasquesuman.R
+import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 import com.example.familiasquesuman.ui.navigation.Rutas
 import com.example.familiasquesuman.ui.theme.Ambar
 import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.Blanco
 import com.example.familiasquesuman.ui.theme.CremaFondo
-import com.example.familiasquesuman.ui.theme.GrisTexto
-import androidx.compose.foundation.lazy.LazyColumn
-import com.example.familiasquesuman.ui.components.PieAvisoPrivacidad
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -132,8 +131,18 @@ fun SobreNosotrosScreen(navController: NavHostController) {
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
-            Button(onClick = { navController.navigate(Rutas.Actividades.ruta) },
-                modifier = Modifier.fillMaxWidth()
+            Button(
+                onClick = {
+                    navController.navigate(Rutas.Actividades.ruta) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(54.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
