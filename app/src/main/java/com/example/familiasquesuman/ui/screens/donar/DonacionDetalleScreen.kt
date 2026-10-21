@@ -228,6 +228,56 @@ fun DetalleEspecieView(donacion: Donacion) {
 
     SeccionOpcionesSugeridas(donacion = donacion)
 
+    // Se agrega la sección de la barra de progreso para especies con meta > 0
+    if (donacion.meta > 0f) {
+        TarjetaSeccion {
+            Text(
+                text = "Meta de recolección",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = AzulMarino
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Outlined.DateRange, contentDescription = null, tint = Ambar, modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Meta total: ${donacion.meta.toInt()} unidades",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = "${donacion.recaudado.toInt()} de ${donacion.meta.toInt()} recolectados",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = AzulMarino,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            val progreso = (donacion.recaudado / donacion.meta).coerceIn(0f, 1f)
+            LinearProgressIndicator(
+                progress = { progreso },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(5.dp)),
+                color = AzulMarino,
+                trackColor = GrisBorde,
+            )
+        }
+    }
+
     val condicionesMostrar = donacion.condiciones.orEmpty().ifBlank { donacion.condicionesRecepcion.orEmpty() }
     if (condicionesMostrar.isNotBlank()) {
         TarjetaSeccion {
