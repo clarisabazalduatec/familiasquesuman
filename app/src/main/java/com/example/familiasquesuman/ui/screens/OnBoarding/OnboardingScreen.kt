@@ -1,4 +1,4 @@
-package com.example.familiasquesuman.ui.screens.onboarding
+ package com.example.familiasquesuman.ui.screens.onboarding
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -24,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Campaign
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Groups
@@ -53,6 +54,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.familiasquesuman.R
@@ -61,6 +64,7 @@ import com.example.familiasquesuman.ui.theme.AmbarClaro
 import com.example.familiasquesuman.ui.theme.AzulMarino
 import com.example.familiasquesuman.ui.theme.Blanco
 import com.example.familiasquesuman.ui.theme.CremaFondo
+import com.example.familiasquesuman.ui.theme.FamiliasQueSumanTheme
 import com.example.familiasquesuman.ui.theme.GrisBorde
 import com.example.familiasquesuman.ui.theme.GrisClaroFondo
 import com.example.familiasquesuman.ui.theme.GrisTexto
@@ -593,7 +597,7 @@ private fun CardInfoActualizacion() {
             ) {
 
                 Text(
-                    text = "Actualización oficial",
+                    text = "Avisos oficiales",
                     style =
                         MaterialTheme.typography.titleSmall,
                     color = AzulMarino
@@ -603,8 +607,8 @@ private fun CardInfoActualizacion() {
 
                 Text(
                     text =
-                        "Nueva campaña de reforestación\n" +
-                                "este sábado en Parque Central.",
+                        "Recibe avisos oficiales del equipo de\n" +
+                                "Familias que Suman",
                     style =
                         MaterialTheme.typography.bodySmall,
                     color = GrisTexto
@@ -612,32 +616,6 @@ private fun CardInfoActualizacion() {
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                Text(
-                    text = "Ver más detalles  ›",
-                    style =
-                        MaterialTheme.typography.titleSmall,
-                    color = AzulMarino
-                )
-            }
-
-            // Placeholder de fotografía
-            Box(
-                modifier = Modifier
-                    .width(70.dp)
-                    .height(60.dp)
-                    .clip(
-                        RoundedCornerShape(12.dp)
-                    )
-                    .background(AmbarClaro),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Text(
-                    text = "Foto",
-                    style =
-                        MaterialTheme.typography.bodySmall,
-                    color = AzulMarino
-                )
             }
         }
     }
@@ -677,8 +655,7 @@ private fun CardTuImpacto() {
             ) {
 
                 Icon(
-                    imageVector =
-                        Icons.Outlined.FavoriteBorder,
+                    imageVector = Icons.Default.Star,
                     contentDescription = null,
                     tint = Ambar
                 )
@@ -692,15 +669,14 @@ private fun CardTuImpacto() {
                     text = "Tu impacto",
                     style =
                         MaterialTheme.typography.titleSmall,
-                    color = AzulMarino
+                    color = AzulMarino,
+                    fontWeight = FontWeight.Bold
                 )
 
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text =
-                        "Has apoyado 3 campañas\n" +
-                                "y 2 proyectos este año.",
+                    text = "Insignias ganadas en la comunidad:",
                     style =
                         MaterialTheme.typography.bodySmall,
                     color = GrisTexto
@@ -709,42 +685,73 @@ private fun CardTuImpacto() {
                 Spacer(modifier = Modifier.height(10.dp))
 
                 Row(
-                    verticalAlignment =
-                        Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-
-                    LinearProgressIndicator(
-                        progress = 0.70f,
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(8.dp)
-                            .clip(
-                                RoundedCornerShape(10.dp)
-                            ),
-                        color = Ambar,
-                        trackColor = GrisClaroFondo
-                    )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Text(
-                        text = "70%",
-                        style =
-                            MaterialTheme.typography.titleSmall,
-                        color = AzulMarino
-                    )
+                    InsigniaMiniItem(titulo = "Reforestación", categoria = "Ambiente")
+                    InsigniaMiniItem(titulo = "Comedor", categoria = "Alimentos")
+                    InsigniaMiniItem(titulo = "Lectura", categoria = "Educación")
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "¡Vas por buen camino!",
+                    text = "¡Gana más insignias completando actividades!",
                     style =
                         MaterialTheme.typography.bodySmall,
                     color = GrisTexto
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun InsigniaMiniItem(titulo: String, categoria: String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.width(58.dp)
+    ) {
+        Surface(
+            shape = CircleShape,
+            color = AmbarClaro,
+            border = BorderStroke(1.dp, Ambar),
+            modifier = Modifier.size(38.dp)
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = Ambar,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(3.dp))
+
+        Text(
+            text = titulo,
+            style = MaterialTheme.typography.labelMedium,
+            color = AzulMarino,
+            fontWeight = FontWeight.Bold,
+            fontSize = 9.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = categoria,
+            style = MaterialTheme.typography.bodySmall,
+            color = GrisTexto,
+            fontSize = 8.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -797,46 +804,17 @@ private fun CardComunidadAccion() {
                     color = AzulMarino
                 )
 
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text =
-                        "Más de 250 familias ya participan\n" +
-                                "en actividades este mes.",
-                    style =
-                        MaterialTheme.typography.bodySmall,
+                        "¡Conecta con más familias en tu comunidad!\n" ,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = GrisTexto
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Row(
-                    verticalAlignment =
-                        Alignment.CenterVertically
-                ) {
-
-                    AvatarTexto("A")
-                    AvatarTexto("L")
-                    AvatarTexto("M")
-                    AvatarTexto("S")
-
-                    Box(
-                        modifier = Modifier
-                            .padding(start = 6.dp)
-                            .size(30.dp)
-                            .clip(CircleShape)
-                            .background(GrisClaroFondo),
-                        contentAlignment = Alignment.Center
-                    ) {
-
-                        Text(
-                            text = "+245",
-                            style =
-                                MaterialTheme.typography.labelSmall,
-                            color = AzulMarino
-                        )
-                    }
-                }
             }
         }
     }
@@ -915,3 +893,11 @@ private fun IndicadoresPagina(
         }
     }
 }
+
+ @Preview
+ @Composable
+ private fun OnboardingScreenPreview() {
+     FamiliasQueSumanTheme {
+         OnboardingScreen({})
+     }
+ }
