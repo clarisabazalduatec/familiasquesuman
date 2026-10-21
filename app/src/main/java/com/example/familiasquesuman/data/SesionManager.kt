@@ -2,6 +2,7 @@ package com.example.familiasquesuman.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -122,6 +123,17 @@ object SesionManager {
         token = null
         usuario = null
         limpiarGuardado()
+    }
+
+    /**
+     * Solo para pruebas (RNF-08): simula que la app se cerró. Olvida lo que hay en memoria
+     * pero NO lo guardado en el teléfono; después se llama init() como al abrir la app.
+     */
+    @VisibleForTesting
+    internal fun simularCierreDeApp() {
+        token = null
+        usuario = null
+        prefs = null
     }
 
     private fun limpiarGuardado() {
