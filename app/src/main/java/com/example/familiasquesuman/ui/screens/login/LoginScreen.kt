@@ -402,70 +402,9 @@ fun LoginScreen(
                     verticalAlignment =
                         Alignment.CenterVertically
                 ) {
-
-                    Checkbox(
-                        checked = recordarme,
-
-                        onCheckedChange = {
-                            recordarme = it
-                        },
-
-                        colors =
-                            CheckboxDefaults.colors(
-
-                                checkedColor =
-                                    Ambar,
-
-                                uncheckedColor =
-                                    GrisTexto,
-
-                                checkmarkColor =
-                                    Blanco
-                            )
-                    )
-
-
-                    Text(
-                        text = "Recordarme",
-
-                        style =
-                            MaterialTheme
-                                .typography
-                                .bodySmall,
-
-                        color =
-                            AzulMarino
-                    )
+                    Spacer(Modifier.padding(8.dp))
                 }
 
-
-                TextButton(
-                    onClick = {
-                        /* pantalla de recuperar contraseña, luego */
-                    },
-
-                    contentPadding =
-                        PaddingValues(
-                            horizontal = 4.dp
-                        )
-                ) {
-
-                    Text(
-                        text =
-                            "¿Olvidaste tu contraseña?",
-
-                        style =
-                            MaterialTheme
-                                .typography
-                                .bodySmall,
-
-                        color =
-                            Ambar,
-
-                        fontWeight =
-                            FontWeight.SemiBold
-                    )
-                }
             }
 
 
